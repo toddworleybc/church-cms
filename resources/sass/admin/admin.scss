@@ -5,5 +5,21 @@
 @import 'vendors/dashboard';
 
 
+// Abstract
+@import 'abstract/mixins';
+@import 'abstract/variables';
+
+// Components
+
+@import 'components/btns';
+
+
+// Pages
+@import 'pages/teachings-create';
+
+// layouts
+@import 'layouts/admin-form';
+
+
 
 

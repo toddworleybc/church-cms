@@ -1,0 +1,20 @@
+.btns {
+
+
+    &__icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+
+        & .feather {
+            margin-right: .5rem;
+        }
+
+
+    }
+
+
+
+
+}

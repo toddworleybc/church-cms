@@ -1,0 +1,41 @@
+.teachings-create {
+
+
+    & .scripture-select {
+
+        display: flex;
+        justify-content: space-between;
+
+
+        & select {
+
+            width: calc((100% / 3) - 1rem);
+        }
+    }
+
+    & .scripture {
+
+        border: 1px solid $border-color;
+        padding: .5rem;
+        margin-top: 2rem;
+
+        & h2 {
+            margin: 1rem auto 1rem 0;
+        }
+    }
+
+
+    &__youtube {
+        display: flex;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        & > * {
+            margin-right: 1rem;
+        }
+    }
+
+
+
+
+
+}

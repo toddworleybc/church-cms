@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\TeachingController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,12 +13,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::view('/', 'index');
+Route::view('/', 'index')->name('index');
 
 Route::view('/welcome', 'welcome');
 
 
-Route::view('/admin', 'admin.index');
+Route::view('/admin', 'admin.index')->name('admin.index');
+
+//Admin Resources ===/
+Route::resources([
+    'teachings' => TeachingController::class
+]);
 
 Auth::routes();
 

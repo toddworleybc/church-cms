@@ -11006,3 +11006,82 @@ body {
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25);
 }
 
+.btns__icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btns__icon .feather {
+  margin-right: 0.5rem;
+}
+
+.teachings-create .scripture-select {
+  display: flex;
+  justify-content: space-between;
+}
+
+.teachings-create .scripture-select select {
+  width: calc((100% / 3) - 1rem);
+}
+
+.teachings-create .scripture {
+  border: 1px solid #ced4da;
+  padding: 0.5rem;
+  margin-top: 2rem;
+}
+
+.teachings-create .scripture h2 {
+  margin: 1rem auto 1rem 0;
+}
+
+.teachings-create__youtube {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.teachings-create__youtube > * {
+  margin-right: 1rem;
+}
+
+.admin-form__wrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.admin-form__main {
+  width: 60%;
+}
+
+.admin-form input {
+  margin-bottom: 1rem;
+}
+
+.admin-form label {
+  font-size: 1.1rem;
+}
+
+.admin-form .form-group {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #576574;
+}
+
+.admin-form__sidebar {
+  width: 30%;
+  border-left: 1px solid #ced4da;
+  padding-left: 2rem;
+}
+
+.admin-form__btns {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.admin-form__publish-btn {
+  margin-top: 1rem;
+}
+
