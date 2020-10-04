@@ -21,7 +21,7 @@ $date = $timestamp->isoFormat('MMM d, YYYY h:mm A');
     {!! Form::open(['route' => 'teachings.store']) !!}
         <div class="admin-form__wrapper">
             <div class="admin-form__main">
-                <div class="form-group">
+                <div class="form-group admin-form__title">
                     {!! Form::label('title', 'Enter Teaching Title') !!}
                     {!! Form::text('title', NULL, ['class'=>'form-control']) !!}
                 </div>
