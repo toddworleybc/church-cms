@@ -11027,7 +11027,7 @@ body {
 
 .teachings-create .scripture {
   border: 1px solid #ced4da;
-  padding: 0.5rem;
+  padding: 1.5rem;
   margin-top: 2rem;
 }
 
@@ -11035,13 +11035,13 @@ body {
   margin: 1rem auto 1rem 0;
 }
 
-.teachings-create__youtube {
+.teachings-create__media-btns {
   display: flex;
   justify-content: flex-start;
   flex-wrap: wrap;
 }
 
-.teachings-create__youtube > * {
+.teachings-create__media-btns > * {
   margin-right: 1rem;
 }
 
@@ -11064,11 +11064,8 @@ body {
 }
 
 .admin-form .form-group {
-  border-bottom: 1px solid #576574;
-}
-
-.admin-form .form-group:not(.admin-form__title) {
   padding: 1.5rem 0;
+  border-bottom: 1px solid #576574;
 }
 
 .admin-form__sidebar {

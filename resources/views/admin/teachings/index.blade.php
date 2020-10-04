@@ -21,32 +21,46 @@ $date = $timestamp->isoFormat('MMM d, YYYY h:mm A');
     {!! Form::open(['route' => 'teachings.store']) !!}
         <div class="admin-form__wrapper">
             <div class="admin-form__main">
-                <div class="form-group admin-form__title">
-                    {!! Form::label('title', 'Enter Teaching Title') !!}
-                    {!! Form::text('title', NULL, ['class'=>'form-control']) !!}
+                <div class="form-group">
+                    <label>Teaching Title</label>
+                    <div class="custom-control custom-radio">
+                        <input type="radio" id="bible" name="title" class="custom-control-input" checked>
+                        <label class="custom-control-label" for="bible">Use bible scripture specified below for title</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input type="radio" id="topical" name="title" class="custom-control-input">
+                        <label class="custom-control-label" for="topical">Enter a title for topical teaching</label>
+                    </div>
                 </div>
                 <div class="form-group">
                     {!! Form::label('author', 'Speaker') !!}
-                    {!! Form::text('author', Null, ['class' => 'form-control']) !!}
+                    <div class="custom-control custom-checkbox mb-2">
+                        <input type="checkbox" class="custom-control-input" id="enterSpeaker">
+                        <label class="custom-control-label" for="enterSpeaker">Enter speaker manually</label>
+                    </div>
                     {!! Form::select('staff', [
-                    'none' => 'No selection',
                     'james wafer' => 'Pastor James Wafer',
                     'dale richmond' => 'Pastor Dale Richmond',
                     'Kelly' => 'Reciptionist Kelly Munsion'
-                    ], 'none', ['class' => 'custom-select']) !!}
+                    ], 'james wafer', ['class' => 'custom-select']) !!}
                 </div>
                 <div class="form-group">
-                    {!! Form::label('video', 'Enter Video') !!}
-                    {!! Form::text('video', NULL, ['class' => 'form-control']) !!}
-                    <div class="teacher-create__youtube">
-                        <button class="btn btn-dark">Get From Youtube</button>
-                        <button class="btn btn-dark">Upload to Youtube</button>
+                    {!! Form::label('video', 'Add Video') !!}
+                    {!! Form::text('video', NULL, ['class' => 'form-control',
+                    'placeholder' => 'Enter video url here']) !!}
+                    <div class="teachings-create__media-btns">
+                        <button class="btn btn-light btns__icon"><span data-feather="cloud"></span>Get From Youtube</button>
+                        <button class="btn btn-light btns__icon"><span data-feather="upload"></span>Upload to Youtube</button>
                     </div>
                 </div>
                 <div class="form-group">
                     {!! Form::label('audio', 'Enter Audio') !!}
                     {!! Form::text('audio', NULL, ['class'=>'form-control']) !!}
-                    <button class="btn btn-dark">Get From SoundCloud</button>
+                    <div class="teachings-create__media-btns">
+                        <button class="btn btn-light btns__icon"><span data-feather="cloud"></span>From SoundCloud</button>
+                        <button class="btn btn-light btns__icon"><span data-feather="upload"></span>Upload to SoundCloud</button>
+                    </div>
+
                 </div>
                 <div id="bible-api" class="form-group">
 
