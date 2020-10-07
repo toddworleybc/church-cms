@@ -9,9 +9,15 @@
 @import 'abstract/mixins';
 @import 'abstract/variables';
 
+// Base
+@import 'base/animations';
+@import 'base/transitions';
+
 // Components
 
 @import 'components/btns';
+@import 'components/scripture';
+@import 'components/vue-transitions';
 
 
 // Pages

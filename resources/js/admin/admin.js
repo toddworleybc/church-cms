@@ -10,6 +10,7 @@ window.Vue = require('vue');
 
 const feather = require('feather-icons');
 
+
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -23,6 +24,8 @@ const feather = require('feather-icons');
 
 // Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 
+const TeachingsCreateComponent = Vue.component('teachings-create-component', require('./components/TeachingsCreateComponent.vue').default);
+
 // /**
 //  * Next, we will create a fresh Vue application instance and attach it to
 //  * the page. Then, you may begin adding components to this application
@@ -32,6 +35,10 @@ const feather = require('feather-icons');
 const app = new Vue({
     el: '#admin-app',
 
+
+    components: {
+        TeachingsCreateComponent
+    },
 
     mounted() {
         feather.replace();

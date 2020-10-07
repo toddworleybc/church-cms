@@ -36,7 +36,7 @@ class TeachingController extends Controller
     public function store(Request $request)
     {
         //
-        echo $request->title;
+        echo $request['publish-date'];
     }
 
     /**

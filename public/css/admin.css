@@ -11006,6 +11006,54 @@ body {
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25);
 }
 
+@-webkit-keyframes growFadeIn {
+  from {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes growFadeIn {
+  from {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@-webkit-keyframes growFadeOut {
+  from {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+}
+
+@keyframes growFadeOut {
+  from {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+}
+
 .btns__icon {
   display: flex;
   justify-content: center;
@@ -11016,23 +11064,87 @@ body {
   margin-right: 0.5rem;
 }
 
-.teachings-create .scripture-select {
+.scripture__select {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  -webkit-animation: growFadeIn 0.2s ease-in;
+          animation: growFadeIn 0.2s ease-in;
+  margin-bottom: 1rem;
 }
 
-.teachings-create .scripture-select select {
-  width: calc((100% / 3) - 1rem);
+.scripture__select select {
+  width: calc((100% / 5) - 1rem);
 }
 
-.teachings-create .scripture {
+.scripture__text {
   border: 1px solid #ced4da;
   padding: 1.5rem;
   margin-top: 2rem;
 }
 
-.teachings-create .scripture h2 {
+.scripture__text h2 {
   margin: 1rem auto 1rem 0;
+}
+
+.scripture__remove-verse {
+  display: inline-block;
+}
+
+.scripture__remove-verse .feather {
+  color: #343a40;
+  transition: all 0.2s;
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.scripture__remove-verse .feather:hover {
+  color: #007bff;
+  cursor: pointer;
+}
+
+.scripture__remove-verse .feather:active {
+  color: #17a2b8;
+  transform: scale(0.9);
+}
+
+.scripture__add-verse {
+  display: inline-block;
+  margin-right: auto;
+}
+
+.scripture__add-verse .feather {
+  color: #343a40;
+  transition: all 0.2s;
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.scripture__add-verse .feather:hover {
+  color: #007bff;
+  cursor: pointer;
+}
+
+.scripture__add-verse .feather:active {
+  color: #17a2b8;
+  transform: scale(0.9);
+}
+
+.scripture__fade-out {
+  -webkit-animation: growFadeOut 0.2s ease-in;
+          animation: growFadeOut 0.2s ease-in;
+  -webkit-animation-fill-mode: forwards;
+          animation-fill-mode: forwards;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 
 .teachings-create__media-btns {
@@ -11043,6 +11155,15 @@ body {
 
 .teachings-create__media-btns > * {
   margin-right: 1rem;
+}
+
+.teachings-create__speaker-container {
+  position: relative;
+}
+
+.teachings-create__speaker-hidden {
+  display: none;
+  opacity: 0;
 }
 
 .admin-form__wrapper {
@@ -11075,6 +11196,7 @@ body {
 }
 
 .admin-form__btns {
+  padding-top: 0 !important;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -11083,5 +11205,9 @@ body {
 
 .admin-form__publish-btn {
   margin-top: 1rem;
+}
+
+.admin-form__time {
+  font-size: 1.1rem;
 }
 

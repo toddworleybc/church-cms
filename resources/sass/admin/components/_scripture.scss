@@ -1,0 +1,46 @@
+.scripture {
+
+    &__select {
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        animation: growFadeIn .2s ease-in;
+        margin-bottom: 1rem;
+
+        & select {
+            width: calc((100% / 5) - 1rem);
+        }
+    }
+
+    &__text {
+
+        border: 1px solid $border-color;
+        padding: 1.5rem;
+        margin-top: 2rem;
+
+        & h2 {
+            margin: 1rem auto 1rem 0;
+        }
+    }
+
+
+    &__remove-verse {
+        display: inline-block;
+        @include scriptureIcons();
+    }
+
+
+    &__add-verse {
+        display: inline-block;
+        margin-right: auto;
+        @include scriptureIcons();
+    }
+
+
+    &__fade-out {
+        animation: growFadeOut .2s ease-in;
+        animation-fill-mode: forwards;
+    }
+
+}

@@ -32,11 +32,16 @@
     }
 
     &__btns {
+      padding-top: 0 !important;
       @include flex-between();
     }
 
     &__publish-btn {
         margin-top: 1rem;
+    }
+
+    &__time {
+        font-size: $font-size-lg;
     }
 
 

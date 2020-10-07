@@ -13,7 +13,7 @@
         "axios": "^0.19",
         "bootstrap": "^4.0.0",
         "browser-sync": "^2.26.12",
-        "browser-sync-webpack-plugin": "^2.0.1",
+        "browser-sync-webpack-plugin": "^2.2.2",
         "cross-env": "^7.0",
         "feather-icons": "^4.28.0",
         "gsap": "^3.5.1",
