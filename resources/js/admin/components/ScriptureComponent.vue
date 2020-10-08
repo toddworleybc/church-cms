@@ -147,8 +147,6 @@ export default {
                     $(e.target).parent().parent().remove();
                 }, 700);
         }
-
-
     }
 
 }

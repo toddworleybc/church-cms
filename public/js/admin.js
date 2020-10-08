@@ -2182,6 +2182,7 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
   mounted: function mounted() {
     this.dateDefaultVal();
     this.todaysDate();
+    console.log(this.feather);
   }
 });
 

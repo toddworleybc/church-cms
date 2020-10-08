@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TeachingController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -17,14 +18,22 @@ Route::view('/', 'index')->name('index');
 
 Route::view('/welcome', 'welcome');
 
-
 Route::view('/admin', 'admin.index')->name('admin.index');
+
+
+
 
 //Admin Resources ===/
 Route::resources([
     'teachings' => TeachingController::class
 ]);
 
+Route::view('/bible', 'bible.bibleapi');
+
+
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+
+

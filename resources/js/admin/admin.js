@@ -8,6 +8,7 @@ require('../bootstrap');
 
 window.Vue = require('vue');
 
+
 const feather = require('feather-icons');
 
 
@@ -34,7 +35,6 @@ const TeachingsCreateComponent = Vue.component('teachings-create-component', req
 
 const app = new Vue({
     el: '#admin-app',
-
 
     components: {
         TeachingsCreateComponent
