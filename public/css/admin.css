@@ -11064,6 +11064,10 @@ body {
   margin-right: 0.5rem;
 }
 
+.scripture {
+  position: relative;
+}
+
 .scripture__select {
   display: flex;
   justify-content: space-between;

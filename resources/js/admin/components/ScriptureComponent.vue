@@ -1,7 +1,15 @@
 <template>
 <div id="bible-api" class="form-group scripture">
+    <div class="scripture__label-heading">
+        <label for="book">Add Bible Scriptures:</label>
+        <div v-if="loader" class="scripture__loader d-inline-flex mb-0">
+            <p class="text-secondary mb-0">Loading...</p>
+            <div class="spinner-border spinner-border-sm text-secondary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
 
-    <label for="book">Enter Teaching Scripture</label>
     <div class="scripture__input-container"></div>
 
         <div @click="rotateSvg()" id="add-scripture-btn" class="scripture__add-verse">
@@ -32,13 +40,117 @@ export default {
         return {
             deg: 0,
             verseId: 0,
-            delay: false
+            delay: false,
+            baseUrl: location.origin + '/bible/',
+            optionsUrl: location.origin + '/bible/options/',
+            disableAddBtn: false,
+            createdSelectInputs: "",
+            loader: false
         }
-    },
+    }, //#-data
 
 
     methods: {
+
+    // EVENTS =============
+    // =====================
+
+        addSelectDivEvents(verseId) {
+
+        // Add click event to minus-square svg when DOM is created
+            $(`#remove-verse-${verseId}`).on('click', e => {
+                this.rotateSvg(true,e);});
+
+
+        // Add selectInput events
+            $(this.createdSelectInputs).on('change', e => {
+                this.setSelectInput(e); });
+
+        }, //#-addSelectDivEvents
+
+
+
+
+
+    // FUNCTIONS ===========
+    // ======================
+
+
+         addVerse() {
+
+        // Set unique #id for each minus button NOTE: will probably be added to the scripture__select div as well later
+            this.verseId += 1;
+
+        // scripture__select html verse-id-
+            const html = `<div data-id="${this.verseId}" id="verse-id-${this.verseId}" class="scripture__select">
+
+            <select class="custom-select" data-change="chapter-${this.verseId}" id="book-${this.verseId}" name="book" required>
+                <option value="none" selected hidden>Book</option>
+            </select>
+
+            <select class="custom-select" data-change="start-verse-${this.verseId}" id="chapter-${this.verseId}" name="chapter" required>
+                <option value="none" selected hidden>Chapter</option>
+            </select>
+
+            <select class="custom-select" data-change="end-verse-${this.verseId}" id="start-verse-${this.verseId}" name="start_verse">
+                <option value="none" selected hidden>Verse</option>
+            </select>
+
+            <span>-To-</span>
+            <select class="custom-select" id="end-verse-${this.verseId}" name="end_verse">
+                <option value="none" selected hidden>Verse</option>
+            </select>
+            <div id="remove-verse-${this.verseId}" class="scripture__remove-verse">
+                <span data-feather="minus-square"></span>
+            </div>
+        </div>`;
+
+
+        // Add html select to the DOM
+            $(".scripture__input-container").append(html);
+            feather.replace();
+
+            this.createdSelectInputs = $(`#verse-id-${this.verseId} .custom-select`);
+
+        // add events for scripture select after created
+            this.addSelectDivEvents(this.verseId);
+
+
+        //set books for select
+            this.setBooksSelect(this.verseId);
+
+
+        // disable every select
+            this.disableAllSelects();
+
+
+        }, // #-add verse
+
+
+
+        removeVerse(e) {
+
+            // Fix bug where if the Rect or Line was clicked on svg it will make sure that it relates to the svg itself
+                if(e.target.localName === "line" || e.target.localName === "rect") e.target = e.target.parentNode;
+
+            // Add fade effect to remove scripture select
+                $(e.target).parent().parent().addClass('scripture__fade-out').animate({
+                    height: "0px",
+                    padding: "0px",
+                    margin: "0px"
+                }, 600);
+
+            // make sure animation is over before removing select
+                setTimeout(() => {
+                    $(e.target).parent().parent().remove();
+                }, 700);
+        },
+
+
+
         rotateSvg(reverse = false, e) {
+        // disable btn if AJAX request fails
+        if(this.disableAddBtn) return;
 
         // Set delay on svg minus and plus buttons to prevent button mashing
         if(this.delay) return;
@@ -63,91 +175,142 @@ export default {
                 this.removeVerse(e);
 
 
-
-
-        // set delay
+        // set delay for btn clicking
                 setTimeout(() => {
                     this.delay = false;
                 }, 1000);
-
-
         },
 
-        addVerse() {
-
-        // Set unique #id for each minus button NOTE: will probably be added to the scripture__select div as well later
-            this.verseId += 1;
-            const removeVerseId = `remove-verse-${this.verseId}`;
-
-        // scripture__select html
-            const html = `<div class="scripture__select">
-
-            <select class="custom-select" id="book" name="book">
-                <option value="none" selected="selected">Book</option>
-                <option value="mathew">Mathew</option>
-                <option value="mark">Mark</option>
-                <option value="luke">Luke</option>
-            </select>
-
-            <select class="custom-select" name="chapter">
-                <option value="none" selected="selected">Chapter</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-            </select>
-
-            <select class="custom-select" name="verse">
-                <option value="none" selected="selected">Verse</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-            </select>
-
-            <span>-To-</span>
-            <select class="custom-select" name="verse">
-                <option value="none" selected="selected">Verse</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-            </select>
-            <div id="${removeVerseId}" class="scripture__remove-verse">
-                <span data-feather="minus-square"></span>
-            </div>
-        </div>`;
 
 
-        // Add html select to the DOM
-            $(".scripture__input-container").append(html);
-            feather.replace();
+        setSelectInput(e) {
 
-        // Add click event to minus-square svg when DOM is created
-            $(`#${removeVerseId}`).on('click', e => {
-                this.rotateSvg(true,e);
-            });
+            // Get the row that the select input was changed and set the select id that needs to have the html inserted
+            const rowSelected = $(e.target).parent(),
+                  selectChangeId = $(e.target).attr('data-change'),
 
-        }, // add verse
+                //Gets select to add options html too
+                    selectToAddOptionsTo = $(rowSelected).children(`#${selectChangeId}`);
 
 
-        removeVerse(e) {
+                // disable select divs after e.target is choosen. This will fix query builder url as well. Create options div with none, selected, etc....
 
-            // Fix bug where if the Rect or Line was clicked on svg it will make sure that it relates to the svg itself
-                if(e.target.localName === "line" || e.target.localName === "rect") e.target = e.target.parentNode;
+                    const selectsToDisable = $(e.target).nextAll('.custom-select');
 
-            // Add fade effect to remove scripture select
-                $(e.target).parent().parent().addClass('scripture__fade-out').animate({
-                    height: "0px",
-                    padding: "0px",
-                    margin: "0px"
-                }, 600);
-            // make sure animation is over before removing select
-                setTimeout(() => {
-                    $(e.target).parent().parent().remove();
-                }, 700);
+                    $(selectsToDisable).each( (i,select) => {
+                        let getName = select.name.match(/[a-z]+$/)[0],
+                            selectName = getName.charAt(0).toUpperCase() + getName.slice(1);
+                        $(select).html(`<option value="none">${selectName}</option>`);
+                        this.disableSelect(select);
+                    } );
+
+                // =======================================
+
+                const slug = this.optionsSlugBuilder(rowSelected);
+
+                // Insert optionsHtml into select
+                this.getBibleHtmlOptions( slug, optionsHtml => {
+                    $(selectToAddOptionsTo).html(optionsHtml);
+                    this.enableSelect(selectToAddOptionsTo);
+                } );
+        },
+
+
+
+
+
+    // HELPER METHODS ==========/
+    // ==========================/
+
+
+        // Disable select option
+        disableSelect(selectedInput) {
+            $(selectedInput).prop('disabled', true);
+        },
+
+
+        // disable all selects aka RESET Selects
+        disableAllSelects() {
+            $(this.createdSelectInputs).each( ( i, selectInput ) => {
+                this.disableSelect(selectInput);
+            } );
+        },
+
+    // enable select option
+        enableSelect(selectedInput) {
+            $(selectedInput).prop('disabled', false);
+        },
+
+
+        // @return html options for query
+        getBibleHtmlOptions(slug, callback) {
+            let url = `${this.optionsUrl}${slug}`;
+            // callback data for function
+            this.getData( url, data => { callback(data);} );
+        },
+
+
+
+        getData(url = this.baseUrl, callback) {
+            this.loader = true;
+            axios.get( url )
+                .then( res => {
+                  const data = res.data;
+                  callback(data);
+                } )
+                .catch( (error) => {
+                // error html
+                    const html = `<div class="alert alert-danger">${error}<div>`,
+                          scriptureContainer = $('.scripture__input-container');
+                // Add error html
+                    $(scriptureContainer).html(html);
+                    this.disableAddBtn = true;
+                } )
+                .then( () => {
+                    this.loader=false;
+                } );
+        },
+
+
+
+
+        // Set the books select when created
+        setBooksSelect(verseId) {
+            this.getBibleHtmlOptions("", bookOptions => {
+                const bookSelect = `#book-${verseId}`;
+                $(bookSelect).append(bookOptions);
+                this.enableSelect(bookSelect);
+            } );
+        },
+
+
+        optionsSlugBuilder(rowSelected) {
+
+            const allRowSelects = $(rowSelected).children('.custom-select');
+            let slug = "";
+
+            // create slug from select values
+            $(allRowSelects).each( (i, select) => {
+                  if($(select).val() !== 'none') {
+                      slug += `${$(select).val()}/`;
+                  }
+            } );
+
+            return slug;
         }
-    }
+
+
+
+
+    }, // #-methods
+
+
+
+
+
+    mounted() {
+    } // #-mounted
+
 
 }
 </script>

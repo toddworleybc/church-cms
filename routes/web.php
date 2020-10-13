@@ -25,10 +25,21 @@ Route::view('/admin', 'admin.index')->name('admin.index');
 
 //Admin Resources ===/
 Route::resources([
-    'teachings' => TeachingController::class
+    'admin/teachings' => TeachingController::class
 ]);
 
-Route::view('/bible', 'bible.bibleapi');
+Route::get( '/bible/options/{book?}/{chapter?}/{startVs?}/{endVs?}', function($book = "", $chapter = "", $startVs = "", $endVs = "") {
+    return view('bible.bibleapi', [
+        'book'    => $book,
+        'chapter' => $chapter,
+        'startVs' => $startVs,
+        'endVs'   => $endVs
+    ]);
+});
+
+// Route::get('/bible/{query}', function($query) {
+//     return view('bible.bibleapi', ['query' => $query]);
+// } );
 
 
 Auth::routes();

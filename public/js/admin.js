@@ -1932,6 +1932,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-icons/dist/feather.js");
@@ -1941,51 +1949,50 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
     return {
       deg: 0,
       verseId: 0,
-      delay: false
+      delay: false,
+      baseUrl: location.origin + '/bible/',
+      optionsUrl: location.origin + '/bible/options/',
+      disableAddBtn: false,
+      createdSelectInputs: "",
+      loader: false
     };
   },
+  //#-data
   methods: {
-    rotateSvg: function rotateSvg() {
+    // EVENTS =============
+    // =====================
+    addSelectDivEvents: function addSelectDivEvents(verseId) {
       var _this = this;
 
-      var reverse = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-      var e = arguments.length > 1 ? arguments[1] : undefined;
-      // Set delay on svg minus and plus buttons to prevent button mashing
-      if (this.delay) return;
-      this.delay = true; // Degree of rotation
+      // Add click event to minus-square svg when DOM is created
+      $("#remove-verse-".concat(verseId)).on('click', function (e) {
+        _this.rotateSvg(true, e);
+      }); // Add selectInput events
 
-      !reverse ? this.deg += 90 : this.deg -= 90; // Animation
-
-      var anima = gsap__WEBPACK_IMPORTED_MODULE_0__["gsap"].to('#add-scripture-btn', {
-        rotate: this.deg + "deg",
-        duration: 1
-      }); // Add or remove verse
-
-      !reverse ? // Add the scripture__select verse
-      this.addVerse() : // Remove scripture verse
-      this.removeVerse(e); // set delay
-
-      setTimeout(function () {
-        _this.delay = false;
-      }, 1000);
-    },
-    addVerse: function addVerse() {
-      var _this2 = this;
-
-      // Set unique #id for each minus button NOTE: will probably be added to the scripture__select div as well later
-      this.verseId += 1;
-      var removeVerseId = "remove-verse-".concat(this.verseId); // scripture__select html
-
-      var html = "<div class=\"scripture__select\">\n\n            <select class=\"custom-select\" id=\"book\" name=\"book\">\n                <option value=\"none\" selected=\"selected\">Book</option>\n                <option value=\"mathew\">Mathew</option>\n                <option value=\"mark\">Mark</option>\n                <option value=\"luke\">Luke</option>\n            </select>\n\n            <select class=\"custom-select\" name=\"chapter\">\n                <option value=\"none\" selected=\"selected\">Chapter</option>\n                <option value=\"1\">1</option>\n                <option value=\"2\">2</option>\n                <option value=\"3\">3</option>\n                <option value=\"4\">4</option>\n            </select>\n\n            <select class=\"custom-select\" name=\"verse\">\n                <option value=\"none\" selected=\"selected\">Verse</option>\n                <option value=\"1\">1</option>\n                <option value=\"2\">2</option>\n                <option value=\"3\">3</option>\n                <option value=\"4\">4</option>\n            </select>\n\n            <span>-To-</span>\n            <select class=\"custom-select\" name=\"verse\">\n                <option value=\"none\" selected=\"selected\">Verse</option>\n                <option value=\"1\">1</option>\n                <option value=\"2\">2</option>\n                <option value=\"3\">3</option>\n                <option value=\"4\">4</option>\n            </select>\n            <div id=\"".concat(removeVerseId, "\" class=\"scripture__remove-verse\">\n                <span data-feather=\"minus-square\"></span>\n            </div>\n        </div>"); // Add html select to the DOM
-
-      $(".scripture__input-container").append(html);
-      feather.replace(); // Add click event to minus-square svg when DOM is created
-
-      $("#".concat(removeVerseId)).on('click', function (e) {
-        _this2.rotateSvg(true, e);
+      $(this.createdSelectInputs).on('change', function (e) {
+        _this.setSelectInput(e);
       });
     },
-    // add verse
+    //#-addSelectDivEvents
+    // FUNCTIONS ===========
+    // ======================
+    addVerse: function addVerse() {
+      // Set unique #id for each minus button NOTE: will probably be added to the scripture__select div as well later
+      this.verseId += 1; // scripture__select html verse-id-
+
+      var html = "<div data-id=\"".concat(this.verseId, "\" id=\"verse-id-").concat(this.verseId, "\" class=\"scripture__select\">\n\n            <select class=\"custom-select\" data-change=\"chapter-").concat(this.verseId, "\" id=\"book-").concat(this.verseId, "\" name=\"book\" required>\n                <option value=\"none\" selected hidden>Book</option>\n            </select>\n\n            <select class=\"custom-select\" data-change=\"start-verse-").concat(this.verseId, "\" id=\"chapter-").concat(this.verseId, "\" name=\"chapter\" required>\n                <option value=\"none\" selected hidden>Chapter</option>\n            </select>\n\n            <select class=\"custom-select\" data-change=\"end-verse-").concat(this.verseId, "\" id=\"start-verse-").concat(this.verseId, "\" name=\"start_verse\">\n                <option value=\"none\" selected hidden>Verse</option>\n            </select>\n\n            <span>-To-</span>\n            <select class=\"custom-select\" id=\"end-verse-").concat(this.verseId, "\" name=\"end_verse\">\n                <option value=\"none\" selected hidden>Verse</option>\n            </select>\n            <div id=\"remove-verse-").concat(this.verseId, "\" class=\"scripture__remove-verse\">\n                <span data-feather=\"minus-square\"></span>\n            </div>\n        </div>"); // Add html select to the DOM
+
+      $(".scripture__input-container").append(html);
+      feather.replace();
+      this.createdSelectInputs = $("#verse-id-".concat(this.verseId, " .custom-select")); // add events for scripture select after created
+
+      this.addSelectDivEvents(this.verseId); //set books for select
+
+      this.setBooksSelect(this.verseId); // disable every select
+
+      this.disableAllSelects();
+    },
+    // #-add verse
     removeVerse: function removeVerse(e) {
       // Fix bug where if the Rect or Line was clicked on svg it will make sure that it relates to the svg itself
       if (e.target.localName === "line" || e.target.localName === "rect") e.target = e.target.parentNode; // Add fade effect to remove scripture select
@@ -1999,8 +2006,131 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       setTimeout(function () {
         $(e.target).parent().parent().remove();
       }, 700);
+    },
+    rotateSvg: function rotateSvg() {
+      var _this2 = this;
+
+      var reverse = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      var e = arguments.length > 1 ? arguments[1] : undefined;
+      // disable btn if AJAX request fails
+      if (this.disableAddBtn) return; // Set delay on svg minus and plus buttons to prevent button mashing
+
+      if (this.delay) return;
+      this.delay = true; // Degree of rotation
+
+      !reverse ? this.deg += 90 : this.deg -= 90; // Animation
+
+      var anima = gsap__WEBPACK_IMPORTED_MODULE_0__["gsap"].to('#add-scripture-btn', {
+        rotate: this.deg + "deg",
+        duration: 1
+      }); // Add or remove verse
+
+      !reverse ? // Add the scripture__select verse
+      this.addVerse() : // Remove scripture verse
+      this.removeVerse(e); // set delay for btn clicking
+
+      setTimeout(function () {
+        _this2.delay = false;
+      }, 1000);
+    },
+    setSelectInput: function setSelectInput(e) {
+      var _this3 = this;
+
+      // Get the row that the select input was changed and set the select id that needs to have the html inserted
+      var rowSelected = $(e.target).parent(),
+          selectChangeId = $(e.target).attr('data-change'),
+          //Gets select to add options html too
+      selectToAddOptionsTo = $(rowSelected).children("#".concat(selectChangeId)); // disable select divs after e.target is choosen. This will fix query builder url as well. Create options div with none, selected, etc....
+
+      var selectsToDisable = $(e.target).nextAll('.custom-select');
+      $(selectsToDisable).each(function (i, select) {
+        var getName = select.name.match(/[a-z]+$/)[0],
+            selectName = getName.charAt(0).toUpperCase() + getName.slice(1);
+        $(select).html("<option value=\"none\">".concat(selectName, "</option>"));
+
+        _this3.disableSelect(select);
+      }); // =======================================
+
+      var slug = this.optionsSlugBuilder(rowSelected); // Insert optionsHtml into select
+
+      this.getBibleHtmlOptions(slug, function (optionsHtml) {
+        $(selectToAddOptionsTo).html(optionsHtml);
+
+        _this3.enableSelect(selectToAddOptionsTo);
+      });
+    },
+    // HELPER METHODS ==========/
+    // ==========================/
+    // Disable select option
+    disableSelect: function disableSelect(selectedInput) {
+      $(selectedInput).prop('disabled', true);
+    },
+    // disable all selects aka RESET Selects
+    disableAllSelects: function disableAllSelects() {
+      var _this4 = this;
+
+      $(this.createdSelectInputs).each(function (i, selectInput) {
+        _this4.disableSelect(selectInput);
+      });
+    },
+    // enable select option
+    enableSelect: function enableSelect(selectedInput) {
+      $(selectedInput).prop('disabled', false);
+    },
+    // @return html options for query
+    getBibleHtmlOptions: function getBibleHtmlOptions(slug, callback) {
+      var url = "".concat(this.optionsUrl).concat(slug); // callback data for function
+
+      this.getData(url, function (data) {
+        callback(data);
+      });
+    },
+    getData: function getData() {
+      var _this5 = this;
+
+      var url = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.baseUrl;
+      var callback = arguments.length > 1 ? arguments[1] : undefined;
+      this.loader = true;
+      axios.get(url).then(function (res) {
+        var data = res.data;
+        callback(data);
+      })["catch"](function (error) {
+        // error html
+        var html = "<div class=\"alert alert-danger\">".concat(error, "<div>"),
+            scriptureContainer = $('.scripture__input-container'); // Add error html
+
+        $(scriptureContainer).html(html);
+        _this5.disableAddBtn = true;
+      }).then(function () {
+        _this5.loader = false;
+      });
+    },
+    // Set the books select when created
+    setBooksSelect: function setBooksSelect(verseId) {
+      var _this6 = this;
+
+      this.getBibleHtmlOptions("", function (bookOptions) {
+        var bookSelect = "#book-".concat(verseId);
+        $(bookSelect).append(bookOptions);
+
+        _this6.enableSelect(bookSelect);
+      });
+    },
+    optionsSlugBuilder: function optionsSlugBuilder(rowSelected) {
+      var allRowSelects = $(rowSelected).children('.custom-select');
+      var slug = ""; // create slug from select values
+
+      $(allRowSelects).each(function (i, select) {
+        if ($(select).val() !== 'none') {
+          slug += "".concat($(select).val(), "/");
+        }
+      });
+      return slug;
     }
-  }
+  },
+  // #-methods
+  mounted: function mounted() {} // #-mounted
+
 });
 
 /***/ }),
@@ -2182,7 +2312,6 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
   mounted: function mounted() {
     this.dateDefaultVal();
     this.todaysDate();
-    console.log(this.feather);
   }
 });
 
@@ -45528,8 +45657,20 @@ var render = function() {
     "div",
     { staticClass: "form-group scripture", attrs: { id: "bible-api" } },
     [
-      _c("label", { attrs: { for: "book" } }, [
-        _vm._v("Enter Teaching Scripture")
+      _c("div", { staticClass: "scripture__label-heading" }, [
+        _c("label", { attrs: { for: "book" } }, [
+          _vm._v("Add Bible Scriptures:")
+        ]),
+        _vm._v(" "),
+        _vm.loader
+          ? _c("div", { staticClass: "scripture__loader d-inline-flex mb-0" }, [
+              _c("p", { staticClass: "text-secondary mb-0" }, [
+                _vm._v("Loading...")
+              ]),
+              _vm._v(" "),
+              _vm._m(0)
+            ])
+          : _vm._e()
       ]),
       _vm._v(" "),
       _c("div", { staticClass: "scripture__input-container" }),
@@ -45548,11 +45689,24 @@ var render = function() {
         [_c("span", { attrs: { "data-feather": "plus-square" } })]
       ),
       _vm._v(" "),
-      _vm._m(0)
+      _vm._m(1)
     ]
   )
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      {
+        staticClass: "spinner-border spinner-border-sm text-secondary",
+        attrs: { role: "status" }
+      },
+      [_c("span", { staticClass: "sr-only" }, [_vm._v("Loading...")])]
+    )
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement

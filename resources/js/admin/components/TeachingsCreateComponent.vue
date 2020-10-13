@@ -179,7 +179,6 @@ export default {
     mounted() {
         this.dateDefaultVal();
         this.todaysDate();
-        console.log(this.feather);
     }
 
 }
