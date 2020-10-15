@@ -19,7 +19,6 @@
 
         border: 1px solid $border-color;
         padding: 1.5rem;
-        margin-top: 2rem;
 
         & h2 {
             margin: 1rem auto 1rem 0;
@@ -43,6 +42,10 @@
     &__fade-out {
         animation: growFadeOut .2s ease-in;
         animation-fill-mode: forwards;
+    }
+
+    &__btn-gen {
+        margin: 1rem 0;
     }
 
 }

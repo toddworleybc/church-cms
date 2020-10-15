@@ -17,3 +17,14 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+
+// Options Html API ===========================
+Route::get('/bible/options/{book?}/{chapter?}/{startVs?}/{endVs?}', function ($book = "", $chapter = "", $startVs = "", $endVs = "") {
+    return view('bible.bibleapi', [
+        'book'    => $book,
+        'chapter' => $chapter,
+        'startVs' => $startVs,
+        'endVs'   => $endVs
+    ]);
+});

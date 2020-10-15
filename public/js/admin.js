@@ -1940,6 +1940,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 
 
 var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-icons/dist/feather.js");
@@ -1950,11 +1954,12 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       deg: 0,
       verseId: 0,
       delay: false,
-      baseUrl: location.origin + '/bible/',
-      optionsUrl: location.origin + '/bible/options/',
+      baseUrl: location.origin + '/api/bible/',
+      optionsUrl: location.origin + '/api/bible/options/',
       disableAddBtn: false,
       createdSelectInputs: "",
-      loader: false
+      loader: false,
+      jsonLoad: []
     };
   },
   //#-data
@@ -1973,14 +1978,70 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
         _this.setSelectInput(e);
       });
     },
-    //#-addSelectDivEvents
-    // FUNCTIONS ===========
-    // ======================
+    // ###--- EVENTS ------/
+    // GENERATE SCRIPTURE =============
+    // ==================================
+    // Get all select input values and organize them in an object
+    generateScripture: function generateScripture(e) {
+      var _this2 = this;
+
+      var removeData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      e.preventDefault();
+      var inputRows = $(".scripture__select"); // remove data from this.jsonLoad
+
+      if (removeData) {
+        var removeId = $(e.target).attr('data-remove-id'),
+            itemIndex = this.jsonLoad.findIndex(function (row) {
+          return row.id === removeId;
+        });
+        if (itemIndex !== -1) this.jsonLoad.splice(itemIndex, 1);
+        return;
+      } // add data to this.jsonLoad
+
+
+      if (inputRows.length) {
+        $(inputRows).each(function (i, row) {
+          var book = $(row).children('[name="book"]').val(),
+              chapter = $(row).children('[name="chapter"]').val(),
+              startVs = $(row).children('[name="start_verse"]').val(),
+              endVs = $(row).children('[name="end_verse"]').val(),
+              rowId = $(row).attr('data-id'),
+              data = {};
+
+          if (book && chapter) {
+            data = {
+              id: rowId,
+              book: book,
+              chapter: chapter,
+              startVs: startVs !== 'none' ? startVs : null,
+              endVs: endVs !== 'none' ? startVs : null
+            };
+          } // Prevent duplicats from entering jsonLoad
+
+
+          var duplicateExists = _this2.checkForDupsJson(data);
+
+          if (duplicateExists) {
+            $("#verse-id-".concat(rowId)).remove();
+            return;
+          }
+
+          ; // create payload
+
+          _this2.jsonLoad.push(data);
+        }); //#- end row loop
+      } //#- end if/
+      //  console.log(this.jsonLoad);
+
+    },
+    // ###--- GENERATE SCRIPTURE ---/
+    // SELECT INPUT CONFIG ===========
+    // ==============================
     addVerse: function addVerse() {
       // Set unique #id for each minus button NOTE: will probably be added to the scripture__select div as well later
       this.verseId += 1; // scripture__select html verse-id-
 
-      var html = "<div data-id=\"".concat(this.verseId, "\" id=\"verse-id-").concat(this.verseId, "\" class=\"scripture__select\">\n\n            <select class=\"custom-select\" data-change=\"chapter-").concat(this.verseId, "\" id=\"book-").concat(this.verseId, "\" name=\"book\" required>\n                <option value=\"none\" selected hidden>Book</option>\n            </select>\n\n            <select class=\"custom-select\" data-change=\"start-verse-").concat(this.verseId, "\" id=\"chapter-").concat(this.verseId, "\" name=\"chapter\" required>\n                <option value=\"none\" selected hidden>Chapter</option>\n            </select>\n\n            <select class=\"custom-select\" data-change=\"end-verse-").concat(this.verseId, "\" id=\"start-verse-").concat(this.verseId, "\" name=\"start_verse\">\n                <option value=\"none\" selected hidden>Verse</option>\n            </select>\n\n            <span>-To-</span>\n            <select class=\"custom-select\" id=\"end-verse-").concat(this.verseId, "\" name=\"end_verse\">\n                <option value=\"none\" selected hidden>Verse</option>\n            </select>\n            <div id=\"remove-verse-").concat(this.verseId, "\" class=\"scripture__remove-verse\">\n                <span data-feather=\"minus-square\"></span>\n            </div>\n        </div>"); // Add html select to the DOM
+      var html = "<div data-id=\"".concat(this.verseId, "\" id=\"verse-id-").concat(this.verseId, "\" class=\"scripture__select\">\n\n            <select class=\"custom-select\" data-change=\"chapter-").concat(this.verseId, "\" id=\"book-").concat(this.verseId, "\" name=\"book\" required>\n                <option value=\"none\" selected hidden>Book</option>\n            </select>\n\n            <select class=\"custom-select\" data-change=\"start-verse-").concat(this.verseId, "\" id=\"chapter-").concat(this.verseId, "\" name=\"chapter\" required>\n                <option value=\"none\" selected hidden>Chapter</option>\n            </select>\n\n            <select class=\"custom-select\" data-change=\"end-verse-").concat(this.verseId, "\" id=\"start-verse-").concat(this.verseId, "\" name=\"start_verse\">\n                <option value=\"none\" selected hidden>Verse</option>\n            </select>\n\n            <span>-To-</span>\n            <select class=\"custom-select\" id=\"end-verse-").concat(this.verseId, "\" name=\"end_verse\">\n                <option value=\"none\" selected hidden>Verse</option>\n            </select>\n            <div id=\"remove-verse-").concat(this.verseId, "\" class=\"scripture__remove-verse\">\n                <span data-feather=\"minus-square\" data-remove-id=\"").concat(this.verseId, "\"></span>\n            </div>\n        </div>"); // Add html select to the DOM
 
       $(".scripture__input-container").append(html);
       feather.replace();
@@ -1995,7 +2056,9 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
     // #-add verse
     removeVerse: function removeVerse(e) {
       // Fix bug where if the Rect or Line was clicked on svg it will make sure that it relates to the svg itself
-      if (e.target.localName === "line" || e.target.localName === "rect") e.target = e.target.parentNode; // Add fade effect to remove scripture select
+      if (e.target.localName === "line" || e.target.localName === "rect") e.target = e.target.parentNode; // remove scripture from json data
+
+      this.generateScripture(e, true); // Add fade effect to remove scripture select
 
       $(e.target).parent().parent().addClass('scripture__fade-out').animate({
         height: "0px",
@@ -2008,7 +2071,7 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       }, 700);
     },
     rotateSvg: function rotateSvg() {
-      var _this2 = this;
+      var _this3 = this;
 
       var reverse = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
       var e = arguments.length > 1 ? arguments[1] : undefined;
@@ -2030,13 +2093,15 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       this.removeVerse(e); // set delay for btn clicking
 
       setTimeout(function () {
-        _this2.delay = false;
+        _this3.delay = false;
       }, 1000);
     },
     setSelectInput: function setSelectInput(e) {
-      var _this3 = this;
+      var _this4 = this;
 
-      // Get the row that the select input was changed and set the select id that needs to have the html inserted
+      // Stop extra request on end_verse onChange
+      if (e.target.name === 'end_verse') return; // Get the row that the select input was changed and set the select id that needs to have the html inserted
+
       var rowSelected = $(e.target).parent(),
           selectChangeId = $(e.target).attr('data-change'),
           //Gets select to add options html too
@@ -2045,32 +2110,50 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       var selectsToDisable = $(e.target).nextAll('.custom-select');
       $(selectsToDisable).each(function (i, select) {
         var getName = select.name.match(/[a-z]+$/)[0],
-            selectName = getName.charAt(0).toUpperCase() + getName.slice(1);
+            selectName = getName.charAt(0).toUpperCase() + getName.slice(1); // Add "s" to the name Chapter
+
+        if (selectName === 'Chapter') selectName += "s";
         $(select).html("<option value=\"none\">".concat(selectName, "</option>"));
 
-        _this3.disableSelect(select);
+        _this4.disableSelect(select);
       }); // =======================================
+      // build url slug
 
       var slug = this.optionsSlugBuilder(rowSelected); // Insert optionsHtml into select
 
       this.getBibleHtmlOptions(slug, function (optionsHtml) {
         $(selectToAddOptionsTo).html(optionsHtml);
 
-        _this3.enableSelect(selectToAddOptionsTo);
+        _this4.enableSelect(selectToAddOptionsTo);
       });
     },
+    // ####--- END SELECT INPUT CONFIG ------------/
     // HELPER METHODS ==========/
     // ==========================/
+    checkForDupsJson: function checkForDupsJson(data) {
+      var dup = false;
+      this.jsonLoad.forEach(function (row) {
+        var storeId1 = row.id,
+            storeId2 = data.id; // remove unquie ids
+
+        row.id = null;
+        data.id = null;
+        if (JSON.stringify(row) === JSON.stringify(data)) dup = true;
+        row.id = storeId1;
+        data.id = storeId2;
+      });
+      return dup;
+    },
     // Disable select option
     disableSelect: function disableSelect(selectedInput) {
       $(selectedInput).prop('disabled', true);
     },
     // disable all selects aka RESET Selects
     disableAllSelects: function disableAllSelects() {
-      var _this4 = this;
+      var _this5 = this;
 
       $(this.createdSelectInputs).each(function (i, selectInput) {
-        _this4.disableSelect(selectInput);
+        _this5.disableSelect(selectInput);
       });
     },
     // enable select option
@@ -2086,7 +2169,7 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       });
     },
     getData: function getData() {
-      var _this5 = this;
+      var _this6 = this;
 
       var url = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.baseUrl;
       var callback = arguments.length > 1 ? arguments[1] : undefined;
@@ -2100,20 +2183,20 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
             scriptureContainer = $('.scripture__input-container'); // Add error html
 
         $(scriptureContainer).html(html);
-        _this5.disableAddBtn = true;
+        _this6.disableAddBtn = true;
       }).then(function () {
-        _this5.loader = false;
+        _this6.loader = false;
       });
     },
     // Set the books select when created
     setBooksSelect: function setBooksSelect(verseId) {
-      var _this6 = this;
+      var _this7 = this;
 
       this.getBibleHtmlOptions("", function (bookOptions) {
         var bookSelect = "#book-".concat(verseId);
         $(bookSelect).append(bookOptions);
 
-        _this6.enableSelect(bookSelect);
+        _this7.enableSelect(bookSelect);
       });
     },
     optionsSlugBuilder: function optionsSlugBuilder(rowSelected) {
@@ -45688,6 +45771,18 @@ var render = function() {
         },
         [_c("span", { attrs: { "data-feather": "plus-square" } })]
       ),
+      _vm._v(" "),
+      _c("div", [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-light scripture__btn-gen",
+            attrs: { id: "scripture-gen" },
+            on: { click: _vm.generateScripture }
+          },
+          [_vm._v("Generate Scripture")]
+        )
+      ]),
       _vm._v(" "),
       _vm._m(1)
     ]

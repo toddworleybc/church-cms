@@ -15,8 +15,11 @@
         <div @click="rotateSvg()" id="add-scripture-btn" class="scripture__add-verse">
             <span data-feather="plus-square"></span>
         </div>
-
+        <div>
+            <button @click="generateScripture" id="scripture-gen" class="btn btn-light scripture__btn-gen">Generate Scripture</button>
+        </div>
     <div class="scripture__text">
+
         <h3>Acts 26, 1-4</h3>
         <p>1 Then Agrippa said to Paul, "You are permitted to speak for yourself." So Paul stretched out his
             hand and answered for
@@ -25,6 +28,7 @@
             things of which I am accused by the Jews,</p>
         <p>3 especially because you are expert in all customs and questions which have to
             do with the Jews. Therefore I beg you to hear me patiently.</p>
+
     </div>
 </div>
 </template>
@@ -41,11 +45,12 @@ export default {
             deg: 0,
             verseId: 0,
             delay: false,
-            baseUrl: location.origin + '/bible/',
-            optionsUrl: location.origin + '/bible/options/',
+            baseUrl: location.origin + '/api/bible/',
+            optionsUrl: location.origin + '/api/bible/options/',
             disableAddBtn: false,
             createdSelectInputs: "",
-            loader: false
+            loader: false,
+            jsonLoad: []
         }
     }, //#-data
 
@@ -66,14 +71,89 @@ export default {
             $(this.createdSelectInputs).on('change', e => {
                 this.setSelectInput(e); });
 
-        }, //#-addSelectDivEvents
+
+        }, // ###--- EVENTS ------/
+
+
+    // GENERATE SCRIPTURE =============
+    // ==================================
+ // Get all select input values and organize them in an object
+
+        generateScripture(e, removeData = false) {
+            e.preventDefault();
+
+            const inputRows = $(".scripture__select");
+
+            // remove data from this.jsonLoad
+            if(removeData) {
+
+                const removeId = $(e.target).attr('data-remove-id'),
+                      itemIndex = this.jsonLoad.findIndex( row => { return row.id === removeId} );
+
+                    if(itemIndex !== -1)
+                        this.jsonLoad.splice( itemIndex, 1);
+
+                return;
+            }
+
+
+
+
+        // add data to this.jsonLoad
+            if(inputRows.length) {
+
+                $(inputRows).each( (i,row) => {
+
+                    let book    = $(row).children('[name="book"]').val(),
+                        chapter = $(row).children('[name="chapter"]').val(),
+                        startVs = $(row).children('[name="start_verse"]').val(),
+                        endVs   = $(row).children('[name="end_verse"]').val(),
+                        rowId   = $(row).attr('data-id'),
+                        data = {};
+
+                        if(book && chapter) {
+
+                            data = {
+                                id: rowId,
+                                book: book,
+                                chapter: chapter,
+                                startVs: startVs !== 'none' ? startVs : null,
+                                endVs: endVs !== 'none' ? startVs : null
+                            }
+
+                        }
+
+
+                    // Prevent duplicats from entering jsonLoad
+
+                        const duplicateExists = this.checkForDupsJson(data);
+
+                        if(duplicateExists) {
+                            $(`#verse-id-${rowId}`).remove();
+
+                            return;
+                        };
+
+                    // create payload
+                        this.jsonLoad.push(data);
+
+                } ); //#- end row loop
+
+
+
+            } //#- end if/
+
+            //  console.log(this.jsonLoad);
+
+        },// ###--- GENERATE SCRIPTURE ---/
 
 
 
 
 
-    // FUNCTIONS ===========
-    // ======================
+
+    // SELECT INPUT CONFIG ===========
+    // ==============================
 
 
          addVerse() {
@@ -101,7 +181,7 @@ export default {
                 <option value="none" selected hidden>Verse</option>
             </select>
             <div id="remove-verse-${this.verseId}" class="scripture__remove-verse">
-                <span data-feather="minus-square"></span>
+                <span data-feather="minus-square" data-remove-id="${this.verseId}"></span>
             </div>
         </div>`;
 
@@ -130,8 +210,13 @@ export default {
 
         removeVerse(e) {
 
+
+
             // Fix bug where if the Rect or Line was clicked on svg it will make sure that it relates to the svg itself
                 if(e.target.localName === "line" || e.target.localName === "rect") e.target = e.target.parentNode;
+
+             // remove scripture from json data
+            this.generateScripture(e, true);
 
             // Add fade effect to remove scripture select
                 $(e.target).parent().parent().addClass('scripture__fade-out').animate({
@@ -185,6 +270,9 @@ export default {
 
         setSelectInput(e) {
 
+            // Stop extra request on end_verse onChange
+            if(e.target.name === 'end_verse') return;
+
             // Get the row that the select input was changed and set the select id that needs to have the html inserted
             const rowSelected = $(e.target).parent(),
                   selectChangeId = $(e.target).attr('data-change'),
@@ -200,12 +288,18 @@ export default {
                     $(selectsToDisable).each( (i,select) => {
                         let getName = select.name.match(/[a-z]+$/)[0],
                             selectName = getName.charAt(0).toUpperCase() + getName.slice(1);
+
+                            // Add "s" to the name Chapter
+                            if(selectName === 'Chapter') selectName += "s";
+
+
                         $(select).html(`<option value="none">${selectName}</option>`);
                         this.disableSelect(select);
                     } );
 
                 // =======================================
 
+                // build url slug
                 const slug = this.optionsSlugBuilder(rowSelected);
 
                 // Insert optionsHtml into select
@@ -214,13 +308,39 @@ export default {
                     this.enableSelect(selectToAddOptionsTo);
                 } );
         },
-
-
-
+        // ####--- END SELECT INPUT CONFIG ------------/
 
 
     // HELPER METHODS ==========/
     // ==========================/
+
+
+        checkForDupsJson(data) {
+
+            let dup = false;
+
+           this.jsonLoad.forEach( row => {
+              const storeId1 = row.id,
+                    storeId2 = data.id;
+
+                // remove unquie ids
+                    row.id = null;
+                    data.id = null;
+
+
+                if( JSON.stringify(row) === JSON.stringify(data) ) dup = true;
+
+                row.id = storeId1;
+                data.id = storeId2
+
+           } );
+
+            return dup;
+
+        },
+
+
+
 
 
         // Disable select option

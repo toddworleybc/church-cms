@@ -11084,7 +11084,6 @@ body {
 .scripture__text {
   border: 1px solid #ced4da;
   padding: 1.5rem;
-  margin-top: 2rem;
 }
 
 .scripture__text h2 {
@@ -11139,6 +11138,10 @@ body {
           animation: growFadeOut 0.2s ease-in;
   -webkit-animation-fill-mode: forwards;
           animation-fill-mode: forwards;
+}
+
+.scripture__btn-gen {
+  margin: 1rem 0;
 }
 
 .fade-enter-active,

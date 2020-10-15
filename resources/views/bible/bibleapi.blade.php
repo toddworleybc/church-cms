@@ -18,7 +18,7 @@ $bible = new Bible();
 @if ($book && $chapter && !$startVs)
     @include('bible.inc.scripture_start_verses_options')
 @endif
-
+{{-- get final verse options --}}
 @if ($book && $chapter && $startVs)
     @include('bible.inc.scripture_end_verses_options')
 @endif

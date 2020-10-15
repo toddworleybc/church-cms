@@ -28,14 +28,7 @@ Route::resources([
     'admin/teachings' => TeachingController::class
 ]);
 
-Route::get( '/bible/options/{book?}/{chapter?}/{startVs?}/{endVs?}', function($book = "", $chapter = "", $startVs = "", $endVs = "") {
-    return view('bible.bibleapi', [
-        'book'    => $book,
-        'chapter' => $chapter,
-        'startVs' => $startVs,
-        'endVs'   => $endVs
-    ]);
-});
+
 
 // Route::get('/bible/{query}', function($query) {
 //     return view('bible.bibleapi', ['query' => $query]);
