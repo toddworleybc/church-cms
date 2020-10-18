@@ -20,3 +20,20 @@
         transform: scaleY(0);
     }
 }
+
+
+@keyframes fadeInOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: .3;
+    }
+}
+
+
+
+.fadeInOut {
+    animation: 1.3s ease-in-out 1s infinite alternate fadeInOut;
+}

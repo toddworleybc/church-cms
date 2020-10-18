@@ -47,7 +47,7 @@
                     <label for="video">Enter Video</label>
                     <input class="form-control" placeholder="Enter Video Url" name="video" type="text" id="video">
                     <div class="teachings-create__media-btns">
-                        <button class="btn btn-light btns__icon"><span data-feather="cloud"></span>Get From Youtube</button>
+                        <button class="btn btn-light btns__icon"><span data-feather="youtube"></span>Get From Youtube</button>
                         <button class="btn btn-light btns__icon"><span data-feather="upload"></span>Upload to
                             Youtube</button>
                     </div>

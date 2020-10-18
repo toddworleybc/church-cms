@@ -21,10 +21,16 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 // Options Html API ===========================
 Route::get('/bible/options/{book?}/{chapter?}/{startVs?}/{endVs?}', function ($book = "", $chapter = "", $startVs = "", $endVs = "") {
-    return view('bible.bibleapi', [
+    return view('bible.bible_options', [
         'book'    => $book,
         'chapter' => $chapter,
         'startVs' => $startVs,
         'endVs'   => $endVs
     ]);
+});
+
+
+// Generate bible scripture
+Route::post('/bible/gen', function() {
+    return view('bible.bible_gen');
 });

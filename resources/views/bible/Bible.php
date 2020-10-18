@@ -61,6 +61,59 @@ class Bible extends lvBible {
         $this->book($book);
     }
 
+
+    public function getScriptures($book, $chapter, $startVs = null, $endVs = null) {
+
+        // set book and chapter
+        $this->setBook($book);
+        $this->chapter($chapter);
+
+
+        // get verse range
+        if($book && $chapter && $startVs && $endVs) {
+
+                $startVs = !$startVs ? 1 : $startVs;
+                $startVs = intval($startVs);
+                $endVs = intval($endVs);
+
+                while($startVs <= $endVs) {
+                    $this->verse($startVs);
+
+                    echo "<p><strong>$startVs:</strong> " . $this->getVerse() . "</p>";
+                    $startVs++;
+                }
+
+                return;
+        }
+
+
+        // Get single Verse
+        if( $book && $chapter && $startVs ) {
+
+            $this->verse($startVs);
+
+            echo "<p><strong>$startVs:</strong> " . $this->getVerse() . "</p>";
+            return;
+        }
+
+
+
+
+        // Get entire chapter
+        if($book && $chapter) {
+
+           $startVs = 1;
+
+           $verses = $this->getChapter();
+
+           foreach ($verses['verses'] as $verse) {
+               echo "<p><strong>".$startVs++.":</strong> " . $verse['text'] . "</p>";
+           }
+
+        }
+
+    }
+
 }
 
 

@@ -30,9 +30,7 @@ Route::resources([
 
 
 
-// Route::get('/bible/{query}', function($query) {
-//     return view('bible.bibleapi', ['query' => $query]);
-// } );
+
 
 
 Auth::routes();

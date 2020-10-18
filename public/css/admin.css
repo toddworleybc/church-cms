@@ -11054,6 +11054,35 @@ body {
   }
 }
 
+@-webkit-keyframes fadeInOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0.3;
+  }
+}
+
+@keyframes fadeInOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0.3;
+  }
+}
+
+.fadeInOut {
+  -webkit-animation: 1.3s ease-in-out 1s infinite alternate fadeInOut;
+          animation: 1.3s ease-in-out 1s infinite alternate fadeInOut;
+}
+
+body {
+  font-size: 1rem;
+}
+
 .btns__icon {
   display: flex;
   justify-content: center;
@@ -11082,8 +11111,7 @@ body {
 }
 
 .scripture__text {
-  border: 1px solid #ced4da;
-  padding: 1.5rem;
+  position: relative;
 }
 
 .scripture__text h2 {

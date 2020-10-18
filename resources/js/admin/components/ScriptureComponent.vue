@@ -2,34 +2,33 @@
 <div id="bible-api" class="form-group scripture">
     <div class="scripture__label-heading">
         <label for="book">Add Bible Scriptures:</label>
-        <div v-if="loader" class="scripture__loader d-inline-flex mb-0">
+        <div v-if="loader" class="d-inline-flex mb-0 fadeInOut">
             <p class="text-secondary mb-0">Loading...</p>
             <div class="spinner-border spinner-border-sm text-secondary" role="status">
                 <span class="sr-only">Loading...</span>
             </div>
         </div>
     </div>
+    <p class="text-secondary"><em>Book and chapters are required <span class="text-danger">*</span></em></p>
 
     <div class="scripture__input-container"></div>
 
-        <div @click="rotateSvg()" id="add-scripture-btn" class="scripture__add-verse">
-            <span data-feather="plus-square"></span>
-        </div>
-        <div>
-            <button @click="generateScripture" id="scripture-gen" class="btn btn-light scripture__btn-gen">Generate Scripture</button>
-        </div>
-    <div class="scripture__text">
-
-        <h3>Acts 26, 1-4</h3>
-        <p>1 Then Agrippa said to Paul, "You are permitted to speak for yourself." So Paul stretched out his
-            hand and answered for
-            himself: <p></p> <p>2 "I think myself happy, King Agrippa, because today I shall answer for myself
-            before you concerning all the
-            things of which I am accused by the Jews,</p>
-        <p>3 especially because you are expert in all customs and questions which have to
-            do with the Jews. Therefore I beg you to hear me patiently.</p>
-
+    <div @click="rotateSvg()" id="add-scripture-btn" class="scripture__add-verse">
+        <span data-feather="plus-square"></span>
     </div>
+    <div>
+        <button @click="generateScripture" id="scripture-gen" class="btn btn-light scripture__btn-gen">Generate Scripture
+            <span data-feather="book-open"></span>
+        </button>
+        <div v-if="genLoader" class="spinner-border spinner-border-sm ml-1 text-dark" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <div class="scripture__text">
+        <div id="scripture__insert" class="bg-light text-secondary p-4 scripture__insert"></div>
+        <p class="text-secondary" v-if="jsonLoad.length === 0">Scriptures will generate above...</p>
+    </div>
+
 </div>
 </template>
 
@@ -50,7 +49,9 @@ export default {
             disableAddBtn: false,
             createdSelectInputs: "",
             loader: false,
-            jsonLoad: []
+            genLoader: false,
+            jsonLoad: [],
+            stopGen: false
         }
     }, //#-data
 
@@ -59,6 +60,8 @@ export default {
 
     // EVENTS =============
     // =====================
+
+
 
         addSelectDivEvents(verseId) {
 
@@ -82,9 +85,32 @@ export default {
         generateScripture(e, removeData = false) {
             e.preventDefault();
 
+            // Stop generation if book or chapter are empty
+             $('.scripture__input-container .custom-select').each( ( i, select ) => {
+
+                 if($(select).attr('name') === 'book') {
+
+                     if($(select).val() === 'none') {
+                         $(select).addClass('is-invalid');
+                         this.stopGen = true;
+                     }
+                 }
+
+
+                 if( $(select).attr('name') === 'chapter' ) {
+                     if($(select).val() === 'none') {
+                         $(select).addClass('is-invalid');
+                         this.stopGen = true;
+                     }
+                 }
+
+            } );
+
+            if(this.stopGen) return;
+
             const inputRows = $(".scripture__select");
 
-            // remove data from this.jsonLoad
+        // remove data from this.jsonLoad
             if(removeData) {
 
                 const removeId = $(e.target).attr('data-remove-id'),
@@ -95,9 +121,6 @@ export default {
 
                 return;
             }
-
-
-
 
         // add data to this.jsonLoad
             if(inputRows.length) {
@@ -118,7 +141,7 @@ export default {
                                 book: book,
                                 chapter: chapter,
                                 startVs: startVs !== 'none' ? startVs : null,
-                                endVs: endVs !== 'none' ? startVs : null
+                                endVs: endVs !== 'none' ? endVs : null
                             }
 
                         }
@@ -128,22 +151,24 @@ export default {
 
                         const duplicateExists = this.checkForDupsJson(data);
 
-                        if(duplicateExists) {
-                            $(`#verse-id-${rowId}`).remove();
-
-                            return;
-                        };
+                        if(duplicateExists) return;
 
                     // create payload
                         this.jsonLoad.push(data);
 
                 } ); //#- end row loop
 
-
-
             } //#- end if/
 
-            //  console.log(this.jsonLoad);
+
+            this.sendPayload(this.jsonLoad);
+
+
+            $('.scripture__input-container .custom-select').each( ( i, select ) => {
+                this.disableSelect(select);
+            } );
+
+
 
         },// ###--- GENERATE SCRIPTURE ---/
 
@@ -169,7 +194,7 @@ export default {
             </select>
 
             <select class="custom-select" data-change="start-verse-${this.verseId}" id="chapter-${this.verseId}" name="chapter" required>
-                <option value="none" selected hidden>Chapter</option>
+                <option value="none" selected hidden>Chapters</option>
             </select>
 
             <select class="custom-select" data-change="end-verse-${this.verseId}" id="start-verse-${this.verseId}" name="start_verse">
@@ -188,9 +213,10 @@ export default {
 
         // Add html select to the DOM
             $(".scripture__input-container").append(html);
-            feather.replace();
+            feather.replace();  // remove icon
 
             this.createdSelectInputs = $(`#verse-id-${this.verseId} .custom-select`);
+
 
         // add events for scripture select after created
             this.addSelectDivEvents(this.verseId);
@@ -210,10 +236,11 @@ export default {
 
         removeVerse(e) {
 
-
-
             // Fix bug where if the Rect or Line was clicked on svg it will make sure that it relates to the svg itself
                 if(e.target.localName === "line" || e.target.localName === "rect") e.target = e.target.parentNode;
+
+            // Id to remove SCRIPTURE ONLY, not select;
+             const removeVsId = $(e.target).attr('data-remove-id');
 
              // remove scripture from json data
             this.generateScripture(e, true);
@@ -225,9 +252,16 @@ export default {
                     margin: "0px"
                 }, 600);
 
+
+            //remove scripture
+                $(`#scripture-${removeVsId}`).addClass('scripture__fade-out').animate({
+                    height: "0px"
+                }, 200);
+
             // make sure animation is over before removing select
                 setTimeout(() => {
                     $(e.target).parent().parent().remove();
+                    $(`#scripture-${removeVsId}`).remove();
                 }, 700);
         },
 
@@ -270,8 +304,22 @@ export default {
 
         setSelectInput(e) {
 
-            // Stop extra request on end_verse onChange
+        // Stop extra request on end_verse onChange
             if(e.target.name === 'end_verse') return;
+
+            if(e.target.name === 'book' ) {
+                $(e.target).removeClass('is-invalid');
+                const chapter = $(e.target).next('[name="chapter"]');
+
+                if($(chapter).val() !== 'none') {
+                    this.stopGen = false;
+                }
+            }
+
+            if(e.target.name === 'chapter') {
+                $(e.target).removeClass('is-invalid');
+                this.stopGen = false;
+            }
 
             // Get the row that the select input was changed and set the select id that needs to have the html inserted
             const rowSelected = $(e.target).parent(),
@@ -327,9 +375,10 @@ export default {
                     row.id = null;
                     data.id = null;
 
-
+                // Best way according to the "Internet" on how to compare objects...lame!
                 if( JSON.stringify(row) === JSON.stringify(data) ) dup = true;
 
+                // set ids back into objects from stored ids
                 row.id = storeId1;
                 data.id = storeId2
 
@@ -338,9 +387,6 @@ export default {
             return dup;
 
         },
-
-
-
 
 
         // Disable select option
@@ -362,6 +408,16 @@ export default {
         },
 
 
+        errorMessage(error) {
+            // error html
+                    const html = `<div class="alert alert-danger">${error}<div>`,
+                          scriptureContainer = $('.scripture__input-container');
+                // Add error html
+                    $(scriptureContainer).html(html);
+                    this.disableAddBtn = true;
+        },
+
+
         // @return html options for query
         getBibleHtmlOptions(slug, callback) {
             let url = `${this.optionsUrl}${slug}`;
@@ -379,29 +435,13 @@ export default {
                   callback(data);
                 } )
                 .catch( (error) => {
-                // error html
-                    const html = `<div class="alert alert-danger">${error}<div>`,
-                          scriptureContainer = $('.scripture__input-container');
-                // Add error html
-                    $(scriptureContainer).html(html);
-                    this.disableAddBtn = true;
+                    this.errorMessage(error);
                 } )
                 .then( () => {
                     this.loader=false;
                 } );
         },
 
-
-
-
-        // Set the books select when created
-        setBooksSelect(verseId) {
-            this.getBibleHtmlOptions("", bookOptions => {
-                const bookSelect = `#book-${verseId}`;
-                $(bookSelect).append(bookOptions);
-                this.enableSelect(bookSelect);
-            } );
-        },
 
 
         optionsSlugBuilder(rowSelected) {
@@ -417,8 +457,39 @@ export default {
             } );
 
             return slug;
-        }
+        },
 
+
+
+        sendPayload( jsonLoad ) {
+
+            this.genLoader = true;
+            const url = this.baseUrl + 'gen';
+
+            axios.post(url, this.jsonLoad, {
+                    headers: {'Content-Type': 'application/json'}
+                 })
+                .then( res => {
+                    const html = res.data;
+                    this.genLoader=false;
+                    $("#scripture__insert").html(html);
+                } )
+                .catch( error => {
+                    this.errorMessage(error);
+                    this.genLoader = false;
+                } );
+
+        },
+
+
+        // Set the books select when created
+        setBooksSelect(verseId) {
+            this.getBibleHtmlOptions("", bookOptions => {
+                const bookSelect = `#book-${verseId}`;
+                $(bookSelect).append(bookOptions);
+                this.enableSelect(bookSelect);
+            } );
+        }
 
 
 

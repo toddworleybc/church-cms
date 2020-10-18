@@ -1943,7 +1943,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 
 var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-icons/dist/feather.js");
@@ -1959,7 +1958,9 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       disableAddBtn: false,
       createdSelectInputs: "",
       loader: false,
-      jsonLoad: []
+      genLoader: false,
+      jsonLoad: [],
+      stopGen: false
     };
   },
   //#-data
@@ -1986,7 +1987,24 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       var _this2 = this;
 
       var removeData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      e.preventDefault();
+      e.preventDefault(); // Stop generation if book or chapter are empty
+
+      $('.scripture__input-container .custom-select').each(function (i, select) {
+        if ($(select).attr('name') === 'book') {
+          if ($(select).val() === 'none') {
+            $(select).addClass('is-invalid');
+            _this2.stopGen = true;
+          }
+        }
+
+        if ($(select).attr('name') === 'chapter') {
+          if ($(select).val() === 'none') {
+            $(select).addClass('is-invalid');
+            _this2.stopGen = true;
+          }
+        }
+      });
+      if (this.stopGen) return;
       var inputRows = $(".scripture__select"); // remove data from this.jsonLoad
 
       if (removeData) {
@@ -2014,25 +2032,24 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
               book: book,
               chapter: chapter,
               startVs: startVs !== 'none' ? startVs : null,
-              endVs: endVs !== 'none' ? startVs : null
+              endVs: endVs !== 'none' ? endVs : null
             };
           } // Prevent duplicats from entering jsonLoad
 
 
           var duplicateExists = _this2.checkForDupsJson(data);
 
-          if (duplicateExists) {
-            $("#verse-id-".concat(rowId)).remove();
-            return;
-          }
-
-          ; // create payload
+          if (duplicateExists) return; // create payload
 
           _this2.jsonLoad.push(data);
         }); //#- end row loop
       } //#- end if/
-      //  console.log(this.jsonLoad);
 
+
+      this.sendPayload(this.jsonLoad);
+      $('.scripture__input-container .custom-select').each(function (i, select) {
+        _this2.disableSelect(select);
+      });
     },
     // ###--- GENERATE SCRIPTURE ---/
     // SELECT INPUT CONFIG ===========
@@ -2041,10 +2058,11 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       // Set unique #id for each minus button NOTE: will probably be added to the scripture__select div as well later
       this.verseId += 1; // scripture__select html verse-id-
 
-      var html = "<div data-id=\"".concat(this.verseId, "\" id=\"verse-id-").concat(this.verseId, "\" class=\"scripture__select\">\n\n            <select class=\"custom-select\" data-change=\"chapter-").concat(this.verseId, "\" id=\"book-").concat(this.verseId, "\" name=\"book\" required>\n                <option value=\"none\" selected hidden>Book</option>\n            </select>\n\n            <select class=\"custom-select\" data-change=\"start-verse-").concat(this.verseId, "\" id=\"chapter-").concat(this.verseId, "\" name=\"chapter\" required>\n                <option value=\"none\" selected hidden>Chapter</option>\n            </select>\n\n            <select class=\"custom-select\" data-change=\"end-verse-").concat(this.verseId, "\" id=\"start-verse-").concat(this.verseId, "\" name=\"start_verse\">\n                <option value=\"none\" selected hidden>Verse</option>\n            </select>\n\n            <span>-To-</span>\n            <select class=\"custom-select\" id=\"end-verse-").concat(this.verseId, "\" name=\"end_verse\">\n                <option value=\"none\" selected hidden>Verse</option>\n            </select>\n            <div id=\"remove-verse-").concat(this.verseId, "\" class=\"scripture__remove-verse\">\n                <span data-feather=\"minus-square\" data-remove-id=\"").concat(this.verseId, "\"></span>\n            </div>\n        </div>"); // Add html select to the DOM
+      var html = "<div data-id=\"".concat(this.verseId, "\" id=\"verse-id-").concat(this.verseId, "\" class=\"scripture__select\">\n\n            <select class=\"custom-select\" data-change=\"chapter-").concat(this.verseId, "\" id=\"book-").concat(this.verseId, "\" name=\"book\" required>\n                <option value=\"none\" selected hidden>Book</option>\n            </select>\n\n            <select class=\"custom-select\" data-change=\"start-verse-").concat(this.verseId, "\" id=\"chapter-").concat(this.verseId, "\" name=\"chapter\" required>\n                <option value=\"none\" selected hidden>Chapters</option>\n            </select>\n\n            <select class=\"custom-select\" data-change=\"end-verse-").concat(this.verseId, "\" id=\"start-verse-").concat(this.verseId, "\" name=\"start_verse\">\n                <option value=\"none\" selected hidden>Verse</option>\n            </select>\n\n            <span>-To-</span>\n            <select class=\"custom-select\" id=\"end-verse-").concat(this.verseId, "\" name=\"end_verse\">\n                <option value=\"none\" selected hidden>Verse</option>\n            </select>\n            <div id=\"remove-verse-").concat(this.verseId, "\" class=\"scripture__remove-verse\">\n                <span data-feather=\"minus-square\" data-remove-id=\"").concat(this.verseId, "\"></span>\n            </div>\n        </div>"); // Add html select to the DOM
 
       $(".scripture__input-container").append(html);
-      feather.replace();
+      feather.replace(); // remove icon
+
       this.createdSelectInputs = $("#verse-id-".concat(this.verseId, " .custom-select")); // add events for scripture select after created
 
       this.addSelectDivEvents(this.verseId); //set books for select
@@ -2056,7 +2074,9 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
     // #-add verse
     removeVerse: function removeVerse(e) {
       // Fix bug where if the Rect or Line was clicked on svg it will make sure that it relates to the svg itself
-      if (e.target.localName === "line" || e.target.localName === "rect") e.target = e.target.parentNode; // remove scripture from json data
+      if (e.target.localName === "line" || e.target.localName === "rect") e.target = e.target.parentNode; // Id to remove SCRIPTURE ONLY, not select;
+
+      var removeVsId = $(e.target).attr('data-remove-id'); // remove scripture from json data
 
       this.generateScripture(e, true); // Add fade effect to remove scripture select
 
@@ -2064,10 +2084,15 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
         height: "0px",
         padding: "0px",
         margin: "0px"
-      }, 600); // make sure animation is over before removing select
+      }, 600); //remove scripture
+
+      $("#scripture-".concat(removeVsId)).addClass('scripture__fade-out').animate({
+        height: "0px"
+      }, 200); // make sure animation is over before removing select
 
       setTimeout(function () {
         $(e.target).parent().parent().remove();
+        $("#scripture-".concat(removeVsId)).remove();
       }, 700);
     },
     rotateSvg: function rotateSvg() {
@@ -2100,7 +2125,22 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       var _this4 = this;
 
       // Stop extra request on end_verse onChange
-      if (e.target.name === 'end_verse') return; // Get the row that the select input was changed and set the select id that needs to have the html inserted
+      if (e.target.name === 'end_verse') return;
+
+      if (e.target.name === 'book') {
+        $(e.target).removeClass('is-invalid');
+        var chapter = $(e.target).next('[name="chapter"]');
+
+        if ($(chapter).val() !== 'none') {
+          this.stopGen = false;
+        }
+      }
+
+      if (e.target.name === 'chapter') {
+        $(e.target).removeClass('is-invalid');
+        this.stopGen = false;
+      } // Get the row that the select input was changed and set the select id that needs to have the html inserted
+
 
       var rowSelected = $(e.target).parent(),
           selectChangeId = $(e.target).attr('data-change'),
@@ -2137,8 +2177,10 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
             storeId2 = data.id; // remove unquie ids
 
         row.id = null;
-        data.id = null;
-        if (JSON.stringify(row) === JSON.stringify(data)) dup = true;
+        data.id = null; // Best way according to the "Internet" on how to compare objects...lame!
+
+        if (JSON.stringify(row) === JSON.stringify(data)) dup = true; // set ids back into objects from stored ids
+
         row.id = storeId1;
         data.id = storeId2;
       });
@@ -2160,6 +2202,14 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
     enableSelect: function enableSelect(selectedInput) {
       $(selectedInput).prop('disabled', false);
     },
+    errorMessage: function errorMessage(error) {
+      // error html
+      var html = "<div class=\"alert alert-danger\">".concat(error, "<div>"),
+          scriptureContainer = $('.scripture__input-container'); // Add error html
+
+      $(scriptureContainer).html(html);
+      this.disableAddBtn = true;
+    },
     // @return html options for query
     getBibleHtmlOptions: function getBibleHtmlOptions(slug, callback) {
       var url = "".concat(this.optionsUrl).concat(slug); // callback data for function
@@ -2178,25 +2228,9 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
         var data = res.data;
         callback(data);
       })["catch"](function (error) {
-        // error html
-        var html = "<div class=\"alert alert-danger\">".concat(error, "<div>"),
-            scriptureContainer = $('.scripture__input-container'); // Add error html
-
-        $(scriptureContainer).html(html);
-        _this6.disableAddBtn = true;
+        _this6.errorMessage(error);
       }).then(function () {
         _this6.loader = false;
-      });
-    },
-    // Set the books select when created
-    setBooksSelect: function setBooksSelect(verseId) {
-      var _this7 = this;
-
-      this.getBibleHtmlOptions("", function (bookOptions) {
-        var bookSelect = "#book-".concat(verseId);
-        $(bookSelect).append(bookOptions);
-
-        _this7.enableSelect(bookSelect);
       });
     },
     optionsSlugBuilder: function optionsSlugBuilder(rowSelected) {
@@ -2209,6 +2243,36 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
         }
       });
       return slug;
+    },
+    sendPayload: function sendPayload(jsonLoad) {
+      var _this7 = this;
+
+      this.genLoader = true;
+      var url = this.baseUrl + 'gen';
+      axios.post(url, this.jsonLoad, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(function (res) {
+        var html = res.data;
+        _this7.genLoader = false;
+        $("#scripture__insert").html(html);
+      })["catch"](function (error) {
+        _this7.errorMessage(error);
+
+        _this7.genLoader = false;
+      });
+    },
+    // Set the books select when created
+    setBooksSelect: function setBooksSelect(verseId) {
+      var _this8 = this;
+
+      this.getBibleHtmlOptions("", function (bookOptions) {
+        var bookSelect = "#book-".concat(verseId);
+        $(bookSelect).append(bookOptions);
+
+        _this8.enableSelect(bookSelect);
+      });
     }
   },
   // #-methods
@@ -45746,7 +45810,7 @@ var render = function() {
         ]),
         _vm._v(" "),
         _vm.loader
-          ? _c("div", { staticClass: "scripture__loader d-inline-flex mb-0" }, [
+          ? _c("div", { staticClass: "d-inline-flex mb-0 fadeInOut" }, [
               _c("p", { staticClass: "text-secondary mb-0" }, [
                 _vm._v("Loading...")
               ]),
@@ -45755,6 +45819,8 @@ var render = function() {
             ])
           : _vm._e()
       ]),
+      _vm._v(" "),
+      _vm._m(1),
       _vm._v(" "),
       _c("div", { staticClass: "scripture__input-container" }),
       _vm._v(" "),
@@ -45780,11 +45846,36 @@ var render = function() {
             attrs: { id: "scripture-gen" },
             on: { click: _vm.generateScripture }
           },
-          [_vm._v("Generate Scripture")]
-        )
+          [
+            _vm._v("Generate Scripture\n            "),
+            _c("span", { attrs: { "data-feather": "book-open" } })
+          ]
+        ),
+        _vm._v(" "),
+        _vm.genLoader
+          ? _c(
+              "div",
+              {
+                staticClass: "spinner-border spinner-border-sm ml-1 text-dark",
+                attrs: { role: "status" }
+              },
+              [_c("span", { staticClass: "sr-only" }, [_vm._v("Loading...")])]
+            )
+          : _vm._e()
       ]),
       _vm._v(" "),
-      _vm._m(1)
+      _c("div", { staticClass: "scripture__text" }, [
+        _c("div", {
+          staticClass: "bg-light text-secondary p-4 scripture__insert",
+          attrs: { id: "scripture__insert" }
+        }),
+        _vm._v(" "),
+        _vm.jsonLoad.length === 0
+          ? _c("p", { staticClass: "text-secondary" }, [
+              _vm._v("Scriptures will generate above...")
+            ])
+          : _vm._e()
+      ])
     ]
   )
 }
@@ -45806,26 +45897,10 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "scripture__text" }, [
-      _c("h3", [_vm._v("Acts 26, 1-4")]),
-      _vm._v(" "),
-      _c("p", [
-        _vm._v(
-          '1 Then Agrippa said to Paul, "You are permitted to speak for yourself." So Paul stretched out his\n            hand and answered for\n            himself: '
-        )
-      ]),
-      _c("p"),
-      _vm._v(" "),
-      _c("p", [
-        _vm._v(
-          '2 "I think myself happy, King Agrippa, because today I shall answer for myself\n            before you concerning all the\n            things of which I am accused by the Jews,'
-        )
-      ]),
-      _vm._v(" "),
-      _c("p", [
-        _vm._v(
-          "3 especially because you are expert in all customs and questions which have to\n            do with the Jews. Therefore I beg you to hear me patiently."
-        )
+    return _c("p", { staticClass: "text-secondary" }, [
+      _c("em", [
+        _vm._v("Book and chapters are required "),
+        _c("span", { staticClass: "text-danger" }, [_vm._v("*")])
       ])
     ])
   }
@@ -46341,7 +46416,7 @@ var staticRenderFns = [
       _vm._v(" "),
       _c("div", { staticClass: "teachings-create__media-btns" }, [
         _c("button", { staticClass: "btn btn-light btns__icon" }, [
-          _c("span", { attrs: { "data-feather": "cloud" } }),
+          _c("span", { attrs: { "data-feather": "youtube" } }),
           _vm._v("Get From Youtube")
         ]),
         _vm._v(" "),

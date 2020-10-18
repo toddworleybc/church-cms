@@ -17,8 +17,12 @@
 
     &__text {
 
-        border: 1px solid $border-color;
-        padding: 1.5rem;
+        position: relative;
+
+
+
+
+
 
         & h2 {
             margin: 1rem auto 1rem 0;
@@ -47,5 +51,8 @@
     &__btn-gen {
         margin: 1rem 0;
     }
+
+
+
 
 }
