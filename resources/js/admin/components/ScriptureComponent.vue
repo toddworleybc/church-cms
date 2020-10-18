@@ -51,7 +51,8 @@ export default {
             loader: false,
             genLoader: false,
             jsonLoad: [],
-            stopGen: false
+            stopGen: false,
+            teachingTitle: ""
         }
     }, //#-data
 
@@ -60,7 +61,6 @@ export default {
 
     // EVENTS =============
     // =====================
-
 
 
         addSelectDivEvents(verseId) {
@@ -163,12 +163,13 @@ export default {
 
             this.sendPayload(this.jsonLoad);
 
-
+        // Disable all selects to prevent new data from being enter
             $('.scripture__input-container .custom-select').each( ( i, select ) => {
                 this.disableSelect(select);
             } );
 
-
+            // Create title for post
+            this.createTheTitle();
 
         },// ###--- GENERATE SCRIPTURE ---/
 
@@ -489,8 +490,33 @@ export default {
                 $(bookSelect).append(bookOptions);
                 this.enableSelect(bookSelect);
             } );
-        }
+        },
 
+
+        createTheTitle() {
+
+            this.jsonLoad.forEach( (verse, i) => {
+
+            // Add "&" inbetween verses
+                if(i > 0 ) this.teachingTitle += " & ";
+
+            // Insert book and title into title
+                this.teachingTitle += verse['book'] + " ";
+                this.teachingTitle += verse['chapter'];
+                console.log(i);
+
+            // Add start verse if present
+                if( verse['startVs'] ) {
+                    this.teachingTitle += verse['startVs'] ? ":" + verse['startVs'] : "";
+                }
+            // Add end verse if present
+                if( verse['endVs'] ) {
+                    this.teachingTitle += verse['endVs'] ? "-" + verse['endVs'] : "";
+                }
+
+            } );
+
+        }
 
 
     }, // #-methods

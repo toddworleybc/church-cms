@@ -1960,7 +1960,8 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       loader: false,
       genLoader: false,
       jsonLoad: [],
-      stopGen: false
+      stopGen: false,
+      teachingTitle: ""
     };
   },
   //#-data
@@ -2046,10 +2047,13 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       } //#- end if/
 
 
-      this.sendPayload(this.jsonLoad);
+      this.sendPayload(this.jsonLoad); // Disable all selects to prevent new data from being enter
+
       $('.scripture__input-container .custom-select').each(function (i, select) {
         _this2.disableSelect(select);
-      });
+      }); // Create title for post
+
+      this.createTheTitle();
     },
     // ###--- GENERATE SCRIPTURE ---/
     // SELECT INPUT CONFIG ===========
@@ -2272,6 +2276,27 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
         $(bookSelect).append(bookOptions);
 
         _this8.enableSelect(bookSelect);
+      });
+    },
+    createTheTitle: function createTheTitle() {
+      var _this9 = this;
+
+      this.jsonLoad.forEach(function (verse, i) {
+        // Add "&" inbetween verses
+        if (i > 0) _this9.teachingTitle += " & "; // Insert book and title into title
+
+        _this9.teachingTitle += verse['book'] + " ";
+        _this9.teachingTitle += verse['chapter'];
+        console.log(i); // Add start verse if present
+
+        if (verse['startVs']) {
+          _this9.teachingTitle += verse['startVs'] ? ":" + verse['startVs'] : "";
+        } // Add end verse if present
+
+
+        if (verse['endVs']) {
+          _this9.teachingTitle += verse['endVs'] ? "-" + verse['endVs'] : "";
+        }
       });
     }
   },
