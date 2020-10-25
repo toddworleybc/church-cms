@@ -3,11 +3,16 @@
     &__wrapper {
         display: flex;
         justify-content: space-between;
-        flex-wrap: wrap;
+        @include res(992) {
+            flex-direction: column;
+        }
     }
 
     &__main {
         width: 60%;
+        @include res(992) {
+            width: 100%;
+        }
     }
 
     & input {
@@ -29,6 +34,11 @@
         width: 30%;
         border-left: 1px solid $border-color;
         padding-left: 2rem;
+        @include res(992) {
+            width: 80%;
+            border-left: none;
+            padding-left: 0;
+        }
     }
 
     &__btns {

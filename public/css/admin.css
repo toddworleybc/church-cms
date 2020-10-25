@@ -11172,6 +11172,71 @@ body {
   margin: 1rem 0;
 }
 
+.video-modal__body {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media only screen and (max-width: 56.25em) {
+  .video-modal__body {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.video-modal__dialog {
+  max-width: 75rem;
+}
+
+.video-modal__input-container {
+  border-top: 1px solid #cdcdcd;
+  padding-top: 1rem;
+}
+
+.video-modal__input-container > *:hover {
+  cursor: pointer;
+}
+
+.video-modal__loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.video-modal__title {
+  border-bottom: 1px solid #cdcdcd;
+  margin-bottom: 1rem;
+}
+
+.video-modal__video {
+  display: flex;
+  justify-content: space-around;
+  flex-direction: column;
+  width: calc((100% / 3) - 2rem);
+  box-shadow: 0 1px 1rem 1px #cdcdcdc7;
+  padding: 1rem;
+  margin: 1rem;
+  border-radius: 0.5rem;
+}
+
+@media only screen and (max-width: 56.25em) {
+  .video-modal__video {
+    width: 80%;
+  }
+}
+
+.video-modal__wrapper-loader {
+  min-height: 10rem;
+  color: #6c757d;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.5s;
@@ -11180,16 +11245,6 @@ body {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
-}
-
-.teachings-create__media-btns {
-  display: flex;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-}
-
-.teachings-create__media-btns > * {
-  margin-right: 1rem;
 }
 
 .teachings-create__speaker-container {
@@ -11204,11 +11259,22 @@ body {
 .admin-form__wrapper {
   display: flex;
   justify-content: space-between;
-  flex-wrap: wrap;
+}
+
+@media only screen and (max-width: 62em) {
+  .admin-form__wrapper {
+    flex-direction: column;
+  }
 }
 
 .admin-form__main {
   width: 60%;
+}
+
+@media only screen and (max-width: 62em) {
+  .admin-form__main {
+    width: 100%;
+  }
 }
 
 .admin-form input {
@@ -11228,6 +11294,14 @@ body {
   width: 30%;
   border-left: 1px solid #ced4da;
   padding-left: 2rem;
+}
+
+@media only screen and (max-width: 62em) {
+  .admin-form__sidebar {
+    width: 80%;
+    border-left: none;
+    padding-left: 0;
+  }
 }
 
 .admin-form__btns {

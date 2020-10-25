@@ -19,6 +19,23 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
+// MEDIA API ===============================/
+// =============================================
+
+Route::get('/youtube', function() {
+    return view('apis.media.youtube.youtube_api');
+});
+
+// ====================================
+// =======================================
+
+
+
+
+
+// BIBLE API ================================
+// ==========================================
+
 // Options Html API ===========================
 Route::get('/bible/options/{book?}/{chapter?}/{startVs?}/{endVs?}', function ($book = "", $chapter = "", $startVs = "", $endVs = "") {
     return view('bible.bible_options', [
@@ -34,3 +51,8 @@ Route::get('/bible/options/{book?}/{chapter?}/{startVs?}/{endVs?}', function ($b
 Route::post('/bible/gen', function() {
     return view('bible.bible_gen');
 });
+// =================================
+// ================================
+
+
+

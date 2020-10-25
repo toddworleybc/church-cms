@@ -495,6 +495,8 @@ export default {
 
         createTheTitle() {
 
+            this.teachingTitle = "";
+
             this.jsonLoad.forEach( (verse, i) => {
 
             // Add "&" inbetween verses
@@ -516,12 +518,16 @@ export default {
 
             } );
 
+            this.passTitleToParent();
+
+        },
+
+        passTitleToParent() {
+            this.$emit('teachingTitle', this.teachingTitle);
         }
 
 
     }, // #-methods
-
-
 
 
 

@@ -1,0 +1,5 @@
+@mixin res($breakpoint) {
+    @media only screen and (max-width: $breakpoint / 16 + 'em') {
+        @content
+    }
+}

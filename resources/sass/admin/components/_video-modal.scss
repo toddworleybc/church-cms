@@ -1,0 +1,92 @@
+.video-modal {
+
+
+
+
+     &__body{
+        display: flex;
+        align-items: stretch;
+        flex-wrap: wrap;
+        justify-content: center;
+        @include res(900) {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+
+
+
+    &__dialog {
+        max-width: 75rem;
+    }
+
+
+    &__input-container {
+
+
+        border-top: 1px solid $grey-dk;
+        padding-top: 1rem;
+
+
+
+        & > *:hover {
+            cursor: pointer;
+        }
+
+
+
+    }
+
+
+
+    &__loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+
+
+    &__title {
+        border-bottom: 1px solid $grey-dk;
+        margin-bottom: 1rem;
+    }
+
+
+
+
+    &__video {
+        display: flex;
+        justify-content: space-around;
+        flex-direction: column;
+        width: calc((100% / 3) - 2rem);
+        box-shadow: 0 1px 1rem 1px #cdcdcdc7;
+        padding: 1rem;
+        margin: 1rem;
+        border-radius: .5rem;
+        @include res(900) {
+           width: 80%;
+        }
+    }
+
+
+
+
+
+    &__wrapper {
+
+
+        &-loader {
+            min-height: 10rem;
+            color: $secondary;
+            background-color: $light;
+            @include flex-center-center();
+        }
+
+
+    }
+
+
+
+}

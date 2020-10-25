@@ -4,6 +4,7 @@ use Book\Bible\Bible;
 $bible = new Bible();
 @endphp
 
+
 {{-- get bible book options --}}
 @if (!$book)
     @include('bible.inc.scripture_books_options')

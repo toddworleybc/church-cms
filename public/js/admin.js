@@ -2281,6 +2281,7 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
     createTheTitle: function createTheTitle() {
       var _this9 = this;
 
+      this.teachingTitle = "";
       this.jsonLoad.forEach(function (verse, i) {
         // Add "&" inbetween verses
         if (i > 0) _this9.teachingTitle += " & "; // Insert book and title into title
@@ -2298,6 +2299,10 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
           _this9.teachingTitle += verse['endVs'] ? "-" + verse['endVs'] : "";
         }
       });
+      this.passTitleToParent();
+    },
+    passTitleToParent: function passTitleToParent() {
+      this.$emit('teachingTitle', this.teachingTitle);
     }
   },
   // #-methods
@@ -2455,12 +2460,34 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 var ScriptureComponent = Vue.component('scripture-component', __webpack_require__(/*! ./ScriptureComponent.vue */ "./resources/js/admin/components/ScriptureComponent.vue")["default"]);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       enterSpeaker: false,
-      topical: false
+      topical: false,
+      teachingTitle: "",
+      baseUrl: location.origin + "/api/",
+      loader: false
     };
   },
   components: {
@@ -2479,6 +2506,25 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
     todaysDate: function todaysDate() {
       var today = new Date().toDateString();
       $('#today').text(today);
+    },
+    setTeachingTitle: function setTeachingTitle(title) {
+      this.teachingTitle = title;
+    },
+    getYoutubeVideos: function getYoutubeVideos() {
+      var _this = this;
+
+      var videosContainer = $('#yt-videos-container'),
+          ytUrl = this.baseUrl + "youtube";
+      this.loader = true;
+      axios.get(ytUrl).then(function (res) {
+        var videoHtml = res.data;
+        $(videosContainer).html(videoHtml);
+      })["catch"](function (error) {
+        var html = "<div class=\"alert alert-danger\">".concat(error, "</div>");
+        $(html).html(html);
+      }).then(function () {
+        _this.loader = false;
+      });
     }
   },
   mounted: function mounted() {
@@ -46031,6 +46077,18 @@ var render = function() {
                         placeholder: "Enter Title"
                       }
                     })
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.teachingTitle && !_vm.topical
+                  ? _c("input", {
+                      staticClass: "form-control mb-0 mt-2",
+                      attrs: {
+                        name: "title",
+                        type: "text",
+                        placeholder: "Enter Title"
+                      },
+                      domProps: { value: _vm.teachingTitle }
+                    })
                   : _vm._e()
               ]),
               _vm._v(" "),
@@ -46122,23 +46180,62 @@ var render = function() {
                 )
               ]),
               _vm._v(" "),
+              _c("div", { staticClass: "form-group" }, [
+                _c("label", { attrs: { for: "video" } }, [
+                  _vm._v("Enter Video")
+                ]),
+                _vm._v(" "),
+                _c("input", {
+                  staticClass: "form-control",
+                  attrs: {
+                    placeholder: "Enter Video Url",
+                    name: "video",
+                    type: "text",
+                    id: "video"
+                  }
+                }),
+                _vm._v(" "),
+                _c("div", { staticClass: "teachings-create__media-btns" }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-light btns__icon",
+                      attrs: {
+                        "data-toggle": "modal",
+                        "data-target": "#loadMediaModal",
+                        type: "button"
+                      },
+                      on: { click: _vm.getYoutubeVideos }
+                    },
+                    [
+                      _c("span", { attrs: { "data-feather": "youtube" } }),
+                      _vm._v("Get From Youtube")
+                    ]
+                  )
+                ])
+              ]),
+              _vm._v(" "),
               _vm._m(0),
               _vm._v(" "),
-              _vm._m(1),
-              _vm._v(" "),
-              _c("scripture-component")
+              _c("scripture-component", {
+                on: {
+                  teachingTitle: function($event) {
+                    return _vm.setTeachingTitle($event)
+                  }
+                }
+              })
             ],
             1
           ),
           _vm._v(" "),
           _c("aside", { staticClass: "admin-form__sidebar" }, [
+            _vm._m(1),
+            _vm._v(" "),
             _vm._m(2),
             _vm._v(" "),
             _vm._m(3),
             _vm._v(" "),
             _vm._m(4),
-            _vm._v(" "),
-            _vm._m(5),
             _vm._v(" "),
             _c("div", { staticClass: "form-group" }, [
               _c("label", { attrs: { for: "image" } }, [
@@ -46418,40 +46515,43 @@ var render = function() {
           ])
         ])
       ]
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal fade video-modal",
+        attrs: { id: "loadMediaModal", tabindex: "-1", "aria-hidden": "true" }
+      },
+      [
+        _c("div", { staticClass: "modal-dialog video-modal__dialog" }, [
+          _c("div", { staticClass: "modal-content" }, [
+            _c(
+              "div",
+              {
+                class: [
+                  _vm.loader ? "video-modal__wrapper-loader" : "",
+                  "video-modal__wrapper"
+                ],
+                attrs: { id: "yt-videos-container" }
+              },
+              [
+                _vm.loader
+                  ? _c("div", { staticClass: "video-modal__loader" }, [
+                      _vm._m(5)
+                    ])
+                  : _vm._e()
+              ]
+            ),
+            _vm._v(" "),
+            _vm._m(6)
+          ])
+        ])
+      ]
     )
   ])
 }
 var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group" }, [
-      _c("label", { attrs: { for: "video" } }, [_vm._v("Enter Video")]),
-      _vm._v(" "),
-      _c("input", {
-        staticClass: "form-control",
-        attrs: {
-          placeholder: "Enter Video Url",
-          name: "video",
-          type: "text",
-          id: "video"
-        }
-      }),
-      _vm._v(" "),
-      _c("div", { staticClass: "teachings-create__media-btns" }, [
-        _c("button", { staticClass: "btn btn-light btns__icon" }, [
-          _c("span", { attrs: { "data-feather": "youtube" } }),
-          _vm._v("Get From Youtube")
-        ]),
-        _vm._v(" "),
-        _c("button", { staticClass: "btn btn-light btns__icon" }, [
-          _c("span", { attrs: { "data-feather": "upload" } }),
-          _vm._v("Upload to\n                            Youtube")
-        ])
-      ])
-    ])
-  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -46473,11 +46573,6 @@ var staticRenderFns = [
         _c("button", { staticClass: "btn btn-light btns__icon" }, [
           _c("span", { attrs: { "data-feather": "cloud" } }),
           _vm._v("From SoundCloud")
-        ]),
-        _vm._v(" "),
-        _c("button", { staticClass: "btn btn-light btns__icon" }, [
-          _c("span", { attrs: { "data-feather": "upload" } }),
-          _vm._v("Upload to\n                            SoundCloud")
         ])
       ])
     ])
@@ -46547,6 +46642,37 @@ var staticRenderFns = [
         staticClass: "form-control",
         attrs: { rows: "4", name: "description", cols: "50", id: "description" }
       })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "video-modal__loading" }, [
+      _c("h4", [_vm._v("Loading Videos...")]),
+      _vm._v(" "),
+      _c("div", { staticClass: "spinner-border", attrs: { role: "status" } })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-footer" }, [
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-secondary",
+          attrs: { type: "button", "data-dismiss": "modal" }
+        },
+        [_vm._v("Cancel")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        { staticClass: "btn btn-primary", attrs: { type: "button" } },
+        [_vm._v("Insert Video")]
+      )
     ])
   }
 ]

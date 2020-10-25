@@ -1,15 +1,6 @@
 .teachings-create {
 
 
-    &__media-btns {
-        display: flex;
-        justify-content: flex-start;
-        flex-wrap: wrap;
-        & > * {
-            margin-right: 1rem;
-        }
-    }
-
     &__speaker-container {
        position: relative;
     }

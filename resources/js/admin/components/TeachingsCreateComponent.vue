@@ -17,6 +17,7 @@
                         <label class="custom-control-label" for="topical">Enter a title for topical teaching</label>
                     </div>
                     <input v-if="topical" name="title" type="text" placeholder="Enter Title" class="form-control mb-0 mt-2">
+                    <input v-if="teachingTitle && !topical" name="title" type="text" placeholder="Enter Title" :value="teachingTitle" class="form-control mb-0 mt-2">
                 </div>
 
                 <div class="form-group">
@@ -47,9 +48,7 @@
                     <label for="video">Enter Video</label>
                     <input class="form-control" placeholder="Enter Video Url" name="video" type="text" id="video">
                     <div class="teachings-create__media-btns">
-                        <button class="btn btn-light btns__icon"><span data-feather="youtube"></span>Get From Youtube</button>
-                        <button class="btn btn-light btns__icon"><span data-feather="upload"></span>Upload to
-                            Youtube</button>
+                        <button @click="getYoutubeVideos" data-toggle="modal" data-target="#loadMediaModal" type="button" class="btn btn-light btns__icon"><span data-feather="youtube"></span>Get From Youtube</button>
                     </div>
                 </div>
                 <div class="form-group">
@@ -57,12 +56,10 @@
                     <input class="form-control" name="audio" type="text" id="audio" placeholder="Enter Audio Url">
                     <div class="teachings-create__media-btns">
                         <button class="btn btn-light btns__icon"><span data-feather="cloud"></span>From SoundCloud</button>
-                        <button class="btn btn-light btns__icon"><span data-feather="upload"></span>Upload to
-                            SoundCloud</button>
                     </div>
 
                 </div>
-                <scripture-component></scripture-component>
+                <scripture-component @teachingTitle="setTeachingTitle($event)"></scripture-component>
             </div>
 
             <aside class="admin-form__sidebar">
@@ -133,6 +130,28 @@
             </aside>
         </div>
     </form>
+
+
+    <!-- Scrollable modal -->
+    <div class="modal fade video-modal" id="loadMediaModal" tabindex="-1"  aria-hidden="true">
+        <div class="modal-dialog video-modal__dialog">
+            <div class="modal-content">
+               <div id="yt-videos-container" v-bind:class="[loader ? 'video-modal__wrapper-loader' : '', 'video-modal__wrapper']">
+                   <div v-if="loader" class="video-modal__loader">
+                       <div class="video-modal__loading">
+                           <h4>Loading Videos...</h4> <div class="spinner-border" role="status"></div>
+                       </div>
+                   </div>
+               </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Insert Video</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 </div>
 
 </template>
@@ -147,7 +166,10 @@ export default {
     data() {
         return {
             enterSpeaker: false,
-            topical: false
+            topical: false,
+            teachingTitle: "",
+            baseUrl: location.origin + "/api/",
+            loader: false
         }
     },
 
@@ -170,6 +192,43 @@ export default {
         todaysDate() {
              const today = new Date().toDateString();
              $('#today').text(today);
+        },
+
+
+        setTeachingTitle(title) {
+            this.teachingTitle = title;
+        },
+
+
+
+
+        getYoutubeVideos() {
+
+            const videosContainer = $('#yt-videos-container'),
+                   ytUrl = this.baseUrl + "youtube";
+
+            this.loader = true;
+
+            axios.get(ytUrl)
+                .then( res => {
+
+                    const videoHtml = res.data;
+
+                    $(videosContainer).html(videoHtml);
+
+                } )
+                .catch( error => {
+                    const html = `<div class="alert alert-danger">${error}</div>`;
+                    $(html).html(html);
+
+                } )
+                .then( () => {
+
+                    this.loader = false;
+
+                } );
+
+
         }
 
 

@@ -1,0 +1,22 @@
+
+
+// Page Teachings Create
+@mixin scriptureIcons() {
+
+        & .feather {
+            color: $dark;
+            transition: all .2s;
+            width: 1.75rem;
+            height: 1.75rem;
+        }
+
+        & .feather:hover {
+            color: $primary;
+            cursor: pointer;
+        }
+
+        & .feather:active {
+            color: $info;
+            transform: scale(.9);
+        }
+}
