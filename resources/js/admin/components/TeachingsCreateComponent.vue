@@ -45,8 +45,13 @@
 
                 </div>
                 <div class="form-group">
-                    <label for="video">Enter Video</label>
-                    <input class="form-control" placeholder="Enter Video Url" name="video" type="text" id="video">
+                    <label v-if="!videoValue" for="video">Enter Video</label>
+                    <div v-if="vidSrc" class="embed-responsive embed-responsive-16by9 teachings-create__media">
+                        <iframe class="embed-responsive-item" :src="vidSrc"
+                            frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                    </div>
+                    <input class="form-control" :value="videoValue" placeholder="Enter Video Url" name="yt_video" type="text" id="video">
                     <div class="teachings-create__media-btns">
                         <button @click="getYoutubeVideos" data-toggle="modal" data-target="#loadMediaModal" type="button" class="btn btn-light btns__icon"><span data-feather="youtube"></span>Get From Youtube</button>
                     </div>
@@ -133,24 +138,27 @@
 
 
     <!-- Scrollable modal -->
-    <div class="modal fade video-modal" id="loadMediaModal" tabindex="-1"  aria-hidden="true">
-        <div class="modal-dialog video-modal__dialog">
+    <div class="modal fade media-modal" id="loadMediaModal" tabindex="-1"  aria-hidden="true">
+
+        <div class="modal-dialog media-modal__dialog">
             <div class="modal-content">
-               <div id="yt-videos-container" v-bind:class="[loader ? 'video-modal__wrapper-loader' : '', 'video-modal__wrapper']">
-                   <div v-if="loader" class="video-modal__loader">
-                       <div class="video-modal__loading">
-                           <h4>Loading Videos...</h4> <div class="spinner-border" role="status"></div>
-                       </div>
-                   </div>
-               </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary">Insert Video</button>
+
+                <div class="media-modal__container">
+                    <div id="media-container" v-bind:class="[loader ? 'media-modal__wrapper-loader' : '', 'media-modal__wrapper']">
+                    </div>
+                    <div class="media-modal__more-container">
+                        <button @click="modalLoadMoreBtn" class="btn btn-secondary media-modal__load-more-btn">Load More <span v-if="loadMoreBtn" class="spinner-border spinner-border-sm"></span></button>
+                    </div>
+                </div>
+
+                <div class="modal-footer media-modal__footer">
+                    <button @click="deselectAllMedia" type="button" class="btn btn-light mr-auto" :disabled="!mediaSelected">Clear Selection</button>
+                    <button @click="emptyModal" type="button" class="btn btn-danger media-modal__cancel" data-dismiss="modal">Cancel</button>
+                    <button @click="insertVideo" data-dismiss='modal' type="button" class="btn btn-primary" :disabled="!mediaSelected">Insert Media</button>
                 </div>
             </div>
         </div>
     </div>
-
 
 </div>
 
@@ -169,7 +177,13 @@ export default {
             topical: false,
             teachingTitle: "",
             baseUrl: location.origin + "/api/",
-            loader: false
+            loader: false,
+            loadMoreBtn: false,
+            vidId: '',
+            videoValue: '',
+            vidSrc: '',
+            audioValue: '',
+            mediaSelected: false
         }
     },
 
@@ -180,6 +194,38 @@ export default {
     props: [ 'action', 'csrf' ],
 
     methods: {
+
+        // Event methods =========/
+        // ========================
+
+        selectedMediaEvent() {
+            // add event handler
+
+            const allMedia = $('.media-modal__media');
+
+            $(allMedia).each( (i, media) => {
+                $(media).on('click', e => {
+                    this.selectMedia(e);
+                });
+            } );
+
+        },
+
+
+        vidValueChange() {
+
+            const videoInput = $('[name="yt_video"');
+
+            $(videoInput).on('change', e => {
+                this.insertVideo(e);
+            });
+
+        },
+
+
+
+        // Main methods ==========/
+        //=================/
         dateDefaultVal() {
             const date = new Date().toISOString(),
                   regEx = /^\d{4}-\d{2}-\d{2}/,
@@ -200,36 +246,155 @@ export default {
         },
 
 
+        getYoutubeVideos(e, nextPage = '') {
+
+            const videosContainer = $('#media-container');
+
+            let   ytUrl = this.baseUrl + "youtube";
 
 
-        getYoutubeVideos() {
+            if(!nextPage) {
+                $(videosContainer).html(this.modalLoaderHTML);
+                this.loader = true;
+            } else {
+                ytUrl += `/?nextPage=${nextPage}`;
+                this.loadMoreBtn = true;
+            }
 
-            const videosContainer = $('#yt-videos-container'),
-                   ytUrl = this.baseUrl + "youtube";
-
-            this.loader = true;
 
             axios.get(ytUrl)
                 .then( res => {
 
                     const videoHtml = res.data;
 
-                    $(videosContainer).html(videoHtml);
+                    !nextPage ?
+                        $(videosContainer).html(videoHtml) :
+                        $(videosContainer).append(videoHtml);
+
+
 
                 } )
                 .catch( error => {
                     const html = `<div class="alert alert-danger">${error}</div>`;
-                    $(html).html(html);
-
+                    $(videosContainer).html(html);
                 } )
                 .then( () => {
+                    if(!nextPage) {
+                        this.loader = false
+                    } else {
 
-                    this.loader = false;
+                        const vidId = $('.video-modal__body').last().attr('id');
+
+                        window.location = `${location.origin}/admin/teachings#${vidId}`;
+
+                        this.loadMoreBtn = false;
+                    }
+
+                    this.selectedMediaEvent();
 
                 } );
+        },
 
+
+        modalLoaderHTML() {
+
+            const html =
+                    `<div class="media-modal__loader">
+                       <div class="media-modal__loading">
+                           <h4>Loading Videos...</h4> <div class="spinner-border" role="status"></div>
+                       </div>
+                    </div>`;
+
+            return html;
+        },
+
+        modalLoadMoreBtn() {
+
+            // get the next page token
+            const nextPage = $('.video-modal__body').last().attr('data-np');
+
+            // send request with nextPage token
+            this.getYoutubeVideos(null, nextPage);
+
+        },
+
+
+        selectMedia(e) {
+
+            let media = $(e.target);
+
+            // remove all media-modal__selected-media classes
+            this.deselectAllMedia();
+
+            // target right element
+            if(!$(media).hasClass('media-modal__media'))
+                media = $(media).parents('.media-modal__media');
+
+            $(media).addClass('media-modal__selected-media');
+
+            $(media).find('.custom-control-input').prop('checked', true);
+
+
+            this.mediaSelected = true;
+
+            // Set the vidId ========/
+            this.vidId = $(e.target).attr('data-media-id');
+
+        },
+
+        deselectAllMedia() {
+            const allMedia = $('.media-modal__media');
+
+            $(allMedia).each( ( i, media ) => {
+
+                if( $(media).hasClass('media-modal__selected-media') ) {
+
+                    $(media).removeClass('media-modal__selected-media');
+
+                    $(media).find('.custom-control-input').prop('checked', false);
+                }
+
+            } );
+
+            this.mediaSelected = false;
+
+        },
+
+        emptyModal() {
+            const mediaContainer = $('#media-container');
+            $(mediaContainer).html('');
+        },
+
+
+
+        insertVideo(e) {
+
+            const ytUrl = 'https://youtu.be/',
+                  ytEmbed = 'https://www.youtube.com/embed/'
+
+
+            if(e.type === 'change') {
+            const vidVal = $('[name="yt_video"]').val(),
+                  regX = /(?<=https:\/\/youtu\.be\/).+$/;
+
+                  if(!vidVal) {
+
+                      this.videoValue = '';
+                      this.vidSrc = '';
+
+                      return;
+
+                  } else {
+                      this.vidId = vidVal.match(regX)[0];
+                  }
+
+            }
+
+            this.videoValue = ytUrl + this.vidId;
+            this.vidSrc = ytEmbed + this.vidId;
 
         }
+
 
 
 
@@ -238,6 +403,7 @@ export default {
     mounted() {
         this.dateDefaultVal();
         this.todaysDate();
+        this.vidValueChange();
     }
 
 }

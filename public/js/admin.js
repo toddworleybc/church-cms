@@ -2479,6 +2479,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 var ScriptureComponent = Vue.component('scripture-component', __webpack_require__(/*! ./ScriptureComponent.vue */ "./resources/js/admin/components/ScriptureComponent.vue")["default"]);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -2487,7 +2495,13 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
       topical: false,
       teachingTitle: "",
       baseUrl: location.origin + "/api/",
-      loader: false
+      loader: false,
+      loadMoreBtn: false,
+      vidId: '',
+      videoValue: '',
+      vidSrc: '',
+      audioValue: '',
+      mediaSelected: false
     };
   },
   components: {
@@ -2495,6 +2509,29 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
   },
   props: ['action', 'csrf'],
   methods: {
+    // Event methods =========/
+    // ========================
+    selectedMediaEvent: function selectedMediaEvent() {
+      var _this = this;
+
+      // add event handler
+      var allMedia = $('.media-modal__media');
+      $(allMedia).each(function (i, media) {
+        $(media).on('click', function (e) {
+          _this.selectMedia(e);
+        });
+      });
+    },
+    vidValueChange: function vidValueChange() {
+      var _this2 = this;
+
+      var videoInput = $('[name="yt_video"');
+      $(videoInput).on('change', function (e) {
+        _this2.insertVideo(e);
+      });
+    },
+    // Main methods ==========/
+    //=================/
     dateDefaultVal: function dateDefaultVal() {
       var date = new Date().toISOString(),
           regEx = /^\d{4}-\d{2}-\d{2}/,
@@ -2510,26 +2547,100 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
     setTeachingTitle: function setTeachingTitle(title) {
       this.teachingTitle = title;
     },
-    getYoutubeVideos: function getYoutubeVideos() {
-      var _this = this;
+    getYoutubeVideos: function getYoutubeVideos(e) {
+      var _this3 = this;
 
-      var videosContainer = $('#yt-videos-container'),
-          ytUrl = this.baseUrl + "youtube";
-      this.loader = true;
+      var nextPage = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+      var videosContainer = $('#media-container');
+      var ytUrl = this.baseUrl + "youtube";
+
+      if (!nextPage) {
+        $(videosContainer).html(this.modalLoaderHTML);
+        this.loader = true;
+      } else {
+        ytUrl += "/?nextPage=".concat(nextPage);
+        this.loadMoreBtn = true;
+      }
+
       axios.get(ytUrl).then(function (res) {
         var videoHtml = res.data;
-        $(videosContainer).html(videoHtml);
+        !nextPage ? $(videosContainer).html(videoHtml) : $(videosContainer).append(videoHtml);
       })["catch"](function (error) {
         var html = "<div class=\"alert alert-danger\">".concat(error, "</div>");
-        $(html).html(html);
+        $(videosContainer).html(html);
       }).then(function () {
-        _this.loader = false;
+        if (!nextPage) {
+          _this3.loader = false;
+        } else {
+          var vidId = $('.video-modal__body').last().attr('id');
+          window.location = "".concat(location.origin, "/admin/teachings#").concat(vidId);
+          _this3.loadMoreBtn = false;
+        }
+
+        _this3.selectedMediaEvent();
       });
+    },
+    modalLoaderHTML: function modalLoaderHTML() {
+      var html = "<div class=\"media-modal__loader\">\n                       <div class=\"media-modal__loading\">\n                           <h4>Loading Videos...</h4> <div class=\"spinner-border\" role=\"status\"></div>\n                       </div>\n                    </div>";
+      return html;
+    },
+    modalLoadMoreBtn: function modalLoadMoreBtn() {
+      // get the next page token
+      var nextPage = $('.video-modal__body').last().attr('data-np'); // send request with nextPage token
+
+      this.getYoutubeVideos(null, nextPage);
+    },
+    selectMedia: function selectMedia(e) {
+      var media = $(e.target); // remove all media-modal__selected-media classes
+
+      this.deselectAllMedia(); // target right element
+
+      if (!$(media).hasClass('media-modal__media')) media = $(media).parents('.media-modal__media');
+      $(media).addClass('media-modal__selected-media');
+      $(media).find('.custom-control-input').prop('checked', true);
+      this.mediaSelected = true; // Set the vidId ========/
+
+      this.vidId = $(e.target).attr('data-media-id');
+    },
+    deselectAllMedia: function deselectAllMedia() {
+      var allMedia = $('.media-modal__media');
+      $(allMedia).each(function (i, media) {
+        if ($(media).hasClass('media-modal__selected-media')) {
+          $(media).removeClass('media-modal__selected-media');
+          $(media).find('.custom-control-input').prop('checked', false);
+        }
+      });
+      this.mediaSelected = false;
+    },
+    emptyModal: function emptyModal() {
+      var mediaContainer = $('#media-container');
+      $(mediaContainer).html('');
+    },
+    insertVideo: function insertVideo(e) {
+      var ytUrl = 'https://youtu.be/',
+          ytEmbed = 'https://www.youtube.com/embed/';
+
+      if (e.type === 'change') {
+        var vidVal = $('[name="yt_video"]').val(),
+            regX = /(?<=https:\/\/youtu\.be\/).+$/;
+
+        if (!vidVal) {
+          this.videoValue = '';
+          this.vidSrc = '';
+          return;
+        } else {
+          this.vidId = vidVal.match(regX)[0];
+        }
+      }
+
+      this.videoValue = ytUrl + this.vidId;
+      this.vidSrc = ytEmbed + this.vidId;
     }
   },
   mounted: function mounted() {
     this.dateDefaultVal();
     this.todaysDate();
+    this.vidValueChange();
   }
 });
 
@@ -46181,18 +46292,43 @@ var render = function() {
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "form-group" }, [
-                _c("label", { attrs: { for: "video" } }, [
-                  _vm._v("Enter Video")
-                ]),
+                !_vm.videoValue
+                  ? _c("label", { attrs: { for: "video" } }, [
+                      _vm._v("Enter Video")
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.vidSrc
+                  ? _c(
+                      "div",
+                      {
+                        staticClass:
+                          "embed-responsive embed-responsive-16by9 teachings-create__media"
+                      },
+                      [
+                        _c("iframe", {
+                          staticClass: "embed-responsive-item",
+                          attrs: {
+                            src: _vm.vidSrc,
+                            frameborder: "0",
+                            allow:
+                              "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
+                            allowfullscreen: ""
+                          }
+                        })
+                      ]
+                    )
+                  : _vm._e(),
                 _vm._v(" "),
                 _c("input", {
                   staticClass: "form-control",
                   attrs: {
                     placeholder: "Enter Video Url",
-                    name: "video",
+                    name: "yt_video",
                     type: "text",
                     id: "video"
-                  }
+                  },
+                  domProps: { value: _vm.videoValue }
                 }),
                 _vm._v(" "),
                 _c("div", { staticClass: "teachings-create__media-btns" }, [
@@ -46520,31 +46656,75 @@ var render = function() {
     _c(
       "div",
       {
-        staticClass: "modal fade video-modal",
+        staticClass: "modal fade media-modal",
         attrs: { id: "loadMediaModal", tabindex: "-1", "aria-hidden": "true" }
       },
       [
-        _c("div", { staticClass: "modal-dialog video-modal__dialog" }, [
+        _c("div", { staticClass: "modal-dialog media-modal__dialog" }, [
           _c("div", { staticClass: "modal-content" }, [
-            _c(
-              "div",
-              {
+            _c("div", { staticClass: "media-modal__container" }, [
+              _c("div", {
                 class: [
-                  _vm.loader ? "video-modal__wrapper-loader" : "",
-                  "video-modal__wrapper"
+                  _vm.loader ? "media-modal__wrapper-loader" : "",
+                  "media-modal__wrapper"
                 ],
-                attrs: { id: "yt-videos-container" }
-              },
-              [
-                _vm.loader
-                  ? _c("div", { staticClass: "video-modal__loader" }, [
-                      _vm._m(5)
-                    ])
-                  : _vm._e()
-              ]
-            ),
+                attrs: { id: "media-container" }
+              }),
+              _vm._v(" "),
+              _c("div", { staticClass: "media-modal__more-container" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-secondary media-modal__load-more-btn",
+                    on: { click: _vm.modalLoadMoreBtn }
+                  },
+                  [
+                    _vm._v("Load More "),
+                    _vm.loadMoreBtn
+                      ? _c("span", {
+                          staticClass: "spinner-border spinner-border-sm"
+                        })
+                      : _vm._e()
+                  ]
+                )
+              ])
+            ]),
             _vm._v(" "),
-            _vm._m(6)
+            _c("div", { staticClass: "modal-footer media-modal__footer" }, [
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-light mr-auto",
+                  attrs: { type: "button", disabled: !_vm.mediaSelected },
+                  on: { click: _vm.deselectAllMedia }
+                },
+                [_vm._v("Clear Selection")]
+              ),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-danger media-modal__cancel",
+                  attrs: { type: "button", "data-dismiss": "modal" },
+                  on: { click: _vm.emptyModal }
+                },
+                [_vm._v("Cancel")]
+              ),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-primary",
+                  attrs: {
+                    "data-dismiss": "modal",
+                    type: "button",
+                    disabled: !_vm.mediaSelected
+                  },
+                  on: { click: _vm.insertVideo }
+                },
+                [_vm._v("Insert Media")]
+              )
+            ])
           ])
         ])
       ]
@@ -46642,37 +46822,6 @@ var staticRenderFns = [
         staticClass: "form-control",
         attrs: { rows: "4", name: "description", cols: "50", id: "description" }
       })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "video-modal__loading" }, [
-      _c("h4", [_vm._v("Loading Videos...")]),
-      _vm._v(" "),
-      _c("div", { staticClass: "spinner-border", attrs: { role: "status" } })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "modal-footer" }, [
-      _c(
-        "button",
-        {
-          staticClass: "btn btn-secondary",
-          attrs: { type: "button", "data-dismiss": "modal" }
-        },
-        [_vm._v("Cancel")]
-      ),
-      _vm._v(" "),
-      _c(
-        "button",
-        { staticClass: "btn btn-primary", attrs: { type: "button" } },
-        [_vm._v("Insert Video")]
-      )
     ])
   }
 ]

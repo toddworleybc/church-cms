@@ -11,4 +11,10 @@
         opacity: 0;
     }
 
+
+    &__media {
+        max-width: 20rem;
+        @include spaceY(1rem);
+    }
+
 }

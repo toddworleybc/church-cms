@@ -11172,7 +11172,11 @@ body {
   margin: 1rem 0;
 }
 
-.video-modal__body {
+.media-modal {
+  padding-right: 0 !important;
+}
+
+.media-modal__body {
   display: flex;
   align-items: stretch;
   flex-wrap: wrap;
@@ -11180,55 +11184,97 @@ body {
 }
 
 @media only screen and (max-width: 56.25em) {
-  .video-modal__body {
+  .media-modal__body {
     flex-direction: column;
     align-items: center;
   }
 }
 
-.video-modal__dialog {
+.media-modal__dialog {
   max-width: 75rem;
 }
 
-.video-modal__input-container {
+.media-modal__footer {
+  padding: 1rem;
+}
+
+.media-modal__input-container {
   border-top: 1px solid #cdcdcd;
   padding-top: 1rem;
 }
 
-.video-modal__input-container > *:hover {
+.media-modal__input-container > *:hover {
   cursor: pointer;
 }
 
-.video-modal__loading {
+.media-modal__loading {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
 }
 
-.video-modal__title {
+.media-modal__more-container {
+  padding: 2rem;
+}
+
+.media-modal__load-more-btn {
+  width: 100%;
+  margin: 1rem auto;
+  text-align: center;
+}
+
+.media-modal__title {
   border-bottom: 1px solid #cdcdcd;
   margin-bottom: 1rem;
 }
 
-.video-modal__video {
+.media-modal__media {
+  position: relative;
   display: flex;
   justify-content: space-around;
   flex-direction: column;
   width: calc((100% / 3) - 2rem);
-  box-shadow: 0 1px 1rem 1px #cdcdcdc7;
   padding: 1rem;
   margin: 1rem;
   border-radius: 0.5rem;
+  transition: all 0.2s ease-in;
+  box-shadow: 0 1px 1rem 1px #cdcdcdc7;
+}
+
+.media-modal__media:hover,
+.media-modal__media:focus {
+  transform: translateY(-5px) scale(1.05);
+  border: 1px solid #007bff;
+  cursor: pointer;
+  box-shadow: 0 1px 0.5rem 1px #007bff;
+}
+
+.media-modal__media:active::after {
+  content: "";
+  display: block;
+  position: absolute;
+  background-color: rgba(0, 123, 255, 0.7);
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
 }
 
 @media only screen and (max-width: 56.25em) {
-  .video-modal__video {
+  .media-modal__media {
     width: 80%;
   }
 }
 
-.video-modal__wrapper-loader {
+.media-modal__selected-media {
+  transform: translateY(-5px) scale(1.05);
+  border: 1px solid #007bff;
+  z-index: 100;
+  box-shadow: 0 1px 0.5rem 1px #007bff;
+}
+
+.media-modal__wrapper-loader {
   min-height: 10rem;
   color: #6c757d;
   background-color: #f8f9fa;
@@ -11254,6 +11300,12 @@ body {
 .teachings-create__speaker-hidden {
   display: none;
   opacity: 0;
+}
+
+.teachings-create__media {
+  max-width: 20rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 .admin-form__wrapper {
