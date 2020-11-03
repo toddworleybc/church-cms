@@ -44,6 +44,7 @@ export default {
             deg: 0,
             verseId: 0,
             delay: false,
+            description: '',
             baseUrl: location.origin + '/api/bible/',
             optionsUrl: location.origin + '/api/bible/options/',
             disableAddBtn: false,
@@ -234,6 +235,36 @@ export default {
         }, // #-add verse
 
 
+        createTheDescription() {
+
+            this.description = '';
+
+            console.log(this.description);
+
+            const scriptures = $(".scripture__insert p");
+            let   text = '';
+
+
+                $(scriptures).each( ( i, scripture ) => {
+                    if(i < 2)
+                        text += $(scripture).text() + " ";
+                } );
+
+
+            // remove verse number
+                text = text.replace(/\d:/gm, '');
+                text = text.substr(1, 120);
+
+
+            // create description
+               const  description = `${this.teachingTitle} bible teaching: ${text}...`;
+
+                this.description = description;
+
+                this.passDescriptionToParent();
+        },
+
+
 
         removeVerse(e) {
 
@@ -264,6 +295,15 @@ export default {
                     $(e.target).parent().parent().remove();
                     $(`#scripture-${removeVsId}`).remove();
                 }, 700);
+
+                // recreate the title
+                this.createTheTitle();
+
+                // set delay to make sure html has been removed
+                setTimeout(() => {
+                    this.createTheDescription();
+                }, 1500);
+
         },
 
 
@@ -474,6 +514,9 @@ export default {
                     const html = res.data;
                     this.genLoader=false;
                     $("#scripture__insert").html(html);
+
+                    // create description for post
+                    this.createTheDescription();
                 } )
                 .catch( error => {
                     this.errorMessage(error);
@@ -505,12 +548,13 @@ export default {
             // Insert book and title into title
                 this.teachingTitle += verse['book'] + " ";
                 this.teachingTitle += verse['chapter'];
-                console.log(i);
+
 
             // Add start verse if present
                 if( verse['startVs'] ) {
                     this.teachingTitle += verse['startVs'] ? ":" + verse['startVs'] : "";
                 }
+
             // Add end verse if present
                 if( verse['endVs'] ) {
                     this.teachingTitle += verse['endVs'] ? "-" + verse['endVs'] : "";
@@ -524,6 +568,10 @@ export default {
 
         passTitleToParent() {
             this.$emit('teachingTitle', this.teachingTitle);
+        },
+
+        passDescriptionToParent() {
+             this.$emit('description', this.description);
         }
 
 

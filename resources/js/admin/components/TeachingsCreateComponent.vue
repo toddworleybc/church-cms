@@ -36,9 +36,9 @@
                         <input type="text" name="speaker" v-show="enterSpeaker" class="form-control mb-0" placeholder="Enter Speaker">
 
                         <select class="custom-select" v-show="!enterSpeaker" name="speaker">
-                            <option value="james wafer" selected="selected">Pastor James Wafer</option>
-                            <option value="dale richmond">Pastor Dale Richmond</option>
-                            <option value="Kelly">Reciptionist Kelly Munsion</option>
+                            <option data-staff="Pastor James Wafer" value="1" selected="selected">Pastor James Wafer</option>
+                            <option data-staff="Pastor Dale Richmond" value="2">Pastor Dale Richmond</option>
+                            <option data-staff="Reciptionist Kelly Munsion" value="3">Reciptionist Kelly Munsion</option>
                         </select>
 
                     </div>
@@ -49,7 +49,8 @@
                     <div v-if="vidSrc" class="embed-responsive embed-responsive-16by9 teachings-create__media">
                         <iframe class="embed-responsive-item" :src="vidSrc"
                             frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen></iframe>
+                            allowfullscreen>
+                        </iframe>
                     </div>
                     <input class="form-control" :value="videoValue" placeholder="Enter Video Url" name="yt_video" type="text" id="video">
                     <div class="teachings-create__media-btns">
@@ -60,11 +61,11 @@
                     <label for="audio">Enter Audio</label>
                     <input class="form-control" name="audio" type="text" id="audio" placeholder="Enter Audio Url">
                     <div class="teachings-create__media-btns">
-                        <button class="btn btn-light btns__icon"><span data-feather="cloud"></span>From SoundCloud</button>
+                        <button type="button" class="btn btn-light btns__icon" disabled><span data-feather="cloud"></span>Get From SoundCloud</button>
                     </div>
 
                 </div>
-                <scripture-component @teachingTitle="setTeachingTitle($event)"></scripture-component>
+                <scripture-component @description="setDescription($event)" @teachingTitle="setTeachingTitle($event)"></scripture-component>
             </div>
 
             <aside class="admin-form__sidebar">
@@ -83,14 +84,14 @@
 
                 <div class="form-group">
                     <label for="description">Description</label>
-                    <textarea class="form-control" rows="4" name="description" cols="50" id="description"></textarea>
+                    <textarea v-model="description" class="form-control" rows="4" name="description" cols="50" id="description"></textarea>
                 </div>
 
                 <div class="form-group">
                     <label for="image">Featured Image</label>
-                    <input class="form-control-file" name="image" type="file" id="image">
+                    <input @change="imagePreview" class="form-control-file" name="image" type="file" id="ft_image">
                     <div class="admin-form__image-preview">
-                        <svg viewBox="0 0 507.99999 285.75001">
+                        <svg v-if="!ftImg" viewBox="0 0 507.99999 285.75001">
                             <defs id="defs2">
                                 <filter id="filter4639" style="color-interpolation-filters:sRGB;">
                                     <feConvolveMatrix id="feConvolveMatrix4635" order="3 3"
@@ -130,6 +131,7 @@
                                 </g>
                             </g>
                         </svg>
+                        <img v-else :src="ftImg" class="img-fluid">
                     </div>
                 </div>
             </aside>
@@ -173,17 +175,20 @@ export default {
 
     data() {
         return {
-            enterSpeaker: false,
-            topical: false,
-            teachingTitle: "",
+            audioValue: '',
             baseUrl: location.origin + "/api/",
+            description: '',
+            enterSpeaker: false,
+            ftImg: '',
             loader: false,
             loadMoreBtn: false,
+            mediaSelected: false,
+            topical: false,
+            teachingTitle: "",
             vidId: '',
-            videoValue: '',
             vidSrc: '',
-            audioValue: '',
-            mediaSelected: false
+            videoValue: ''
+
         }
     },
 
@@ -195,9 +200,19 @@ export default {
 
     methods: {
 
-        // Event methods =========/
+    // Event methods =========/
         // ========================
 
+
+    // insert featured image onto screen before loading into the database
+        imagePreview(e) {
+            const file = e.target.files[0];
+            this.readFile(file);
+        },
+
+
+
+    // add event for select media
         selectedMediaEvent() {
             // add event handler
 
@@ -212,6 +227,7 @@ export default {
         },
 
 
+    // add event for video input change
         vidValueChange() {
 
             const videoInput = $('[name="yt_video"');
@@ -224,8 +240,9 @@ export default {
 
 
 
-        // Main methods ==========/
+     // Main methods ==========/
         //=================/
+
         dateDefaultVal() {
             const date = new Date().toISOString(),
                   regEx = /^\d{4}-\d{2}-\d{2}/,
@@ -235,113 +252,7 @@ export default {
                   $(input).attr('value', theDate);
         },
 
-        todaysDate() {
-             const today = new Date().toDateString();
-             $('#today').text(today);
-        },
-
-
-        setTeachingTitle(title) {
-            this.teachingTitle = title;
-        },
-
-
-        getYoutubeVideos(e, nextPage = '') {
-
-            const videosContainer = $('#media-container');
-
-            let   ytUrl = this.baseUrl + "youtube";
-
-
-            if(!nextPage) {
-                $(videosContainer).html(this.modalLoaderHTML);
-                this.loader = true;
-            } else {
-                ytUrl += `/?nextPage=${nextPage}`;
-                this.loadMoreBtn = true;
-            }
-
-
-            axios.get(ytUrl)
-                .then( res => {
-
-                    const videoHtml = res.data;
-
-                    !nextPage ?
-                        $(videosContainer).html(videoHtml) :
-                        $(videosContainer).append(videoHtml);
-
-
-
-                } )
-                .catch( error => {
-                    const html = `<div class="alert alert-danger">${error}</div>`;
-                    $(videosContainer).html(html);
-                } )
-                .then( () => {
-                    if(!nextPage) {
-                        this.loader = false
-                    } else {
-
-                        const vidId = $('.video-modal__body').last().attr('id');
-
-                        window.location = `${location.origin}/admin/teachings#${vidId}`;
-
-                        this.loadMoreBtn = false;
-                    }
-
-                    this.selectedMediaEvent();
-
-                } );
-        },
-
-
-        modalLoaderHTML() {
-
-            const html =
-                    `<div class="media-modal__loader">
-                       <div class="media-modal__loading">
-                           <h4>Loading Videos...</h4> <div class="spinner-border" role="status"></div>
-                       </div>
-                    </div>`;
-
-            return html;
-        },
-
-        modalLoadMoreBtn() {
-
-            // get the next page token
-            const nextPage = $('.video-modal__body').last().attr('data-np');
-
-            // send request with nextPage token
-            this.getYoutubeVideos(null, nextPage);
-
-        },
-
-
-        selectMedia(e) {
-
-            let media = $(e.target);
-
-            // remove all media-modal__selected-media classes
-            this.deselectAllMedia();
-
-            // target right element
-            if(!$(media).hasClass('media-modal__media'))
-                media = $(media).parents('.media-modal__media');
-
-            $(media).addClass('media-modal__selected-media');
-
-            $(media).find('.custom-control-input').prop('checked', true);
-
-
-            this.mediaSelected = true;
-
-            // Set the vidId ========/
-            this.vidId = $(e.target).attr('data-media-id');
-
-        },
-
+    // deselect the media
         deselectAllMedia() {
             const allMedia = $('.media-modal__media');
 
@@ -360,12 +271,66 @@ export default {
 
         },
 
-        emptyModal() {
+    // Empty the modal media
+         emptyModal() {
             const mediaContainer = $('#media-container');
             $(mediaContainer).html('');
         },
 
 
+        getYoutubeVideos(e, nextPage = '') {
+
+        // Where media is inserted after API call
+            const videosContainer = $('#media-container');
+
+        // base url ofr youtube videos
+            let   ytUrl = this.baseUrl + "youtube";
+
+
+        // Check if request is coming from next token
+            if(!nextPage) {
+                $(videosContainer).html(this.modalLoaderHTML);
+                this.loader = true;
+            } else {
+                ytUrl += `/?nextPage=${nextPage}`;
+                this.loadMoreBtn = true;
+            }
+
+        // Make request
+            axios.get(ytUrl)
+                .then( res => {
+
+                    const videoHtml = res.data;
+
+                    !nextPage ?
+                        $(videosContainer).html(videoHtml) :
+                        $(videosContainer).append(videoHtml);
+
+                } )
+                .catch( error => {
+                    const html = `<div class="alert alert-danger">${error}</div>`;
+                    $(videosContainer).html(html);
+                } )
+                .then( () => {
+                    if(!nextPage) {
+
+                        this.loader = false
+
+                    } else {
+
+                    // this is used to get the modal back up to the top of the new request
+                        const vidId = $('.media-modal__body').last().attr('id');
+
+                        window.location = `${location.origin}/admin/teachings#${vidId}`;
+
+                        this.loadMoreBtn = false;
+                    }
+
+                // add select media event to each media
+                    this.selectedMediaEvent();
+
+                } );
+        },
 
         insertVideo(e) {
 
@@ -393,12 +358,89 @@ export default {
             this.videoValue = ytUrl + this.vidId;
             this.vidSrc = ytEmbed + this.vidId;
 
+        },
+
+
+         modalLoaderHTML() {
+
+            const html =
+                    `<div class="media-modal__loader">
+                       <div class="media-modal__loading">
+                           <h4>Loading Videos...</h4> <div class="spinner-border" role="status"></div>
+                       </div>
+                    </div>`;
+
+            return html;
+        },
+
+        modalLoadMoreBtn() {
+
+            // get the next page token
+            const nextPage = $('.media-modal__body').last().attr('data-np');
+
+            // send request with nextPage token
+            this.getYoutubeVideos(null, nextPage);
+
+        },
+
+
+        readFile(file) {
+
+            const reader = new FileReader();
+
+            $(reader).on('load', (e) => {
+                this.ftImg = e.target.result;
+            });
+
+             reader.readAsDataURL(file);
+        },
+
+
+
+        selectMedia(e) {
+
+            let media = $(e.target);
+
+            // remove all media-modal__selected-media classes
+            this.deselectAllMedia();
+
+            // target right element
+            if(!$(media).hasClass('media-modal__media'))
+                media = $(media).parents('.media-modal__media');
+
+            $(media).addClass('media-modal__selected-media');
+
+            $(media).find('.custom-control-input').prop('checked', true);
+
+
+            this.mediaSelected = true;
+
+            // Set the vidId ========/
+            this.vidId = $(e.target).attr('data-media-id');
+
+        },
+
+
+
+
+        setTeachingTitle(title) {
+            this.teachingTitle = title;
+        },
+
+
+        setDescription(description) {
+            this.description = description;
+        },
+
+
+
+        todaysDate() {
+             const today = new Date().toDateString();
+             $('#today').text(today);
         }
 
 
-
-
-    },
+    }, // end of methods =========/
 
     mounted() {
         this.dateDefaultVal();

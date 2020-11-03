@@ -1953,6 +1953,7 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       deg: 0,
       verseId: 0,
       delay: false,
+      description: '',
       baseUrl: location.origin + '/api/bible/',
       optionsUrl: location.origin + '/api/bible/options/',
       disableAddBtn: false,
@@ -2076,7 +2077,25 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       this.disableAllSelects();
     },
     // #-add verse
+    createTheDescription: function createTheDescription() {
+      this.description = '';
+      console.log(this.description);
+      var scriptures = $(".scripture__insert p");
+      var text = '';
+      $(scriptures).each(function (i, scripture) {
+        if (i < 2) text += $(scripture).text() + " ";
+      }); // remove verse number
+
+      text = text.replace(/\d:/gm, '');
+      text = text.substr(1, 120); // create description
+
+      var description = "".concat(this.teachingTitle, " bible teaching: ").concat(text, "...");
+      this.description = description;
+      this.passDescriptionToParent();
+    },
     removeVerse: function removeVerse(e) {
+      var _this3 = this;
+
       // Fix bug where if the Rect or Line was clicked on svg it will make sure that it relates to the svg itself
       if (e.target.localName === "line" || e.target.localName === "rect") e.target = e.target.parentNode; // Id to remove SCRIPTURE ONLY, not select;
 
@@ -2097,10 +2116,16 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       setTimeout(function () {
         $(e.target).parent().parent().remove();
         $("#scripture-".concat(removeVsId)).remove();
-      }, 700);
+      }, 700); // recreate the title
+
+      this.createTheTitle(); // set delay to make sure html has been removed
+
+      setTimeout(function () {
+        _this3.createTheDescription();
+      }, 1500);
     },
     rotateSvg: function rotateSvg() {
-      var _this3 = this;
+      var _this4 = this;
 
       var reverse = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
       var e = arguments.length > 1 ? arguments[1] : undefined;
@@ -2122,11 +2147,11 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       this.removeVerse(e); // set delay for btn clicking
 
       setTimeout(function () {
-        _this3.delay = false;
+        _this4.delay = false;
       }, 1000);
     },
     setSelectInput: function setSelectInput(e) {
-      var _this4 = this;
+      var _this5 = this;
 
       // Stop extra request on end_verse onChange
       if (e.target.name === 'end_verse') return;
@@ -2159,7 +2184,7 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
         if (selectName === 'Chapter') selectName += "s";
         $(select).html("<option value=\"none\">".concat(selectName, "</option>"));
 
-        _this4.disableSelect(select);
+        _this5.disableSelect(select);
       }); // =======================================
       // build url slug
 
@@ -2168,7 +2193,7 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       this.getBibleHtmlOptions(slug, function (optionsHtml) {
         $(selectToAddOptionsTo).html(optionsHtml);
 
-        _this4.enableSelect(selectToAddOptionsTo);
+        _this5.enableSelect(selectToAddOptionsTo);
       });
     },
     // ####--- END SELECT INPUT CONFIG ------------/
@@ -2196,10 +2221,10 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
     },
     // disable all selects aka RESET Selects
     disableAllSelects: function disableAllSelects() {
-      var _this5 = this;
+      var _this6 = this;
 
       $(this.createdSelectInputs).each(function (i, selectInput) {
-        _this5.disableSelect(selectInput);
+        _this6.disableSelect(selectInput);
       });
     },
     // enable select option
@@ -2223,7 +2248,7 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       });
     },
     getData: function getData() {
-      var _this6 = this;
+      var _this7 = this;
 
       var url = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.baseUrl;
       var callback = arguments.length > 1 ? arguments[1] : undefined;
@@ -2232,9 +2257,9 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
         var data = res.data;
         callback(data);
       })["catch"](function (error) {
-        _this6.errorMessage(error);
+        _this7.errorMessage(error);
       }).then(function () {
-        _this6.loader = false;
+        _this7.loader = false;
       });
     },
     optionsSlugBuilder: function optionsSlugBuilder(rowSelected) {
@@ -2249,7 +2274,7 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       return slug;
     },
     sendPayload: function sendPayload(jsonLoad) {
-      var _this7 = this;
+      var _this8 = this;
 
       this.genLoader = true;
       var url = this.baseUrl + 'gen';
@@ -2259,50 +2284,54 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
         }
       }).then(function (res) {
         var html = res.data;
-        _this7.genLoader = false;
-        $("#scripture__insert").html(html);
-      })["catch"](function (error) {
-        _this7.errorMessage(error);
+        _this8.genLoader = false;
+        $("#scripture__insert").html(html); // create description for post
 
-        _this7.genLoader = false;
+        _this8.createTheDescription();
+      })["catch"](function (error) {
+        _this8.errorMessage(error);
+
+        _this8.genLoader = false;
       });
     },
     // Set the books select when created
     setBooksSelect: function setBooksSelect(verseId) {
-      var _this8 = this;
+      var _this9 = this;
 
       this.getBibleHtmlOptions("", function (bookOptions) {
         var bookSelect = "#book-".concat(verseId);
         $(bookSelect).append(bookOptions);
 
-        _this8.enableSelect(bookSelect);
+        _this9.enableSelect(bookSelect);
       });
     },
     createTheTitle: function createTheTitle() {
-      var _this9 = this;
+      var _this10 = this;
 
       this.teachingTitle = "";
       this.jsonLoad.forEach(function (verse, i) {
         // Add "&" inbetween verses
-        if (i > 0) _this9.teachingTitle += " & "; // Insert book and title into title
+        if (i > 0) _this10.teachingTitle += " & "; // Insert book and title into title
 
-        _this9.teachingTitle += verse['book'] + " ";
-        _this9.teachingTitle += verse['chapter'];
-        console.log(i); // Add start verse if present
+        _this10.teachingTitle += verse['book'] + " ";
+        _this10.teachingTitle += verse['chapter']; // Add start verse if present
 
         if (verse['startVs']) {
-          _this9.teachingTitle += verse['startVs'] ? ":" + verse['startVs'] : "";
+          _this10.teachingTitle += verse['startVs'] ? ":" + verse['startVs'] : "";
         } // Add end verse if present
 
 
         if (verse['endVs']) {
-          _this9.teachingTitle += verse['endVs'] ? "-" + verse['endVs'] : "";
+          _this10.teachingTitle += verse['endVs'] ? "-" + verse['endVs'] : "";
         }
       });
       this.passTitleToParent();
     },
     passTitleToParent: function passTitleToParent() {
       this.$emit('teachingTitle', this.teachingTitle);
+    },
+    passDescriptionToParent: function passDescriptionToParent() {
+      this.$emit('description', this.description);
     }
   },
   // #-methods
@@ -2487,21 +2516,25 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 var ScriptureComponent = Vue.component('scripture-component', __webpack_require__(/*! ./ScriptureComponent.vue */ "./resources/js/admin/components/ScriptureComponent.vue")["default"]);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      enterSpeaker: false,
-      topical: false,
-      teachingTitle: "",
+      audioValue: '',
       baseUrl: location.origin + "/api/",
+      description: '',
+      enterSpeaker: false,
+      ftImg: '',
       loader: false,
       loadMoreBtn: false,
+      mediaSelected: false,
+      topical: false,
+      teachingTitle: "",
       vidId: '',
-      videoValue: '',
       vidSrc: '',
-      audioValue: '',
-      mediaSelected: false
+      videoValue: ''
     };
   },
   components: {
@@ -2511,6 +2544,12 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
   methods: {
     // Event methods =========/
     // ========================
+    // insert featured image onto screen before loading into the database
+    imagePreview: function imagePreview(e) {
+      var file = e.target.files[0];
+      this.readFile(file);
+    },
+    // add event for select media
     selectedMediaEvent: function selectedMediaEvent() {
       var _this = this;
 
@@ -2522,6 +2561,7 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
         });
       });
     },
+    // add event for video input change
     vidValueChange: function vidValueChange() {
       var _this2 = this;
 
@@ -2540,19 +2580,30 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
 
       $(input).attr('value', theDate);
     },
-    todaysDate: function todaysDate() {
-      var today = new Date().toDateString();
-      $('#today').text(today);
+    // deselect the media
+    deselectAllMedia: function deselectAllMedia() {
+      var allMedia = $('.media-modal__media');
+      $(allMedia).each(function (i, media) {
+        if ($(media).hasClass('media-modal__selected-media')) {
+          $(media).removeClass('media-modal__selected-media');
+          $(media).find('.custom-control-input').prop('checked', false);
+        }
+      });
+      this.mediaSelected = false;
     },
-    setTeachingTitle: function setTeachingTitle(title) {
-      this.teachingTitle = title;
+    // Empty the modal media
+    emptyModal: function emptyModal() {
+      var mediaContainer = $('#media-container');
+      $(mediaContainer).html('');
     },
     getYoutubeVideos: function getYoutubeVideos(e) {
       var _this3 = this;
 
       var nextPage = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-      var videosContainer = $('#media-container');
-      var ytUrl = this.baseUrl + "youtube";
+      // Where media is inserted after API call
+      var videosContainer = $('#media-container'); // base url ofr youtube videos
+
+      var ytUrl = this.baseUrl + "youtube"; // Check if request is coming from next token
 
       if (!nextPage) {
         $(videosContainer).html(this.modalLoaderHTML);
@@ -2560,7 +2611,8 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
       } else {
         ytUrl += "/?nextPage=".concat(nextPage);
         this.loadMoreBtn = true;
-      }
+      } // Make request
+
 
       axios.get(ytUrl).then(function (res) {
         var videoHtml = res.data;
@@ -2572,49 +2624,15 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
         if (!nextPage) {
           _this3.loader = false;
         } else {
-          var vidId = $('.video-modal__body').last().attr('id');
+          // this is used to get the modal back up to the top of the new request
+          var vidId = $('.media-modal__body').last().attr('id');
           window.location = "".concat(location.origin, "/admin/teachings#").concat(vidId);
           _this3.loadMoreBtn = false;
-        }
+        } // add select media event to each media
+
 
         _this3.selectedMediaEvent();
       });
-    },
-    modalLoaderHTML: function modalLoaderHTML() {
-      var html = "<div class=\"media-modal__loader\">\n                       <div class=\"media-modal__loading\">\n                           <h4>Loading Videos...</h4> <div class=\"spinner-border\" role=\"status\"></div>\n                       </div>\n                    </div>";
-      return html;
-    },
-    modalLoadMoreBtn: function modalLoadMoreBtn() {
-      // get the next page token
-      var nextPage = $('.video-modal__body').last().attr('data-np'); // send request with nextPage token
-
-      this.getYoutubeVideos(null, nextPage);
-    },
-    selectMedia: function selectMedia(e) {
-      var media = $(e.target); // remove all media-modal__selected-media classes
-
-      this.deselectAllMedia(); // target right element
-
-      if (!$(media).hasClass('media-modal__media')) media = $(media).parents('.media-modal__media');
-      $(media).addClass('media-modal__selected-media');
-      $(media).find('.custom-control-input').prop('checked', true);
-      this.mediaSelected = true; // Set the vidId ========/
-
-      this.vidId = $(e.target).attr('data-media-id');
-    },
-    deselectAllMedia: function deselectAllMedia() {
-      var allMedia = $('.media-modal__media');
-      $(allMedia).each(function (i, media) {
-        if ($(media).hasClass('media-modal__selected-media')) {
-          $(media).removeClass('media-modal__selected-media');
-          $(media).find('.custom-control-input').prop('checked', false);
-        }
-      });
-      this.mediaSelected = false;
-    },
-    emptyModal: function emptyModal() {
-      var mediaContainer = $('#media-container');
-      $(mediaContainer).html('');
     },
     insertVideo: function insertVideo(e) {
       var ytUrl = 'https://youtu.be/',
@@ -2635,8 +2653,50 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
 
       this.videoValue = ytUrl + this.vidId;
       this.vidSrc = ytEmbed + this.vidId;
+    },
+    modalLoaderHTML: function modalLoaderHTML() {
+      var html = "<div class=\"media-modal__loader\">\n                       <div class=\"media-modal__loading\">\n                           <h4>Loading Videos...</h4> <div class=\"spinner-border\" role=\"status\"></div>\n                       </div>\n                    </div>";
+      return html;
+    },
+    modalLoadMoreBtn: function modalLoadMoreBtn() {
+      // get the next page token
+      var nextPage = $('.media-modal__body').last().attr('data-np'); // send request with nextPage token
+
+      this.getYoutubeVideos(null, nextPage);
+    },
+    readFile: function readFile(file) {
+      var _this4 = this;
+
+      var reader = new FileReader();
+      $(reader).on('load', function (e) {
+        _this4.ftImg = e.target.result;
+      });
+      reader.readAsDataURL(file);
+    },
+    selectMedia: function selectMedia(e) {
+      var media = $(e.target); // remove all media-modal__selected-media classes
+
+      this.deselectAllMedia(); // target right element
+
+      if (!$(media).hasClass('media-modal__media')) media = $(media).parents('.media-modal__media');
+      $(media).addClass('media-modal__selected-media');
+      $(media).find('.custom-control-input').prop('checked', true);
+      this.mediaSelected = true; // Set the vidId ========/
+
+      this.vidId = $(e.target).attr('data-media-id');
+    },
+    setTeachingTitle: function setTeachingTitle(title) {
+      this.teachingTitle = title;
+    },
+    setDescription: function setDescription(description) {
+      this.description = description;
+    },
+    todaysDate: function todaysDate() {
+      var today = new Date().toDateString();
+      $('#today').text(today);
     }
   },
+  // end of methods =========/
   mounted: function mounted() {
     this.dateDefaultVal();
     this.todaysDate();
@@ -46271,20 +46331,35 @@ var render = function() {
                           "option",
                           {
                             attrs: {
-                              value: "james wafer",
+                              "data-staff": "Pastor James Wafer",
+                              value: "1",
                               selected: "selected"
                             }
                           },
                           [_vm._v("Pastor James Wafer")]
                         ),
                         _vm._v(" "),
-                        _c("option", { attrs: { value: "dale richmond" } }, [
-                          _vm._v("Pastor Dale Richmond")
-                        ]),
+                        _c(
+                          "option",
+                          {
+                            attrs: {
+                              "data-staff": "Pastor Dale Richmond",
+                              value: "2"
+                            }
+                          },
+                          [_vm._v("Pastor Dale Richmond")]
+                        ),
                         _vm._v(" "),
-                        _c("option", { attrs: { value: "Kelly" } }, [
-                          _vm._v("Reciptionist Kelly Munsion")
-                        ])
+                        _c(
+                          "option",
+                          {
+                            attrs: {
+                              "data-staff": "Reciptionist Kelly Munsion",
+                              value: "3"
+                            }
+                          },
+                          [_vm._v("Reciptionist Kelly Munsion")]
+                        )
                       ]
                     )
                   ]
@@ -46355,6 +46430,9 @@ var render = function() {
               _vm._v(" "),
               _c("scripture-component", {
                 on: {
+                  description: function($event) {
+                    return _vm.setDescription($event)
+                  },
                   teachingTitle: function($event) {
                     return _vm.setTeachingTitle($event)
                   }
@@ -46371,7 +46449,38 @@ var render = function() {
             _vm._v(" "),
             _vm._m(3),
             _vm._v(" "),
-            _vm._m(4),
+            _c("div", { staticClass: "form-group" }, [
+              _c("label", { attrs: { for: "description" } }, [
+                _vm._v("Description")
+              ]),
+              _vm._v(" "),
+              _c("textarea", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.description,
+                    expression: "description"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: {
+                  rows: "4",
+                  name: "description",
+                  cols: "50",
+                  id: "description"
+                },
+                domProps: { value: _vm.description },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.description = $event.target.value
+                  }
+                }
+              })
+            ]),
             _vm._v(" "),
             _c("div", { staticClass: "form-group" }, [
               _c("label", { attrs: { for: "image" } }, [
@@ -46380,160 +46489,125 @@ var render = function() {
               _vm._v(" "),
               _c("input", {
                 staticClass: "form-control-file",
-                attrs: { name: "image", type: "file", id: "image" }
+                attrs: { name: "image", type: "file", id: "ft_image" },
+                on: { change: _vm.imagePreview }
               }),
               _vm._v(" "),
               _c("div", { staticClass: "admin-form__image-preview" }, [
-                _c(
-                  "svg",
-                  { attrs: { viewBox: "0 0 507.99999 285.75001" } },
-                  [
-                    _c("defs", { attrs: { id: "defs2" } }, [
-                      _c(
-                        "filter",
-                        {
-                          staticStyle: {
-                            "color-interpolation-filters": "sRGB"
-                          },
-                          attrs: { id: "filter4639" }
-                        },
-                        [
-                          _c("feConvolveMatrix", {
-                            attrs: {
-                              id: "feConvolveMatrix4635",
-                              order: "3 3",
-                              kernelMatrix: "1 1 1 1 -8 1 1 1 1",
-                              in: "SourceGraphic",
-                              divisor: "1",
-                              targetX: "1",
-                              targetY: "1",
-                              preserveAlpha: "true",
-                              result: "result0",
-                              bias: "0"
-                            }
-                          }),
-                          _vm._v(" "),
-                          _c("feColorMatrix", {
-                            attrs: {
-                              id: "feColorMatrix4637",
-                              result: "result3",
-                              values:
-                                "-0.15 -0.3 -0.05 0 1 -0.15 -0.3 -0.05 0 1 -0.15 -0.3 -0.05 0 1 0 0 0 1 0"
-                            }
-                          })
-                        ],
-                        1
-                      )
-                    ]),
-                    _vm._v(" "),
-                    _c(
-                      "metadata",
-                      { attrs: { id: "metadata5" } },
+                !_vm.ftImg
+                  ? _c(
+                      "svg",
+                      { attrs: { viewBox: "0 0 507.99999 285.75001" } },
                       [
+                        _c("defs", { attrs: { id: "defs2" } }, [
+                          _c(
+                            "filter",
+                            {
+                              staticStyle: {
+                                "color-interpolation-filters": "sRGB"
+                              },
+                              attrs: { id: "filter4639" }
+                            },
+                            [
+                              _c("feConvolveMatrix", {
+                                attrs: {
+                                  id: "feConvolveMatrix4635",
+                                  order: "3 3",
+                                  kernelMatrix: "1 1 1 1 -8 1 1 1 1",
+                                  in: "SourceGraphic",
+                                  divisor: "1",
+                                  targetX: "1",
+                                  targetY: "1",
+                                  preserveAlpha: "true",
+                                  result: "result0",
+                                  bias: "0"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("feColorMatrix", {
+                                attrs: {
+                                  id: "feColorMatrix4637",
+                                  result: "result3",
+                                  values:
+                                    "-0.15 -0.3 -0.05 0 1 -0.15 -0.3 -0.05 0 1 -0.15 -0.3 -0.05 0 1 0 0 0 1 0"
+                                }
+                              })
+                            ],
+                            1
+                          )
+                        ]),
+                        _vm._v(" "),
                         _c(
-                          "rdf:RDF",
+                          "metadata",
+                          { attrs: { id: "metadata5" } },
                           [
                             _c(
-                              "cc:Work",
-                              { attrs: { "rdf:about": "" } },
+                              "rdf:RDF",
                               [
-                                _c("dc:format", [_vm._v("image/svg+xml")]),
-                                _vm._v(" "),
-                                _c("dc:type", {
-                                  attrs: {
-                                    "rdf:resource":
-                                      "http://purl.org/dc/dcmitype/StillImage"
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("dc:title")
+                                _c(
+                                  "cc:Work",
+                                  { attrs: { "rdf:about": "" } },
+                                  [
+                                    _c("dc:format", [_vm._v("image/svg+xml")]),
+                                    _vm._v(" "),
+                                    _c("dc:type", {
+                                      attrs: {
+                                        "rdf:resource":
+                                          "http://purl.org/dc/dcmitype/StillImage"
+                                      }
+                                    }),
+                                    _vm._v(" "),
+                                    _c("dc:title")
+                                  ],
+                                  1
+                                )
                               ],
                               1
                             )
                           ],
                           1
-                        )
-                      ],
-                      1
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "g",
-                      {
-                        attrs: {
-                          transform: "translate(0,-11.249983)",
-                          id: "layer1"
-                        }
-                      },
-                      [
+                        ),
+                        _vm._v(" "),
                         _c(
                           "g",
                           {
                             attrs: {
-                              transform: "translate(-1.4157104,1.2974741)",
-                              id: "g4646"
+                              transform: "translate(0,-11.249983)",
+                              id: "layer1"
                             }
                           },
                           [
-                            _c("rect", {
-                              staticStyle: {
-                                opacity: "1",
-                                fill: "#cccccc",
-                                "fill-opacity": "1",
-                                stroke: "none",
-                                "stroke-width": "0.93530208",
-                                "stroke-miterlimit": "4",
-                                "stroke-dasharray": "none",
-                                "stroke-opacity": "1"
-                              },
-                              attrs: {
-                                id: "rect4518",
-                                width: "508.88116",
-                                height: "287.58203",
-                                x: "0.53454089",
-                                y: "9.9525089"
-                              }
-                            }),
-                            _vm._v(" "),
                             _c(
-                              "text",
+                              "g",
                               {
-                                staticStyle: {
-                                  "font-style": "normal",
-                                  "font-variant": "normal",
-                                  "font-weight": "normal",
-                                  "font-stretch": "normal",
-                                  "font-size": "70.20953369px",
-                                  "line-height": "1.25",
-                                  "font-family": "sans-serif",
-                                  "-inkscape-font-specification":
-                                    "'sans-serif, Normal'",
-                                  "font-variant-ligatures": "normal",
-                                  "font-variant-caps": "normal",
-                                  "font-variant-numeric": "normal",
-                                  "font-feature-settings": "normal",
-                                  "text-align": "center",
-                                  "letter-spacing": "0px",
-                                  "word-spacing": "0px",
-                                  "writing-mode": "lr-tb",
-                                  "text-anchor": "middle",
-                                  fill: "#ffffff",
-                                  "fill-opacity": "1",
-                                  stroke: "#000000",
-                                  "stroke-width": "1.75523829",
-                                  "stroke-opacity": "0.21531101"
-                                },
                                 attrs: {
-                                  "xml:space": "preserve",
-                                  x: "217.01743",
-                                  y: "109.48398",
-                                  id: "text4545",
-                                  transform: "scale(1.156635,0.86457698)"
+                                  transform: "translate(-1.4157104,1.2974741)",
+                                  id: "g4646"
                                 }
                               },
                               [
+                                _c("rect", {
+                                  staticStyle: {
+                                    opacity: "1",
+                                    fill: "#cccccc",
+                                    "fill-opacity": "1",
+                                    stroke: "none",
+                                    "stroke-width": "0.93530208",
+                                    "stroke-miterlimit": "4",
+                                    "stroke-dasharray": "none",
+                                    "stroke-opacity": "1"
+                                  },
+                                  attrs: {
+                                    id: "rect4518",
+                                    width: "508.88116",
+                                    height: "287.58203",
+                                    x: "0.53454089",
+                                    y: "9.9525089"
+                                  }
+                                }),
+                                _vm._v(" "),
                                 _c(
-                                  "tspan",
+                                  "text",
                                   {
                                     staticStyle: {
                                       "font-style": "normal",
@@ -46541,6 +46615,7 @@ var render = function() {
                                       "font-weight": "normal",
                                       "font-stretch": "normal",
                                       "font-size": "70.20953369px",
+                                      "line-height": "1.25",
                                       "font-family": "sans-serif",
                                       "-inkscape-font-specification":
                                         "'sans-serif, Normal'",
@@ -46549,103 +46624,143 @@ var render = function() {
                                       "font-variant-numeric": "normal",
                                       "font-feature-settings": "normal",
                                       "text-align": "center",
+                                      "letter-spacing": "0px",
+                                      "word-spacing": "0px",
                                       "writing-mode": "lr-tb",
                                       "text-anchor": "middle",
-                                      "stroke-width": "1.75523829",
-                                      stroke: "#000000",
-                                      "stroke-opacity": "0.21531101",
                                       fill: "#ffffff",
-                                      "fill-opacity": "1"
+                                      "fill-opacity": "1",
+                                      stroke: "#000000",
+                                      "stroke-width": "1.75523829",
+                                      "stroke-opacity": "0.21531101"
                                     },
                                     attrs: {
-                                      id: "tspan4543",
-                                      x: "229.35895",
-                                      y: "109.48398"
+                                      "xml:space": "preserve",
+                                      x: "217.01743",
+                                      y: "109.48398",
+                                      id: "text4545",
+                                      transform: "scale(1.156635,0.86457698)"
                                     }
                                   },
                                   [
-                                    _vm._v(
-                                      "\n                                            Select "
+                                    _c(
+                                      "tspan",
+                                      {
+                                        staticStyle: {
+                                          "font-style": "normal",
+                                          "font-variant": "normal",
+                                          "font-weight": "normal",
+                                          "font-stretch": "normal",
+                                          "font-size": "70.20953369px",
+                                          "font-family": "sans-serif",
+                                          "-inkscape-font-specification":
+                                            "'sans-serif, Normal'",
+                                          "font-variant-ligatures": "normal",
+                                          "font-variant-caps": "normal",
+                                          "font-variant-numeric": "normal",
+                                          "font-feature-settings": "normal",
+                                          "text-align": "center",
+                                          "writing-mode": "lr-tb",
+                                          "text-anchor": "middle",
+                                          "stroke-width": "1.75523829",
+                                          stroke: "#000000",
+                                          "stroke-opacity": "0.21531101",
+                                          fill: "#ffffff",
+                                          "fill-opacity": "1"
+                                        },
+                                        attrs: {
+                                          id: "tspan4543",
+                                          x: "229.35895",
+                                          y: "109.48398"
+                                        }
+                                      },
+                                      [
+                                        _vm._v(
+                                          "\n                                            Select "
+                                        )
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "tspan",
+                                      {
+                                        staticStyle: {
+                                          "font-style": "normal",
+                                          "font-variant": "normal",
+                                          "font-weight": "normal",
+                                          "font-stretch": "normal",
+                                          "font-size": "70.20953369px",
+                                          "font-family": "sans-serif",
+                                          "-inkscape-font-specification":
+                                            "'sans-serif, Normal'",
+                                          "font-variant-ligatures": "normal",
+                                          "font-variant-caps": "normal",
+                                          "font-variant-numeric": "normal",
+                                          "font-feature-settings": "normal",
+                                          "text-align": "center",
+                                          "writing-mode": "lr-tb",
+                                          "text-anchor": "middle",
+                                          "stroke-width": "1.75523829",
+                                          stroke: "#000000",
+                                          "stroke-opacity": "0.21531101",
+                                          fill: "#ffffff",
+                                          "fill-opacity": "1"
+                                        },
+                                        attrs: {
+                                          x: "229.35895",
+                                          y: "197.2459",
+                                          id: "tspan4547"
+                                        }
+                                      },
+                                      [_vm._v("Feature ")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "tspan",
+                                      {
+                                        staticStyle: {
+                                          "font-style": "normal",
+                                          "font-variant": "normal",
+                                          "font-weight": "normal",
+                                          "font-stretch": "normal",
+                                          "font-size": "70.20953369px",
+                                          "font-family": "sans-serif",
+                                          "-inkscape-font-specification":
+                                            "'sans-serif, Normal'",
+                                          "font-variant-ligatures": "normal",
+                                          "font-variant-caps": "normal",
+                                          "font-variant-numeric": "normal",
+                                          "font-feature-settings": "normal",
+                                          "text-align": "center",
+                                          "writing-mode": "lr-tb",
+                                          "text-anchor": "middle",
+                                          "stroke-width": "1.75523829",
+                                          stroke: "#000000",
+                                          "stroke-opacity": "0.21531101",
+                                          fill: "#ffffff",
+                                          "fill-opacity": "1"
+                                        },
+                                        attrs: {
+                                          x: "217.01743",
+                                          y: "285.00781",
+                                          id: "tspan4549"
+                                        }
+                                      },
+                                      [_vm._v("Image")]
                                     )
                                   ]
-                                ),
-                                _vm._v(" "),
-                                _c(
-                                  "tspan",
-                                  {
-                                    staticStyle: {
-                                      "font-style": "normal",
-                                      "font-variant": "normal",
-                                      "font-weight": "normal",
-                                      "font-stretch": "normal",
-                                      "font-size": "70.20953369px",
-                                      "font-family": "sans-serif",
-                                      "-inkscape-font-specification":
-                                        "'sans-serif, Normal'",
-                                      "font-variant-ligatures": "normal",
-                                      "font-variant-caps": "normal",
-                                      "font-variant-numeric": "normal",
-                                      "font-feature-settings": "normal",
-                                      "text-align": "center",
-                                      "writing-mode": "lr-tb",
-                                      "text-anchor": "middle",
-                                      "stroke-width": "1.75523829",
-                                      stroke: "#000000",
-                                      "stroke-opacity": "0.21531101",
-                                      fill: "#ffffff",
-                                      "fill-opacity": "1"
-                                    },
-                                    attrs: {
-                                      x: "229.35895",
-                                      y: "197.2459",
-                                      id: "tspan4547"
-                                    }
-                                  },
-                                  [_vm._v("Feature ")]
-                                ),
-                                _vm._v(" "),
-                                _c(
-                                  "tspan",
-                                  {
-                                    staticStyle: {
-                                      "font-style": "normal",
-                                      "font-variant": "normal",
-                                      "font-weight": "normal",
-                                      "font-stretch": "normal",
-                                      "font-size": "70.20953369px",
-                                      "font-family": "sans-serif",
-                                      "-inkscape-font-specification":
-                                        "'sans-serif, Normal'",
-                                      "font-variant-ligatures": "normal",
-                                      "font-variant-caps": "normal",
-                                      "font-variant-numeric": "normal",
-                                      "font-feature-settings": "normal",
-                                      "text-align": "center",
-                                      "writing-mode": "lr-tb",
-                                      "text-anchor": "middle",
-                                      "stroke-width": "1.75523829",
-                                      stroke: "#000000",
-                                      "stroke-opacity": "0.21531101",
-                                      fill: "#ffffff",
-                                      "fill-opacity": "1"
-                                    },
-                                    attrs: {
-                                      x: "217.01743",
-                                      y: "285.00781",
-                                      id: "tspan4549"
-                                    }
-                                  },
-                                  [_vm._v("Image")]
                                 )
                               ]
                             )
                           ]
                         )
-                      ]
+                      ],
+                      1
                     )
-                  ],
-                  1
-                )
+                  : _c("img", {
+                      staticClass: "img-fluid",
+                      attrs: { src: _vm.ftImg }
+                    })
               ])
             ])
           ])
@@ -46750,10 +46865,17 @@ var staticRenderFns = [
       }),
       _vm._v(" "),
       _c("div", { staticClass: "teachings-create__media-btns" }, [
-        _c("button", { staticClass: "btn btn-light btns__icon" }, [
-          _c("span", { attrs: { "data-feather": "cloud" } }),
-          _vm._v("From SoundCloud")
-        ])
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-light btns__icon",
+            attrs: { type: "button", disabled: "" }
+          },
+          [
+            _c("span", { attrs: { "data-feather": "cloud" } }),
+            _vm._v("Get From SoundCloud")
+          ]
+        )
       ])
     ])
   },
@@ -46808,19 +46930,6 @@ var staticRenderFns = [
       _c("input", {
         staticClass: "form-control",
         attrs: { name: "publish-date", type: "date", id: "publish-date" }
-      })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group" }, [
-      _c("label", { attrs: { for: "description" } }, [_vm._v("Description")]),
-      _vm._v(" "),
-      _c("textarea", {
-        staticClass: "form-control",
-        attrs: { rows: "4", name: "description", cols: "50", id: "description" }
       })
     ])
   }

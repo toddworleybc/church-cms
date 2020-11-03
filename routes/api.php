@@ -22,9 +22,18 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 // MEDIA API ===============================/
 // =============================================
 
+
+
+// Youtube
 Route::get('/youtube', function() {
     return view('apis.media.youtube.youtube_api');
 });
+
+
+Route::get('/podbean', function() {
+    return view('apis.media.podbean.podbean_api');
+});
+
 
 // ====================================
 // =======================================
