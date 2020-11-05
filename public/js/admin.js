@@ -2518,11 +2518,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 var ScriptureComponent = Vue.component('scripture-component', __webpack_require__(/*! ./ScriptureComponent.vue */ "./resources/js/admin/components/ScriptureComponent.vue")["default"]);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      audioValue: '',
+      audioId: '',
+      audioUrl: '',
       baseUrl: location.origin + "/api/",
       description: '',
       enterSpeaker: false,
@@ -2530,6 +2533,8 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
       loader: false,
       loadMoreBtn: false,
       mediaSelected: false,
+      mediaType: '',
+      loadmore: true,
       topical: false,
       teachingTitle: "",
       vidId: '',
@@ -2549,6 +2554,10 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
       var file = e.target.files[0];
       this.readFile(file);
     },
+    // emptyModal when backdrop is clicked
+    modalBackdropClickCancel: function modalBackdropClickCancel() {
+      $("#loadMediaModal").on('hide.bs.modal', this.emptyModal);
+    },
     // add event for select media
     selectedMediaEvent: function selectedMediaEvent() {
       var _this = this;
@@ -2565,13 +2574,26 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
     vidValueChange: function vidValueChange() {
       var _this2 = this;
 
-      var videoInput = $('[name="yt_video"');
+      var videoInput = $('[name="yt_video"]');
       $(videoInput).on('change', function (e) {
         _this2.insertVideo(e);
       });
     },
+    // add event for audio input change
+    audioValueChange: function audioValueChange() {
+      var _this3 = this;
+
+      var audioInput = $('[name="pb_audio"]');
+      $(audioInput).on('change', function (e) {
+        _this3.insertAudio(e);
+      });
+    },
     // Main methods ==========/
     //=================/
+    checkLoadMore: function checkLoadMore() {
+      // check if has more
+      this.loadmore = parseInt($(".media-modal__body").last().attr('data-np'));
+    },
     dateDefaultVal: function dateDefaultVal() {
       var date = new Date().toISOString(),
           regEx = /^\d{4}-\d{2}-\d{2}/,
@@ -2595,24 +2617,48 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
     emptyModal: function emptyModal() {
       var mediaContainer = $('#media-container');
       $(mediaContainer).html('');
+      this.mediaType = '';
     },
-    getYoutubeVideos: function getYoutubeVideos(e) {
-      var _this3 = this;
+    getPodbeanAudio: function getPodbeanAudio(e) {
+      var _this4 = this;
 
       var nextPage = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-      // Where media is inserted after API call
+      this.mediaType = 'audio';
+      var audioContainer = $('#media-container');
+      var pbUrl = this.baseUrl + "podbean"; // create url if next page token is true
+
+      pbUrl = this.nextPageUrl(nextPage, pbUrl);
+      axios.get(pbUrl).then(function (res) {
+        !nextPage ? $(audioContainer).html(res.data) : $(audioContainer).append(res.data);
+      })["catch"](function (error) {
+        var html = "<div class=\"alert alert-danger\">".concat(error, "</div>");
+        $(audioContainer).html(html);
+      }).then(function () {
+        // add select media event to each media
+        _this4.selectedMediaEvent(); // add backdrop close event
+
+
+        _this4.modalBackdropClickCancel(); // this.loader = false;
+        // this.loadMoreBtn = false;
+
+
+        _this4.modalPageControl(nextPage);
+
+        _this4.checkLoadMore();
+      });
+    },
+    getYoutubeVideos: function getYoutubeVideos(e) {
+      var _this5 = this;
+
+      var nextPage = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+      //set media type
+      this.mediaType = 'video'; // Where media is inserted after API call
+
       var videosContainer = $('#media-container'); // base url ofr youtube videos
 
-      var ytUrl = this.baseUrl + "youtube"; // Check if request is coming from next token
+      var ytUrl = this.baseUrl + "youtube"; // create url if next page token is true
 
-      if (!nextPage) {
-        $(videosContainer).html(this.modalLoaderHTML);
-        this.loader = true;
-      } else {
-        ytUrl += "/?nextPage=".concat(nextPage);
-        this.loadMoreBtn = true;
-      } // Make request
-
+      ytUrl = this.nextPageUrl(nextPage, ytUrl); // Make request
 
       axios.get(ytUrl).then(function (res) {
         var videoHtml = res.data;
@@ -2621,18 +2667,41 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
         var html = "<div class=\"alert alert-danger\">".concat(error, "</div>");
         $(videosContainer).html(html);
       }).then(function () {
-        if (!nextPage) {
-          _this3.loader = false;
-        } else {
-          // this is used to get the modal back up to the top of the new request
-          var vidId = $('.media-modal__body').last().attr('id');
-          window.location = "".concat(location.origin, "/admin/teachings#").concat(vidId);
-          _this3.loadMoreBtn = false;
-        } // add select media event to each media
+        // if(!nextPage) {
+        //     this.loader = false
+        // } else {
+        // // this is used to get the modal back up to the top of the new request
+        //     const vidId = $('.media-modal__body').last().attr('id');
+        //     window.location = `${location.origin}/admin/teachings#${vidId}`;
+        //     this.loadMoreBtn = false;
+        // }
+        _this5.modalPageControl(nextPage); // add select media event to each media
 
 
-        _this3.selectedMediaEvent();
+        _this5.selectedMediaEvent(); // add backdrop close event
+
+
+        _this5.modalBackdropClickCancel();
+
+        _this5.checkLoadMore();
       });
+    },
+    insertAudio: function insertAudio(e) {
+      if (e.type === 'change') {
+        var audioValue = $(e.target).val();
+        audioValue = audioValue.replace('share', 'player');
+        audioValue = audioValue.replace('pb-', '');
+        this.audioUrl = audioValue;
+      }
+    },
+    insertMedia: function insertMedia(e) {
+      if (this.mediaType === 'video') {
+        this.insertVideo(e);
+      }
+
+      if (this.mediaType === 'audio') {
+        this.insertAudio(e);
+      }
     },
     insertVideo: function insertVideo(e) {
       var ytUrl = 'https://youtu.be/',
@@ -2655,21 +2724,53 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
       this.vidSrc = ytEmbed + this.vidId;
     },
     modalLoaderHTML: function modalLoaderHTML() {
-      var html = "<div class=\"media-modal__loader\">\n                       <div class=\"media-modal__loading\">\n                           <h4>Loading Videos...</h4> <div class=\"spinner-border\" role=\"status\"></div>\n                       </div>\n                    </div>";
+      var media = '';
+      if (this.mediaType === 'video') media = 'Videos';
+      if (this.mediaType === 'audio') media = 'Audio';
+      var html = "<div class=\"media-modal__loader\">\n                       <div class=\"media-modal__loading\">\n                           <h4>Loading ".concat(media, "...</h4> <div class=\"spinner-border\" role=\"status\"></div>\n                       </div>\n                    </div>");
       return html;
     },
     modalLoadMoreBtn: function modalLoadMoreBtn() {
       // get the next page token
-      var nextPage = $('.media-modal__body').last().attr('data-np'); // send request with nextPage token
+      var nextPage = $('.media-modal__body').last().attr('data-np');
 
-      this.getYoutubeVideos(null, nextPage);
+      if (this.mediaType === 'video') {
+        // send request with nextPage token
+        this.getYoutubeVideos(null, nextPage);
+      }
+
+      if (this.mediaType === 'audio') {
+        this.getPodbeanAudio(null, nextPage);
+      }
+    },
+    modalPageControl: function modalPageControl(nextPage) {
+      // used to turn loader off and reset modal page to new incoming data scroll top
+      if (!nextPage) {
+        this.loader = false;
+      } else {
+        // this is used to get the modal back up to the top of the new request
+        var vidId = $('.media-modal__body').last().attr('id');
+        window.location = "".concat(location.origin, "/admin/teachings#").concat(vidId);
+        this.loadMoreBtn = false;
+      }
+    },
+    nextPageUrl: function nextPageUrl(nextPage, url) {
+      if (nextPage) {
+        url += "/?nextPage=".concat(nextPage);
+        this.loadMoreBtn = true;
+      } else {
+        $('#media-container').html(this.modalLoaderHTML);
+        this.loader = true;
+      }
+
+      return url;
     },
     readFile: function readFile(file) {
-      var _this4 = this;
+      var _this6 = this;
 
       var reader = new FileReader();
       $(reader).on('load', function (e) {
-        _this4.ftImg = e.target.result;
+        _this6.ftImg = e.target.result;
       });
       reader.readAsDataURL(file);
     },
@@ -2681,9 +2782,18 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
       if (!$(media).hasClass('media-modal__media')) media = $(media).parents('.media-modal__media');
       $(media).addClass('media-modal__selected-media');
       $(media).find('.custom-control-input').prop('checked', true);
-      this.mediaSelected = true; // Set the vidId ========/
+      this.mediaSelected = true;
 
-      this.vidId = $(e.target).attr('data-media-id');
+      if (this.mediaType === 'video') {
+        // Set the vidId ========/
+        this.vidId = $(e.target).attr('data-media-id');
+      }
+
+      if (this.mediaType === 'audio') {
+        // Set the audio Id =======/
+        this.audioId = $(e.target).attr('data-media-id');
+        this.audioUrl = $(e.target).attr('data-audio-url');
+      }
     },
     setTeachingTitle: function setTeachingTitle(title) {
       this.teachingTitle = title;
@@ -2698,7 +2808,9 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
   },
   // end of methods =========/
   mounted: function mounted() {
+    this.audioValueChange();
     this.dateDefaultVal();
+    this.modalBackdropClickCancel();
     this.todaysDate();
     this.vidValueChange();
   }
@@ -46426,7 +46538,56 @@ var render = function() {
                 ])
               ]),
               _vm._v(" "),
-              _vm._m(0),
+              _c("div", { staticClass: "form-group" }, [
+                !_vm.audioUrl
+                  ? _c("label", { attrs: { for: "audio" } }, [
+                      _vm._v("Enter Audio")
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.audioUrl
+                  ? _c("iframe", {
+                      attrs: {
+                        id: "audio_iframe",
+                        src: _vm.audioUrl,
+                        width: "100%",
+                        height: "100",
+                        frameborder: "0",
+                        scrolling: "no"
+                      }
+                    })
+                  : _vm._e(),
+                _vm._v(" "),
+                _c("input", {
+                  staticClass: "form-control",
+                  attrs: {
+                    name: "pb_audio",
+                    type: "text",
+                    id: "audio",
+                    placeholder: "Enter Audio Url"
+                  },
+                  domProps: { value: _vm.audioUrl }
+                }),
+                _vm._v(" "),
+                _c("div", { staticClass: "teachings-create__media-btns" }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-light btns__icon",
+                      attrs: {
+                        type: "button",
+                        "data-toggle": "modal",
+                        "data-target": "#loadMediaModal"
+                      },
+                      on: { click: _vm.getPodbeanAudio }
+                    },
+                    [
+                      _c("span", { attrs: { "data-feather": "volume-2" } }),
+                      _vm._v("Get From Podbean")
+                    ]
+                  )
+                ])
+              ]),
               _vm._v(" "),
               _c("scripture-component", {
                 on: {
@@ -46443,11 +46604,11 @@ var render = function() {
           ),
           _vm._v(" "),
           _c("aside", { staticClass: "admin-form__sidebar" }, [
+            _vm._m(0),
+            _vm._v(" "),
             _vm._m(1),
             _vm._v(" "),
             _vm._m(2),
-            _vm._v(" "),
-            _vm._m(3),
             _vm._v(" "),
             _c("div", { staticClass: "form-group" }, [
               _c("label", { attrs: { for: "description" } }, [
@@ -46791,6 +46952,7 @@ var render = function() {
                   "button",
                   {
                     staticClass: "btn btn-secondary media-modal__load-more-btn",
+                    attrs: { disabled: !_vm.loadmore },
                     on: { click: _vm.modalLoadMoreBtn }
                   },
                   [
@@ -46820,8 +46982,7 @@ var render = function() {
                 "button",
                 {
                   staticClass: "btn btn-danger media-modal__cancel",
-                  attrs: { type: "button", "data-dismiss": "modal" },
-                  on: { click: _vm.emptyModal }
+                  attrs: { type: "button", "data-dismiss": "modal" }
                 },
                 [_vm._v("Cancel")]
               ),
@@ -46835,7 +46996,7 @@ var render = function() {
                     type: "button",
                     disabled: !_vm.mediaSelected
                   },
-                  on: { click: _vm.insertVideo }
+                  on: { click: _vm.insertMedia }
                 },
                 [_vm._v("Insert Media")]
               )
@@ -46847,38 +47008,6 @@ var render = function() {
   ])
 }
 var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group" }, [
-      _c("label", { attrs: { for: "audio" } }, [_vm._v("Enter Audio")]),
-      _vm._v(" "),
-      _c("input", {
-        staticClass: "form-control",
-        attrs: {
-          name: "audio",
-          type: "text",
-          id: "audio",
-          placeholder: "Enter Audio Url"
-        }
-      }),
-      _vm._v(" "),
-      _c("div", { staticClass: "teachings-create__media-btns" }, [
-        _c(
-          "button",
-          {
-            staticClass: "btn btn-light btns__icon",
-            attrs: { type: "button", disabled: "" }
-          },
-          [
-            _c("span", { attrs: { "data-feather": "cloud" } }),
-            _vm._v("Get From SoundCloud")
-          ]
-        )
-      ])
-    ])
-  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
