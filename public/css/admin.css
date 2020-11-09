@@ -11326,6 +11326,7 @@ body {
 
 .admin-form__image-preview {
   max-width: 20rem;
+  margin: 1rem 0;
 }
 
 .admin-form .form-group {
@@ -11347,6 +11348,10 @@ body {
   margin-top: 1rem;
 }
 
+.admin-form__remove-img-btn {
+  margin-top: 1rem;
+}
+
 .admin-form__time {
   font-size: 1.1rem;
 }
@@ -11355,6 +11360,7 @@ body {
   width: 30%;
   border-left: 1px solid #ced4da;
   padding-left: 2rem;
+  overflow: hidden;
 }
 
 @media only screen and (max-width: 62em) {

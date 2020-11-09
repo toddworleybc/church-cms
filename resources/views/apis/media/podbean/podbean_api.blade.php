@@ -4,7 +4,7 @@
 
     $client_id = env('PODBEAN_CLIENT_ID');
     $client_secret = env('PODBEAN_CLIENT_SECRET');
-    $limit = 3;
+    $limit = 6;
     $offset = isset($_GET['nextPage']) ? intval($_GET['nextPage']) * $limit : 0;
     $nextPage = isset($_GET['nextPage']) ? intval($_GET['nextPage']) + 1 : 1;
 

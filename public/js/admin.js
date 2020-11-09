@@ -2059,6 +2059,12 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
     // ###--- GENERATE SCRIPTURE ---/
     // SELECT INPUT CONFIG ===========
     // ==============================
+    addNoScripturesHtml: function addNoScripturesHtml() {
+      if (!this.jsonLoad.length) {
+        var html = "<p class=\"mb-0\">No scriptures generated...</p>";
+        $("#scripture__insert").html(html);
+      }
+    },
     addVerse: function addVerse() {
       // Set unique #id for each minus button NOTE: will probably be added to the scripture__select div as well later
       this.verseId += 1; // scripture__select html verse-id-
@@ -2077,9 +2083,15 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       this.disableAllSelects();
     },
     // #-add verse
+    createTextAreaValue: function createTextAreaValue() {
+      var scriptureText = $("#scripture__insert").text(),
+          scriptureHtml = $("#scripture__insert").html(),
+          scriptureInput = $("#scripture-input"); // compare text to make empty or copy scripture html
+
+      scriptureText === "No scriptures generated..." ? $(scriptureInput).html('') : $(scriptureInput).html(scriptureHtml.trim());
+    },
     createTheDescription: function createTheDescription() {
       this.description = '';
-      console.log(this.description);
       var scriptures = $(".scripture__insert p");
       var text = '';
       $(scriptures).each(function (i, scripture) {
@@ -2089,7 +2101,7 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       text = text.replace(/\d:/gm, '');
       text = text.substr(1, 120); // create description
 
-      var description = "".concat(this.teachingTitle, " bible teaching: ").concat(text, "...");
+      var description = this.jsonLoad.length ? "".concat(this.teachingTitle, " bible teaching: ").concat(text, "...") : '';
       this.description = description;
       this.passDescriptionToParent();
     },
@@ -2118,10 +2130,15 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
         $("#scripture-".concat(removeVsId)).remove();
       }, 700); // recreate the title
 
-      this.createTheTitle(); // set delay to make sure html has been removed
+      this.createTheTitle(); // add no scriptures html
+
+      this.addNoScripturesHtml(); // set delay to make sure html has been removed
 
       setTimeout(function () {
-        _this3.createTheDescription();
+        _this3.createTheDescription(); // edit the textarea #scripture-input
+
+
+        _this3.createTextAreaValue();
       }, 1500);
     },
     rotateSvg: function rotateSvg() {
@@ -2283,15 +2300,20 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
           'Content-Type': 'application/json'
         }
       }).then(function (res) {
-        var html = res.data;
-        _this8.genLoader = false;
-        $("#scripture__insert").html(html); // create description for post
+        var html = res.data,
+            text = html.trim(); // and html to generated script
 
-        _this8.createTheDescription();
+        $("#scripture__insert").html(html); // add scripture to textarea input hidden
+
+        $("#scripture-input").html(text);
       })["catch"](function (error) {
         _this8.errorMessage(error);
 
         _this8.genLoader = false;
+      }).then(function () {
+        _this8.genLoader = false; // create description for post
+
+        _this8.createTheDescription();
       });
     },
     // Set the books select when created
@@ -2520,6 +2542,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 var ScriptureComponent = Vue.component('scripture-component', __webpack_require__(/*! ./ScriptureComponent.vue */ "./resources/js/admin/components/ScriptureComponent.vue")["default"]);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -2549,6 +2572,15 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
   methods: {
     // Event methods =========/
     // ========================
+    // add event for audio input change
+    audioValueChange: function audioValueChange() {
+      var _this = this;
+
+      var audioInput = $('[name="pb_audio"]');
+      $(audioInput).on('change', function (e) {
+        _this.insertAudio(e);
+      });
+    },
     // insert featured image onto screen before loading into the database
     imagePreview: function imagePreview(e) {
       var file = e.target.files[0];
@@ -2560,47 +2592,48 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
     },
     // add event for select media
     selectedMediaEvent: function selectedMediaEvent() {
-      var _this = this;
+      var _this2 = this;
 
       // add event handler
       var allMedia = $('.media-modal__media');
       $(allMedia).each(function (i, media) {
         $(media).on('click', function (e) {
-          _this.selectMedia(e);
+          _this2.selectMedia(e);
         });
       });
     },
     // add event for video input change
     vidValueChange: function vidValueChange() {
-      var _this2 = this;
+      var _this3 = this;
 
       var videoInput = $('[name="yt_video"]');
       $(videoInput).on('change', function (e) {
-        _this2.insertVideo(e);
-      });
-    },
-    // add event for audio input change
-    audioValueChange: function audioValueChange() {
-      var _this3 = this;
-
-      var audioInput = $('[name="pb_audio"]');
-      $(audioInput).on('change', function (e) {
-        _this3.insertAudio(e);
+        _this3.insertVideo(e);
       });
     },
     // Main methods ==========/
     //=================/
+    // function to disable load more btn if no more media is available to load
     checkLoadMore: function checkLoadMore() {
-      // check if has more
-      this.loadmore = parseInt($(".media-modal__body").last().attr('data-np'));
+      if (this.mediaType === 'audio') {
+        // disable load more btn
+        this.loadmore = parseInt($(".media-modal__body").last().attr('data-np'));
+      }
+
+      if (this.mediaType === 'video') {
+        var more = $(".media-modal__body").last().attr('data-np'); // if no more disable load more btn
+
+        if (more === '0') this.loadmore = parseInt(more);
+      }
     },
     dateDefaultVal: function dateDefaultVal() {
-      var date = new Date().toISOString(),
-          regEx = /^\d{4}-\d{2}-\d{2}/,
-          theDate = date.match(regEx)[0],
-          input = $('#publish-date'); // set date value attr
+      var date = new Date();
+      var offset = date.getTimezoneOffset(),
+          input = $('#publish-date');
+      date = new Date(date.getTime() - offset * 60 * 1000);
+      date = date.toISOString().split("T")[0]; // set date value attr
 
-      $(input).attr('value', theDate);
+      $(input).attr('value', date);
     },
     // deselect the media
     deselectAllMedia: function deselectAllMedia() {
@@ -2638,8 +2671,7 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
         _this4.selectedMediaEvent(); // add backdrop close event
 
 
-        _this4.modalBackdropClickCancel(); // this.loader = false;
-        // this.loadMoreBtn = false;
+        _this4.modalBackdropClickCancel(); // this.loadMoreBtn = false;
 
 
         _this4.modalPageControl(nextPage);
@@ -2667,14 +2699,6 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
         var html = "<div class=\"alert alert-danger\">".concat(error, "</div>");
         $(videosContainer).html(html);
       }).then(function () {
-        // if(!nextPage) {
-        //     this.loader = false
-        // } else {
-        // // this is used to get the modal back up to the top of the new request
-        //     const vidId = $('.media-modal__body').last().attr('id');
-        //     window.location = `${location.origin}/admin/teachings#${vidId}`;
-        //     this.loadMoreBtn = false;
-        // }
         _this5.modalPageControl(nextPage); // add select media event to each media
 
 
@@ -2774,6 +2798,10 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
       });
       reader.readAsDataURL(file);
     },
+    removeImg: function removeImg() {
+      $('#ft_image').val('');
+      this.ftImg = '';
+    },
     selectMedia: function selectMedia(e) {
       var media = $(e.target); // remove all media-modal__selected-media classes
 
@@ -2795,11 +2823,11 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
         this.audioUrl = $(e.target).attr('data-audio-url');
       }
     },
-    setTeachingTitle: function setTeachingTitle(title) {
-      this.teachingTitle = title;
-    },
     setDescription: function setDescription(description) {
       this.description = description;
+    },
+    setTeachingTitle: function setTeachingTitle(title) {
+      this.teachingTitle = title;
     },
     todaysDate: function todaysDate() {
       var today = new Date().toDateString();
@@ -46178,6 +46206,10 @@ var render = function() {
       _vm._v(" "),
       _c("div", { staticClass: "scripture__input-container" }),
       _vm._v(" "),
+      _c("textarea", {
+        attrs: { name: "scripture", id: "scripture-input", hidden: "" }
+      }),
+      _vm._v(" "),
       _c(
         "div",
         {
@@ -46219,16 +46251,20 @@ var render = function() {
       ]),
       _vm._v(" "),
       _c("div", { staticClass: "scripture__text" }, [
-        _c("div", {
-          staticClass: "bg-light text-secondary p-4 scripture__insert",
-          attrs: { id: "scripture__insert" }
-        }),
-        _vm._v(" "),
-        _vm.jsonLoad.length === 0
-          ? _c("p", { staticClass: "text-secondary" }, [
-              _vm._v("Scriptures will generate above...")
-            ])
-          : _vm._e()
+        _c(
+          "div",
+          {
+            staticClass: "bg-light text-secondary p-4 scripture__insert",
+            attrs: { id: "scripture__insert" }
+          },
+          [
+            !_vm.jsonLoad.length
+              ? _c("p", { staticClass: "mb-0" }, [
+                  _vm._v("No scriptures generated...")
+                ])
+              : _vm._e()
+          ]
+        )
       ])
     ]
   )
@@ -46649,7 +46685,7 @@ var render = function() {
               ]),
               _vm._v(" "),
               _c("input", {
-                staticClass: "form-control-file",
+                staticClass: "form-control-file admin-form__ft-img-input",
                 attrs: { name: "image", type: "file", id: "ft_image" },
                 on: { change: _vm.imagePreview }
               }),
@@ -46919,9 +46955,26 @@ var render = function() {
                       1
                     )
                   : _c("img", {
-                      staticClass: "img-fluid",
+                      staticClass: "img-fluid d-block",
                       attrs: { src: _vm.ftImg }
-                    })
+                    }),
+                _vm._v(" "),
+                _vm.ftImg
+                  ? _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-light admin-form__remove-img-btn",
+                        attrs: { id: "remove-img" },
+                        on: {
+                          click: function($event) {
+                            $event.preventDefault()
+                            return _vm.removeImg($event)
+                          }
+                        }
+                      },
+                      [_vm._v("× Remove Image")]
+                    )
+                  : _vm._e()
               ])
             ])
           ])

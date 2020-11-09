@@ -12,6 +12,7 @@
     <p class="text-secondary"><em>Book and chapters are required <span class="text-danger">*</span></em></p>
 
     <div class="scripture__input-container"></div>
+    <textarea name="scripture" id="scripture-input" hidden></textarea>
 
     <div @click="rotateSvg()" id="add-scripture-btn" class="scripture__add-verse">
         <span data-feather="plus-square"></span>
@@ -25,8 +26,7 @@
         </div>
     </div>
     <div class="scripture__text">
-        <div id="scripture__insert" class="bg-light text-secondary p-4 scripture__insert"></div>
-        <p class="text-secondary" v-if="jsonLoad.length === 0">Scriptures will generate above...</p>
+        <div id="scripture__insert" class="bg-light text-secondary p-4 scripture__insert"><p class="mb-0" v-if="!jsonLoad.length">No scriptures generated...</p></div>
     </div>
 
 </div>
@@ -96,7 +96,6 @@ export default {
                          this.stopGen = true;
                      }
                  }
-
 
                  if( $(select).attr('name') === 'chapter' ) {
                      if($(select).val() === 'none') {
@@ -183,6 +182,18 @@ export default {
     // ==============================
 
 
+        addNoScripturesHtml() {
+
+            if(!this.jsonLoad.length) {
+
+                const html = `<p class="mb-0">No scriptures generated...</p>`;
+
+                $("#scripture__insert").html(html);
+            }
+
+        },
+
+
          addVerse() {
 
         // Set unique #id for each minus button NOTE: will probably be added to the scripture__select div as well later
@@ -235,11 +246,24 @@ export default {
         }, // #-add verse
 
 
+
+
+        createTextAreaValue() {
+
+            const scriptureText = $("#scripture__insert").text(),
+                    scriptureHtml = $("#scripture__insert").html(),
+                    scriptureInput = $("#scripture-input");
+
+                // compare text to make empty or copy scripture html
+                    scriptureText === "No scriptures generated..." ?
+                        $(scriptureInput).html('') :
+                        $(scriptureInput).html(scriptureHtml.trim());
+        },
+
+
         createTheDescription() {
 
             this.description = '';
-
-            console.log(this.description);
 
             const scriptures = $(".scripture__insert p");
             let   text = '';
@@ -257,7 +281,7 @@ export default {
 
 
             // create description
-               const  description = `${this.teachingTitle} bible teaching: ${text}...`;
+               const  description = this.jsonLoad.length ? `${this.teachingTitle} bible teaching: ${text}...` : '';
 
                 this.description = description;
 
@@ -290,21 +314,33 @@ export default {
                     height: "0px"
                 }, 200);
 
+
             // make sure animation is over before removing select
                 setTimeout(() => {
                     $(e.target).parent().parent().remove();
                     $(`#scripture-${removeVsId}`).remove();
                 }, 700);
 
-                // recreate the title
+            // recreate the title
                 this.createTheTitle();
 
-                // set delay to make sure html has been removed
+            // add no scriptures html
+                this.addNoScripturesHtml();
+
+
+            // set delay to make sure html has been removed
                 setTimeout(() => {
                     this.createTheDescription();
+
+            // edit the textarea #scripture-input
+                    this.createTextAreaValue();
+
+
                 }, 1500);
 
         },
+
+
 
 
 
@@ -511,16 +547,24 @@ export default {
                     headers: {'Content-Type': 'application/json'}
                  })
                 .then( res => {
-                    const html = res.data;
-                    this.genLoader=false;
+                    const html = res.data,
+                          text = html.trim();
+
+                // and html to generated script
                     $("#scripture__insert").html(html);
 
-                    // create description for post
-                    this.createTheDescription();
+                // add scripture to textarea input hidden
+                    $("#scripture-input").html(text);
+
                 } )
                 .catch( error => {
                     this.errorMessage(error);
                     this.genLoader = false;
+                } )
+                .then( () => {
+                     this.genLoader=false;
+                     // create description for post
+                    this.createTheDescription();
                 } );
 
         },
@@ -572,7 +616,7 @@ export default {
 
         passDescriptionToParent() {
              this.$emit('description', this.description);
-        }
+        },
 
 
     }, // #-methods

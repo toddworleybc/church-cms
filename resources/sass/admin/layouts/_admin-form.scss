@@ -19,9 +19,8 @@
 
     &__image-preview {
         max-width: 20rem;
+        margin: 1rem 0;
     }
-
-
 
 
 
@@ -44,6 +43,9 @@
         margin-top: 1rem;
     }
 
+    &__remove-img-btn {
+        margin-top: 1rem;
+    }
 
 
     &__time {
@@ -56,6 +58,7 @@
         width: 30%;
         border-left: 1px solid $border-color;
         padding-left: 2rem;
+        overflow: hidden;
         @include res(992) {
             width: 100%;
             border-left: none;

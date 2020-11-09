@@ -91,7 +91,7 @@
 
                 <div class="form-group">
                     <label for="image">Featured Image</label>
-                    <input @change="imagePreview" class="form-control-file" name="image" type="file" id="ft_image">
+                    <input @change="imagePreview" class="form-control-file admin-form__ft-img-input" name="image" type="file" id="ft_image">
                     <div class="admin-form__image-preview">
                         <svg v-if="!ftImg" viewBox="0 0 507.99999 285.75001">
                             <defs id="defs2">
@@ -133,7 +133,8 @@
                                 </g>
                             </g>
                         </svg>
-                        <img v-else :src="ftImg" class="img-fluid">
+                        <img v-else :src="ftImg" class="img-fluid d-block">
+                        <button v-if="ftImg" @click.prevent="removeImg" id="remove-img" class="btn btn-light admin-form__remove-img-btn">&times; Remove Image</button>
                     </div>
                 </div>
             </aside>
@@ -193,7 +194,6 @@ export default {
             vidId: '',
             vidSrc: '',
             videoValue: ''
-
         }
     },
 
@@ -207,6 +207,17 @@ export default {
 
     // Event methods =========/
         // ========================
+
+    // add event for audio input change
+
+        audioValueChange() {
+            const audioInput = $('[name="pb_audio"]');
+
+            $(audioInput).on('change', e => {
+                this.insertAudio(e);
+            });
+
+        },
 
 
     // insert featured image onto screen before loading into the database
@@ -236,6 +247,7 @@ export default {
         },
 
 
+
     // add event for video input change
         vidValueChange() {
 
@@ -248,36 +260,48 @@ export default {
         },
 
 
-    // add event for audio input change
 
-        audioValueChange() {
-            const audioInput = $('[name="pb_audio"]');
-
-            $(audioInput).on('change', e => {
-                this.insertAudio(e);
-            });
-
-        },
 
 
      // Main methods ==========/
         //=================/
+
+    // function to disable load more btn if no more media is available to load
         checkLoadMore() {
 
-        // check if has more
+            if(this.mediaType === 'audio') {
 
-            this.loadmore = parseInt($(".media-modal__body").last().attr('data-np'));
+            // disable load more btn
+                this.loadmore = parseInt($(".media-modal__body").last().attr('data-np'));
 
+            }
+
+
+            if(this.mediaType === 'video') {
+
+                const more = $(".media-modal__body").last().attr('data-np');
+
+                // if no more disable load more btn
+                if(more === '0') this.loadmore = parseInt(more);
+
+            }
         },
 
         dateDefaultVal() {
-            const date = new Date().toISOString(),
-                  regEx = /^\d{4}-\d{2}-\d{2}/,
-                  theDate = date.match(regEx)[0],
-                  input = $('#publish-date');
-                  // set date value attr
-                  $(input).attr('value', theDate);
+            let     date = new Date();
+
+            const   offset = date.getTimezoneOffset(),
+                    input = $('#publish-date');
+
+                    date = new Date(date.getTime() - (offset*60*1000));
+                    date = date.toISOString().split("T")[0];
+
+                    // set date value attr
+                    $(input).attr('value', date);
         },
+
+
+
 
     // deselect the media
         deselectAllMedia() {
@@ -335,9 +359,8 @@ export default {
                 // add backdrop close event
                     this.modalBackdropClickCancel();
 
-                    // this.loader = false;
 
-                    // this.loadMoreBtn = false;
+                // this.loadMoreBtn = false;
                     this.modalPageControl(nextPage);
 
                     this.checkLoadMore();
@@ -379,20 +402,6 @@ export default {
                     $(videosContainer).html(html);
                 } )
                 .then( () => {
-                    // if(!nextPage) {
-
-                    //     this.loader = false
-
-                    // } else {
-
-                    // // this is used to get the modal back up to the top of the new request
-                    //     const vidId = $('.media-modal__body').last().attr('id');
-
-                    //     window.location = `${location.origin}/admin/teachings#${vidId}`;
-
-                    //     this.loadMoreBtn = false;
-                    // }
-
 
                     this.modalPageControl(nextPage);
 
@@ -406,8 +415,6 @@ export default {
 
                 } );
         },
-
-
 
 
 
@@ -502,7 +509,6 @@ export default {
                 this.getPodbeanAudio(null, nextPage);
             }
 
-
         },
 
         modalPageControl(nextPage) {
@@ -551,6 +557,11 @@ export default {
         },
 
 
+        removeImg() {
+            $('#ft_image').val('');
+            this.ftImg = '';
+        },
+
 
         selectMedia(e) {
 
@@ -582,22 +593,16 @@ export default {
                 this.audioUrl = $(e.target).attr('data-audio-url');
             }
 
-
-
         },
-
-
-
-
-        setTeachingTitle(title) {
-            this.teachingTitle = title;
-        },
-
 
         setDescription(description) {
             this.description = description;
         },
 
+
+        setTeachingTitle(title) {
+            this.teachingTitle = title;
+        },
 
 
         todaysDate() {
