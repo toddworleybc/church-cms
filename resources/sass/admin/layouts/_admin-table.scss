@@ -1,0 +1,12 @@
+.admin-table {
+
+    & th {
+        border-top: none;
+    }
+
+
+    & tr {
+        cursor: pointer;
+    }
+
+}

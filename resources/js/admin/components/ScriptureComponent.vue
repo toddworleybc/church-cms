@@ -58,6 +58,12 @@ export default {
     }, //#-data
 
 
+
+    props: [
+        'scriptureHtml'
+    ],
+
+
     methods: {
 
     // EVENTS =============
@@ -288,7 +294,11 @@ export default {
                 this.passDescriptionToParent();
         },
 
+        editScriptureInsert() {
+            $('.scripture_insert').html(this.scriptureHtml);
 
+
+        },
 
         removeVerse(e) {
 
@@ -624,6 +634,7 @@ export default {
 
 
     mounted() {
+        console.log(this.scriptureHtml);
     } // #-mounted
 
 

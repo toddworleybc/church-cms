@@ -1,7 +1,7 @@
 <template>
 <div class="admin-form teachings-create">
 
-    <form method="POST" :action="action" accept-charset="UTF-8">
+    <form method="POST" :action="action" accept-charset="UTF-8" enctype="multipart/form-data">
         <input name="_token" type="hidden" :value="csrf">
         <div class="admin-form__wrapper">
             <div class="admin-form__main">
@@ -35,7 +35,7 @@
 
                         <input type="text" name="speaker" v-show="enterSpeaker" class="form-control mb-0" placeholder="Enter Speaker">
 
-                        <select class="custom-select" v-show="!enterSpeaker" name="speaker">
+                        <select class="custom-select" v-show="!enterSpeaker" name="staff_id">
                             <option data-staff="Pastor James Wafer" value="1" selected="selected">Pastor James Wafer</option>
                             <option data-staff="Pastor Dale Richmond" value="2">Pastor Dale Richmond</option>
                             <option data-staff="Reciptionist Kelly Munsion" value="3">Reciptionist Kelly Munsion</option>
@@ -52,7 +52,7 @@
                             allowfullscreen>
                         </iframe>
                     </div>
-                    <input class="form-control" :value="videoValue" placeholder="Enter Video Url" name="yt_video" type="text" id="video">
+                    <input class="form-control" :value="videoValue" placeholder="Enter Video Url" name="video" type="text" id="video">
                     <div class="teachings-create__media-btns">
                         <button @click="getYoutubeVideos" data-toggle="modal" data-target="#loadMediaModal" type="button" class="btn btn-light btns__icon"><span data-feather="youtube"></span>Get From Youtube</button>
                     </div>
@@ -61,27 +61,27 @@
                     <label v-if="!audioUrl" for="audio">Enter Audio</label>
                     <iframe v-if="audioUrl" id="audio_iframe" :src="audioUrl" width="100%" height="100" frameborder="0" scrolling="no">
                     </iframe>
-                    <input class="form-control" :value="audioUrl" name="pb_audio" type="text" id="audio" placeholder="Enter Audio Url">
+                    <input class="form-control" :value="audioUrl" name="audio" type="text" id="audio" placeholder="Enter Audio Url">
                     <div class="teachings-create__media-btns">
                         <button @click="getPodbeanAudio" type="button" class="btn btn-light btns__icon" data-toggle="modal" data-target="#loadMediaModal"><span data-feather="volume-2"></span>Get From Podbean</button>
                     </div>
 
                 </div>
-                <scripture-component @description="setDescription($event)" @teachingTitle="setTeachingTitle($event)"></scripture-component>
+                <scripture-component :scripture-html="scriptureHtml" @description="setDescription($event)" @teachingTitle="setTeachingTitle($event)"></scripture-component>
             </div>
 
             <aside class="admin-form__sidebar">
                 <p class="admin-form__time">Today's Date: <span id="today"></span></p>
                 <div class="form-group admin-form__btns">
                     <button type="submit" class="btn btn-info btns__icon admin-form__publish-btn"><span
-                            data-feather="save"></span>Save Teaching</button>
+                            data-feather="save"></span>Save Draft</button>
                     <button type="submit" class="btn btn-primary btns__icon admin-form__publish-btn"><span
-                            data-feather="send"></span>Publish Teaching</button>
+                            data-feather="send"></span>{{ editMode ? 'Edit' : 'Publish' }} Teaching</button>
                 </div>
 
                 <div class="form-group">
                     <label for="publish-date" class="d-block">Publish Date</label>
-                    <input class="form-control" name="publish-date" type="date" id="publish-date">
+                    <input class="form-control" name="publish_date" type="date" id="publish-date">
                 </div>
 
                 <div class="form-group">
@@ -182,6 +182,7 @@ export default {
             audioUrl: '',
             baseUrl: location.origin + "/api/",
             description: '',
+            editMode: false,
             enterSpeaker: false,
             ftImg: '',
             loader: false,
@@ -190,6 +191,8 @@ export default {
             mediaType: '',
             loadmore: true,
             topical: false,
+            scriptureHtml: '',
+            teaching: {},
             teachingTitle: "",
             vidId: '',
             vidSrc: '',
@@ -201,7 +204,7 @@ export default {
         ScriptureComponent
     },
 
-    props: [ 'action', 'csrf' ],
+    props: [ 'action', 'csrf', 'teachingData' ],
 
     methods: {
 
@@ -211,7 +214,7 @@ export default {
     // add event for audio input change
 
         audioValueChange() {
-            const audioInput = $('[name="pb_audio"]');
+            const audioInput = $('[name="audio"]');
 
             $(audioInput).on('change', e => {
                 this.insertAudio(e);
@@ -251,7 +254,7 @@ export default {
     // add event for video input change
         vidValueChange() {
 
-            const videoInput = $('[name="yt_video"]');
+            const videoInput = $('[name="video"]');
 
             $(videoInput).on('change', e => {
                 this.insertVideo(e);
@@ -322,6 +325,7 @@ export default {
 
         },
 
+
     // Empty the modal media
          emptyModal() {
             const mediaContainer = $('#media-container');
@@ -330,6 +334,25 @@ export default {
         },
 
 
+        editTeachingSettings() {
+
+        // check if we are not on teaching create
+            if(this.teachingData) {
+
+            // switch template to edit mode
+                this.editMode = true;
+
+            // get the data
+                this.teaching = JSON.parse(this.teachingData);
+
+            // set values
+                this.teachingTitle = this.teaching.title;
+                this.description = this.teaching.description;
+                this.scriptureHtml = this.teaching.scripture;
+            }
+
+
+        },
 
         getPodbeanAudio(e, nextPage = '') {
             this.mediaType = 'audio';
@@ -452,7 +475,7 @@ export default {
 
 
             if(e.type === 'change') {
-            const vidVal = $('[name="yt_video"]').val(),
+            const vidVal = $('[name="video"]').val(),
                   regX = /(?<=https:\/\/youtu\.be\/).+$/;
 
                   if(!vidVal) {
@@ -619,6 +642,7 @@ export default {
         this.modalBackdropClickCancel();
         this.todaysDate();
         this.vidValueChange();
+        this.editTeachingSettings();
     }
 
 }

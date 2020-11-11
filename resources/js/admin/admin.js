@@ -25,7 +25,9 @@ const feather = require('feather-icons');
 
 // Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 
-const TeachingsCreateComponent = Vue.component('teachings-create-component', require('./components/TeachingsCreateComponent.vue').default);
+const TeachingsFormComponent = Vue.component('teachings-form-component', require('./components/TeachingsFormComponent.vue').default);
+
+const TeachingTableComponent = Vue.component('teaching-table-component', require('./components/TeachingTableComponent.vue').default);
 
 // /**
 //  * Next, we will create a fresh Vue application instance and attach it to
@@ -37,7 +39,8 @@ const app = new Vue({
     el: '#admin-app',
 
     components: {
-        TeachingsCreateComponent
+        TeachingsFormComponent,
+        TeachingTableComponent
     },
 
     mounted() {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Teaching;
 
 class TeachingController extends Controller
 {
@@ -13,8 +14,10 @@ class TeachingController extends Controller
      */
     public function index()
     {
-        //
-        return view('admin.teachings.index');
+
+        $teachings = Teaching::all();
+
+        return view('admin.teachings.index', compact('teachings') );
     }
 
     /**
@@ -25,6 +28,7 @@ class TeachingController extends Controller
     public function create()
     {
         //
+        return view('admin.teachings.create');
     }
 
     /**
@@ -35,8 +39,12 @@ class TeachingController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        echo $request['publish-date'];
+
+       return Teaching::create($request->all()) ?
+
+            redirect()->back()->with('success', 'Teaching has been published') :
+            redirect()->back()->with('danger', 'Teaching could not be created!');
+
     }
 
     /**
@@ -58,7 +66,11 @@ class TeachingController extends Controller
      */
     public function edit($id)
     {
-        //
+
+        $teaching = Teaching::find($id);
+
+        return view('admin.teachings.edit', compact('teaching'));
+
     }
 
     /**

@@ -11382,3 +11382,11 @@ body {
   }
 }
 
+.admin-table th {
+  border-top: none;
+}
+
+.admin-table tr {
+  cursor: pointer;
+}
+

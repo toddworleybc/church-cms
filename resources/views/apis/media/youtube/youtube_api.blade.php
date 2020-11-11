@@ -48,7 +48,7 @@ $nextPageToken = isset($response['nextPageToken']) ? $response['nextPageToken'] 
             $videoId = isset($video['id']['videoId']) ? $video['id']['videoId'] : '';
         @endphp
 
-            <div data-media-id="{{ $videoId ?? '' ?? '' }}" class="media-modal__media">
+            <div data-media-id="{{ $videoId ?? '' }}" class="media-modal__media">
 
                 <div class="media-modal__title">
                     <h5>{{ $video['snippet']['title'] ?? 'No Title' }}</h5>
@@ -56,14 +56,14 @@ $nextPageToken = isset($response['nextPageToken']) ? $response['nextPageToken'] 
                 </div>
 
                 <div class="embed-responsive embed-responsive-16by9 media-modal__iframe">
-                    <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/{{ $videoId ?? '' ?? '' }}"
+                    <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/{{ $videoId ?? '' }}"
                         frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowfullscreen></iframe>
                 </div>
 
                 <div class="custom-control custom-radio mt-3 media-modal__input-container">
-                    <input type="radio" id="yt-{{ $videoId ?? '' ?? '' }}" name="yt_vid" value="{{ $videoId ?? '' ?? '' }}" class="custom-control-input">
-                    <label class="custom-control-label" for="yt-{{ $videoId ?? '' ?? '' }}">Select Video</label>
+                    <input type="radio" id="yt-{{ $videoId ?? '' }}" name="yt_vid" value="{{ $videoId ?? '' }}" class="custom-control-input">
+                    <label class="custom-control-label" for="yt-{{ $videoId ?? '' }}">Select Video</label>
                 </div>
 
             </div>
