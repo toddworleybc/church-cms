@@ -15,11 +15,14 @@
     }
 
 
+    &__image {
+        overflow: hidden;
 
+        &-preview {
+            max-width: 20rem;
+            margin: 1rem 0;
+        }
 
-    &__image-preview {
-        max-width: 20rem;
-        margin: 1rem 0;
     }
 
 
@@ -58,7 +61,6 @@
         width: 30%;
         border-left: 1px solid $border-color;
         padding-left: 2rem;
-        overflow: hidden;
         @include res(992) {
             width: 100%;
             border-left: none;

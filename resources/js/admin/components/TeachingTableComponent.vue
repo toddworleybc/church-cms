@@ -16,7 +16,7 @@
 
             <tr scope="row" @click="editTeaching" :id="`teaching-${teaching.id}`"  v-for="teaching in teachings" :data-teaching-id="teaching.id" :key="teaching.id">
                 <td>{{ teaching.id }}</td>
-                <td>{{ teaching.title }}</td>
+                <td>{{ teaching.title.substr(0, 50) }}</td>
                 <td>{{ teaching.speaker ? teaching.speaker : teaching.staff_id }}</td>
                 <td>{{ teaching.status }}</td>
                 <td>{{ teaching.publish_date }}</td>
@@ -78,7 +78,9 @@ export default {
 
     mounted() {
         this.teachings = JSON.parse(this.teachingsData);
+        this.teachings = this.teachings.reverse(); // ORDER BY DESENDING
         this.dateConvert();
+
     }
 
 

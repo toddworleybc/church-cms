@@ -1943,6 +1943,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 
 var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-icons/dist/feather.js");
@@ -1961,6 +1962,7 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       loader: false,
       genLoader: false,
       jsonLoad: [],
+      scripture: '',
       stopGen: false,
       teachingTitle: ""
     };
@@ -2061,10 +2063,15 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
     // SELECT INPUT CONFIG ===========
     // ==============================
     addNoScripturesHtml: function addNoScripturesHtml() {
-      if (!this.jsonLoad.length) {
-        var html = "<p class=\"mb-0\">No scriptures generated...</p>";
+      var addNow = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      var html = "<p class=\"mb-0\">No scriptures generated...</p>";
+
+      if (addNow) {
         $("#scripture__insert").html(html);
+        return;
       }
+
+      if (!this.jsonLoad.length) $("#scripture__insert").html(html);
     },
     addVerse: function addVerse() {
       // Set unique #id for each minus button NOTE: will probably be added to the scripture__select div as well later
@@ -2107,10 +2114,17 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       this.passDescriptionToParent();
     },
     editScriptureInsert: function editScriptureInsert() {
-      $('.scripture_insert').html(this.scriptureHtml);
+      var _this3 = this;
+
+      setTimeout(function () {
+        if (_this3.scriptureHtml) {
+          _this3.scripture = _this3.scriptureHtml;
+          $("#scripture-input").html(_this3.scriptureHtml);
+        }
+      }, 250);
     },
     removeVerse: function removeVerse(e) {
-      var _this3 = this;
+      var _this4 = this;
 
       // Fix bug where if the Rect or Line was clicked on svg it will make sure that it relates to the svg itself
       if (e.target.localName === "line" || e.target.localName === "rect") e.target = e.target.parentNode; // Id to remove SCRIPTURE ONLY, not select;
@@ -2139,14 +2153,14 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       this.addNoScripturesHtml(); // set delay to make sure html has been removed
 
       setTimeout(function () {
-        _this3.createTheDescription(); // edit the textarea #scripture-input
+        _this4.createTheDescription(); // edit the textarea #scripture-input
 
 
-        _this3.createTextAreaValue();
+        _this4.createTextAreaValue();
       }, 1500);
     },
     rotateSvg: function rotateSvg() {
-      var _this4 = this;
+      var _this5 = this;
 
       var reverse = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
       var e = arguments.length > 1 ? arguments[1] : undefined;
@@ -2168,11 +2182,11 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       this.removeVerse(e); // set delay for btn clicking
 
       setTimeout(function () {
-        _this4.delay = false;
+        _this5.delay = false;
       }, 1000);
     },
     setSelectInput: function setSelectInput(e) {
-      var _this5 = this;
+      var _this6 = this;
 
       // Stop extra request on end_verse onChange
       if (e.target.name === 'end_verse') return;
@@ -2205,7 +2219,7 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
         if (selectName === 'Chapter') selectName += "s";
         $(select).html("<option value=\"none\">".concat(selectName, "</option>"));
 
-        _this5.disableSelect(select);
+        _this6.disableSelect(select);
       }); // =======================================
       // build url slug
 
@@ -2214,7 +2228,7 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       this.getBibleHtmlOptions(slug, function (optionsHtml) {
         $(selectToAddOptionsTo).html(optionsHtml);
 
-        _this5.enableSelect(selectToAddOptionsTo);
+        _this6.enableSelect(selectToAddOptionsTo);
       });
     },
     // ####--- END SELECT INPUT CONFIG ------------/
@@ -2242,10 +2256,10 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
     },
     // disable all selects aka RESET Selects
     disableAllSelects: function disableAllSelects() {
-      var _this6 = this;
+      var _this7 = this;
 
       $(this.createdSelectInputs).each(function (i, selectInput) {
-        _this6.disableSelect(selectInput);
+        _this7.disableSelect(selectInput);
       });
     },
     // enable select option
@@ -2269,7 +2283,7 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       });
     },
     getData: function getData() {
-      var _this7 = this;
+      var _this8 = this;
 
       var url = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.baseUrl;
       var callback = arguments.length > 1 ? arguments[1] : undefined;
@@ -2278,9 +2292,9 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
         var data = res.data;
         callback(data);
       })["catch"](function (error) {
-        _this7.errorMessage(error);
+        _this8.errorMessage(error);
       }).then(function () {
-        _this7.loader = false;
+        _this8.loader = false;
       });
     },
     optionsSlugBuilder: function optionsSlugBuilder(rowSelected) {
@@ -2295,7 +2309,7 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       return slug;
     },
     sendPayload: function sendPayload(jsonLoad) {
-      var _this8 = this;
+      var _this9 = this;
 
       this.genLoader = true;
       var url = this.baseUrl + 'gen';
@@ -2311,44 +2325,46 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
 
         $("#scripture-input").html(text);
       })["catch"](function (error) {
-        _this8.errorMessage(error);
+        _this9.errorMessage(error);
 
-        _this8.genLoader = false;
+        _this9.genLoader = false;
       }).then(function () {
-        _this8.genLoader = false; // create description for post
+        _this9.genLoader = false; // create description for post
 
-        _this8.createTheDescription();
+        _this9.createTheDescription();
+
+        if (!_this9.jsonLoad.length) _this9.addNoScripturesHtml(true);
       });
     },
     // Set the books select when created
     setBooksSelect: function setBooksSelect(verseId) {
-      var _this9 = this;
+      var _this10 = this;
 
       this.getBibleHtmlOptions("", function (bookOptions) {
         var bookSelect = "#book-".concat(verseId);
         $(bookSelect).append(bookOptions);
 
-        _this9.enableSelect(bookSelect);
+        _this10.enableSelect(bookSelect);
       });
     },
     createTheTitle: function createTheTitle() {
-      var _this10 = this;
+      var _this11 = this;
 
       this.teachingTitle = "";
       this.jsonLoad.forEach(function (verse, i) {
         // Add "&" inbetween verses
-        if (i > 0) _this10.teachingTitle += " & "; // Insert book and title into title
+        if (i > 0) _this11.teachingTitle += " & "; // Insert book and title into title
 
-        _this10.teachingTitle += verse['book'] + " ";
-        _this10.teachingTitle += verse['chapter']; // Add start verse if present
+        _this11.teachingTitle += verse['book'] + " ";
+        _this11.teachingTitle += verse['chapter']; // Add start verse if present
 
         if (verse['startVs']) {
-          _this10.teachingTitle += verse['startVs'] ? ":" + verse['startVs'] : "";
+          _this11.teachingTitle += verse['startVs'] ? ":" + verse['startVs'] : "";
         } // Add end verse if present
 
 
         if (verse['endVs']) {
-          _this10.teachingTitle += verse['endVs'] ? "-" + verse['endVs'] : "";
+          _this11.teachingTitle += verse['endVs'] ? "-" + verse['endVs'] : "";
         }
       });
       this.passTitleToParent();
@@ -2362,7 +2378,7 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
   },
   // #-methods
   mounted: function mounted() {
-    console.log(this.scriptureHtml);
+    this.editScriptureInsert();
   } // #-mounted
 
 });
@@ -2438,6 +2454,8 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
   },
   mounted: function mounted() {
     this.teachings = JSON.parse(this.teachingsData);
+    this.teachings = this.teachings.reverse(); // ORDER BY DESENDING
+
     this.dateConvert();
   }
 });
@@ -2635,15 +2653,21 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
       editMode: false,
       enterSpeaker: false,
       ftImg: '',
+      ftImgInfo: {},
       loader: false,
       loadMoreBtn: false,
       mediaSelected: false,
       mediaType: '',
       loadmore: true,
-      topical: false,
       scriptureHtml: '',
-      teaching: {},
+      staffId: '',
+      status: '',
+      speaker: '',
+      teaching: '',
       teachingTitle: "",
+      topical: false,
+      topicalTitle: '',
+      type: '',
       vidId: '',
       vidSrc: '',
       videoValue: ''
@@ -2652,7 +2676,7 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
   components: {
     ScriptureComponent: ScriptureComponent
   },
-  props: ['action', 'csrf', 'teachingData'],
+  props: ['action', 'csrf', 'teachingData', 'imageUrl'],
   methods: {
     // Event methods =========/
     // ========================
@@ -2685,6 +2709,10 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
           _this2.selectMedia(e);
         });
       });
+    },
+    setStatusValue: function setStatusValue(e) {
+      var status = $(e.target).attr("data-status");
+      this.status = status;
     },
     // add event for video input change
     vidValueChange: function vidValueChange() {
@@ -2736,17 +2764,63 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
       $(mediaContainer).html('');
       this.mediaType = '';
     },
+    // insert video values on edit page
+    insertEditVideoValues: function insertEditVideoValues(videoUrl) {
+      var ytEmbed = 'https://www.youtube.com/embed/',
+          regX = /(?<=https:\/\/youtu\.be\/).+$/;
+
+      if (videoUrl) {
+        var vidId = videoUrl.match(regX)[0];
+        this.vidId = vidId;
+        this.vidSrc = ytEmbed + vidId;
+        this.videoValue = videoUrl;
+      }
+    },
     editTeachingSettings: function editTeachingSettings() {
       // check if we are not on teaching create
       if (this.teachingData) {
-        // switch template to edit mode
-        this.editMode = true; // get the data
+        // get the data
+        this.teaching = JSON.parse(this.teachingData);
+        var imagePath = "".concat(this.teaching.ft_image); // switch template to edit mode
 
-        this.teaching = JSON.parse(this.teachingData); // set values
+        this.editMode = true; // set values
 
-        this.teachingTitle = this.teaching.title;
+        this.setEditTeachingTitle(this.teaching);
         this.description = this.teaching.description;
         this.scriptureHtml = this.teaching.scripture;
+        this.insertEditVideoValues(this.teaching.video);
+        this.audioUrl = this.teaching.audio;
+        this.status = this.teaching.status;
+        this.setEditStaffSpeakerValues(this.teaching);
+        if (imagePath) this.ftImg = "".concat(location.origin, "/").concat(imagePath);
+      } else {
+        // set default for staff on create teaching page.
+        this.staffId = '1';
+      }
+    },
+    setEditStaffSpeakerValues: function setEditStaffSpeakerValues(teaching) {
+      if (!teaching.staff_id) {
+        this.speaker = teaching.speaker;
+        this.enterSpeaker = true;
+        $("#enterSpeaker").prop('checked', true);
+        this.staffId = "1";
+      } else {
+        this.staffId = teaching.staff_id;
+        this.enterSpeaker = false;
+        $("#enterSpeaker").prop('checked', false);
+      }
+    },
+    setEditTeachingTitle: function setEditTeachingTitle(teaching) {
+      if (teaching.type === 'topical') {
+        $("#topical").prop('checked', true);
+        this.topical = true;
+        this.topicalTitle = teaching.title;
+      }
+
+      if (teaching.type === 'teaching') {
+        $("#teaching").prop('checked', true);
+        this.topical = false;
+        this.teachingTitle = teaching.title;
       }
     },
     getPodbeanAudio: function getPodbeanAudio(e) {
@@ -2780,7 +2854,7 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
       var _this5 = this;
 
       var nextPage = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-      //set media type
+      //set media type for modal
       this.mediaType = 'video'; // Where media is inserted after API call
 
       var videosContainer = $('#media-container'); // base url ofr youtube videos
@@ -2871,7 +2945,7 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
       } else {
         // this is used to get the modal back up to the top of the new request
         var vidId = $('.media-modal__body').last().attr('id');
-        window.location = "".concat(location.origin, "/admin/teachings#").concat(vidId);
+        window.location = "".concat(location.origin, "/admin/teachings/create#").concat(vidId);
         this.loadMoreBtn = false;
       }
     },
@@ -2900,7 +2974,7 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
       this.ftImg = '';
     },
     selectMedia: function selectMedia(e) {
-      var media = $(e.target); // remove all media-modal__selected-media classes
+      var media = $(e.target).closest(".media-modal__media"); // remove all media-modal__selected-media classes
 
       this.deselectAllMedia(); // target right element
 
@@ -2911,13 +2985,14 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
 
       if (this.mediaType === 'video') {
         // Set the vidId ========/
-        this.vidId = $(e.target).attr('data-media-id');
+        // ALL "media" vars below in video and audio were e.target
+        this.vidId = $(media).attr('data-media-id');
       }
 
       if (this.mediaType === 'audio') {
         // Set the audio Id =======/
-        this.audioId = $(e.target).attr('data-media-id');
-        this.audioUrl = $(e.target).attr('data-audio-url');
+        this.audioId = $(media).attr('data-media-id');
+        this.audioUrl = $(media).attr('data-audio-url');
       }
     },
     setDescription: function setDescription(description) {
@@ -2925,6 +3000,9 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
     },
     setTeachingTitle: function setTeachingTitle(title) {
       this.teachingTitle = title;
+    },
+    statusPublished: function statusPublished() {
+      return this.status !== "Published" ? false : true;
     },
     todaysDate: function todaysDate() {
       var today = new Date().toDateString();
@@ -2935,10 +3013,10 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
   mounted: function mounted() {
     this.audioValueChange();
     this.dateDefaultVal();
+    this.editTeachingSettings();
     this.modalBackdropClickCancel();
     this.todaysDate();
     this.vidValueChange();
-    this.editTeachingSettings();
   }
 });
 
@@ -67875,10 +67953,6 @@ var render = function() {
       _vm._v(" "),
       _c("div", { staticClass: "scripture__input-container" }),
       _vm._v(" "),
-      _c("textarea", {
-        attrs: { name: "scripture", id: "scripture-input", hidden: "" }
-      }),
-      _vm._v(" "),
       _c(
         "div",
         {
@@ -67919,6 +67993,10 @@ var render = function() {
           : _vm._e()
       ]),
       _vm._v(" "),
+      _c("textarea", {
+        attrs: { name: "scripture", id: "scripture-input", hidden: "" }
+      }),
+      _vm._v(" "),
       _c("div", { staticClass: "scripture__text" }, [
         _c(
           "div",
@@ -67927,7 +68005,8 @@ var render = function() {
             attrs: { id: "scripture__insert" }
           },
           [
-            !_vm.jsonLoad.length
+            _c("span", { domProps: { innerHTML: _vm._s(_vm.scripture) } }),
+            !_vm.jsonLoad.length && !_vm.scripture
               ? _c("p", { staticClass: "mb-0" }, [
                   _vm._v("No scriptures generated...")
                 ])
@@ -68006,7 +68085,7 @@ var render = function() {
             [
               _c("td", [_vm._v(_vm._s(teaching.id))]),
               _vm._v(" "),
-              _c("td", [_vm._v(_vm._s(teaching.title))]),
+              _c("td", [_vm._v(_vm._s(teaching.title.substr(0, 50)))]),
               _vm._v(" "),
               _c("td", [
                 _vm._v(
@@ -68081,6 +68160,7 @@ var render = function() {
       "form",
       {
         attrs: {
+          id: "teaching-form",
           method: "POST",
           action: _vm.action,
           "accept-charset": "UTF-8",
@@ -68092,6 +68172,12 @@ var render = function() {
           attrs: { name: "_token", type: "hidden" },
           domProps: { value: _vm.csrf }
         }),
+        _vm._v(" "),
+        _vm.editMode
+          ? _c("input", {
+              attrs: { name: "_method", type: "hidden", value: "PATCH" }
+            })
+          : _vm._e(),
         _vm._v(" "),
         _c("div", { staticClass: "admin-form__wrapper" }, [
           _c(
@@ -68106,8 +68192,9 @@ var render = function() {
                     staticClass: "custom-control-input",
                     attrs: {
                       type: "radio",
-                      id: "bible",
-                      name: "title",
+                      id: "teaching",
+                      value: "teaching",
+                      name: "type",
                       checked: ""
                     },
                     on: {
@@ -68121,7 +68208,7 @@ var render = function() {
                     "label",
                     {
                       staticClass: "custom-control-label",
-                      attrs: { for: "bible" }
+                      attrs: { for: "teaching" }
                     },
                     [
                       _vm._v(
@@ -68134,7 +68221,12 @@ var render = function() {
                 _c("div", { staticClass: "custom-control custom-radio" }, [
                   _c("input", {
                     staticClass: "custom-control-input",
-                    attrs: { type: "radio", id: "topical", name: "title" },
+                    attrs: {
+                      type: "radio",
+                      id: "topical",
+                      value: "topical",
+                      name: "type"
+                    },
                     on: {
                       change: function($event) {
                         _vm.topical = 1
@@ -68154,24 +68246,57 @@ var render = function() {
                 _vm._v(" "),
                 _vm.topical
                   ? _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.topicalTitle,
+                          expression: "topicalTitle"
+                        }
+                      ],
                       staticClass: "form-control mb-0 mt-2",
                       attrs: {
                         name: "title",
                         type: "text",
-                        placeholder: "Enter Title"
+                        placeholder: "Enter Topical Title"
+                      },
+                      domProps: { value: _vm.topicalTitle },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.topicalTitle = $event.target.value
+                        }
                       }
                     })
                   : _vm._e(),
                 _vm._v(" "),
                 _vm.teachingTitle && !_vm.topical
                   ? _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.teachingTitle,
+                          expression: "teachingTitle"
+                        }
+                      ],
                       staticClass: "form-control mb-0 mt-2",
                       attrs: {
                         name: "title",
                         type: "text",
                         placeholder: "Enter Title"
                       },
-                      domProps: { value: _vm.teachingTitle }
+                      domProps: { value: _vm.teachingTitle },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.teachingTitle = $event.target.value
+                        }
+                      }
                     })
                   : _vm._e()
               ]),
@@ -68208,73 +68333,79 @@ var render = function() {
                   "div",
                   { staticClass: "teachings-create__speaker-container" },
                   [
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "show",
-                          rawName: "v-show",
-                          value: _vm.enterSpeaker,
-                          expression: "enterSpeaker"
-                        }
-                      ],
-                      staticClass: "form-control mb-0",
-                      attrs: {
-                        type: "text",
-                        name: "speaker",
-                        placeholder: "Enter Speaker"
-                      }
-                    }),
-                    _vm._v(" "),
-                    _c(
-                      "select",
-                      {
-                        directives: [
-                          {
-                            name: "show",
-                            rawName: "v-show",
-                            value: !_vm.enterSpeaker,
-                            expression: "!enterSpeaker"
+                    _vm.enterSpeaker
+                      ? _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.speaker,
+                              expression: "speaker"
+                            }
+                          ],
+                          staticClass: "form-control mb-0",
+                          attrs: {
+                            type: "text",
+                            name: "speaker",
+                            placeholder: "Enter Speaker"
+                          },
+                          domProps: { value: _vm.speaker },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.speaker = $event.target.value
+                            }
                           }
-                        ],
-                        staticClass: "custom-select",
-                        attrs: { name: "staff_id" }
-                      },
-                      [
-                        _c(
-                          "option",
+                        })
+                      : _vm._e(),
+                    _vm._v(" "),
+                    !_vm.enterSpeaker
+                      ? _c(
+                          "select",
                           {
-                            attrs: {
-                              "data-staff": "Pastor James Wafer",
-                              value: "1",
-                              selected: "selected"
-                            }
+                            staticClass: "custom-select",
+                            attrs: { name: "staff_id" },
+                            domProps: { value: _vm.staffId }
                           },
-                          [_vm._v("Pastor James Wafer")]
-                        ),
-                        _vm._v(" "),
-                        _c(
-                          "option",
-                          {
-                            attrs: {
-                              "data-staff": "Pastor Dale Richmond",
-                              value: "2"
-                            }
-                          },
-                          [_vm._v("Pastor Dale Richmond")]
-                        ),
-                        _vm._v(" "),
-                        _c(
-                          "option",
-                          {
-                            attrs: {
-                              "data-staff": "Reciptionist Kelly Munsion",
-                              value: "3"
-                            }
-                          },
-                          [_vm._v("Reciptionist Kelly Munsion")]
+                          [
+                            _c(
+                              "option",
+                              {
+                                attrs: {
+                                  "data-staff": "Pastor James Wafer",
+                                  value: "1",
+                                  selected: "selected"
+                                }
+                              },
+                              [_vm._v("Pastor James Wafer")]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "option",
+                              {
+                                attrs: {
+                                  "data-staff": "Pastor Dale Richmond",
+                                  value: "2"
+                                }
+                              },
+                              [_vm._v("Pastor Dale Richmond")]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "option",
+                              {
+                                attrs: {
+                                  "data-staff": "Reciptionist Kelly Munsion",
+                                  value: "3"
+                                }
+                              },
+                              [_vm._v("Reciptionist Kelly Munsion")]
+                            )
+                          ]
                         )
-                      ]
-                    )
+                      : _vm._e()
                   ]
                 )
               ]),
@@ -68391,7 +68522,7 @@ var render = function() {
               ]),
               _vm._v(" "),
               _c("scripture-component", {
-                attrs: { "scripture-html": _vm.scriptureHtml },
+                attrs: { scriptureHtml: _vm.scriptureHtml },
                 on: {
                   description: function($event) {
                     return _vm.setDescription($event)
@@ -68408,26 +68539,55 @@ var render = function() {
           _c("aside", { staticClass: "admin-form__sidebar" }, [
             _vm._m(0),
             _vm._v(" "),
+            _vm.status && _vm.teaching
+              ? _c("p", { staticClass: "admin-form__time" }, [
+                  _vm._v("Teaching Status: "),
+                  _c("span", [_vm._v(_vm._s(_vm.status))])
+                ])
+              : _vm._e(),
+            _vm._v(" "),
             _c("div", { staticClass: "form-group admin-form__btns" }, [
-              _vm._m(1),
+              _c("input", {
+                attrs: { id: "status", type: "hidden", name: "status" },
+                domProps: { value: _vm.status }
+              }),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  staticClass:
+                    "btn btn-info btns__icon admin-form__publish-btn",
+                  attrs: { "data-status": "Draft", type: "submit" },
+                  on: { click: _vm.setStatusValue }
+                },
+                [
+                  _c("span", { attrs: { "data-feather": "save" } }),
+                  _vm._v("Save Draft")
+                ]
+              ),
               _vm._v(" "),
               _c(
                 "button",
                 {
                   staticClass:
                     "btn btn-primary btns__icon admin-form__publish-btn",
-                  attrs: { type: "submit" }
+                  attrs: { "data-status": "Published", type: "submit" },
+                  on: { click: _vm.setStatusValue }
                 },
                 [
                   _c("span", { attrs: { "data-feather": "send" } }),
                   _vm._v(
-                    _vm._s(_vm.editMode ? "Edit" : "Publish") + " Teaching"
+                    _vm._s(
+                      _vm.editMode && _vm.statusPublished()
+                        ? "Update"
+                        : "Publish"
+                    ) + " Teaching"
                   )
                 ]
               )
             ]),
             _vm._v(" "),
-            _vm._m(2),
+            _vm._m(1),
             _vm._v(" "),
             _c("div", { staticClass: "form-group" }, [
               _c("label", { attrs: { for: "description" } }, [
@@ -68462,14 +68622,14 @@ var render = function() {
               })
             ]),
             _vm._v(" "),
-            _c("div", { staticClass: "form-group" }, [
+            _c("div", { staticClass: "form-group admin-form__image" }, [
               _c("label", { attrs: { for: "image" } }, [
                 _vm._v("Featured Image")
               ]),
               _vm._v(" "),
               _c("input", {
                 staticClass: "form-control-file admin-form__ft-img-input",
-                attrs: { name: "image", type: "file", id: "ft_image" },
+                attrs: { name: "ft_image", type: "file", id: "ft_image" },
                 on: { change: _vm.imagePreview }
               }),
               _vm._v(" "),
@@ -68852,19 +69012,6 @@ var staticRenderFns = [
       _vm._v("Today's Date: "),
       _c("span", { attrs: { id: "today" } })
     ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c(
-      "button",
-      {
-        staticClass: "btn btn-info btns__icon admin-form__publish-btn",
-        attrs: { type: "submit" }
-      },
-      [_c("span", { attrs: { "data-feather": "save" } }), _vm._v("Save Draft")]
-    )
   },
   function() {
     var _vm = this

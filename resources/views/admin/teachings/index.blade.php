@@ -10,8 +10,14 @@
     </div>
 </div>
 
+@if (count($teachings))
+    <teaching-table-component teachings-data="{{ json_encode($teachings) }}"></teaching-table-component>
+    @else
+    <div class="bg-light px-2 py-4 text-secondary">
+        Create Your First Teaching!
+    </div>
+@endif
 
-<teaching-table-component teachings-data="{{ json_encode($teachings) }}"></teaching-table-component>
 
 
 

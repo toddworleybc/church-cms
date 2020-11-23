@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreTeaching;
 use App\Models\Teaching;
 
 class TeachingController extends Controller
@@ -37,13 +38,36 @@ class TeachingController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreTeaching $request)
     {
 
-       return Teaching::create($request->all()) ?
 
-            redirect()->back()->with('success', 'Teaching has been published') :
-            redirect()->back()->with('danger', 'Teaching could not be created!');
+
+        $input = $request->validated();
+
+        if($request->hasFile('ft_image'))
+            $input['ft_image'] = $this->storeImage($request->file("ft_image"));
+
+
+       $createdTeaching = Teaching::create($input);
+
+        if($createdTeaching) {
+
+        // Check status to see where to redirect after creating teaching
+            if($input['status'] === 'Draft') {
+
+                $url = "admin/teachings/" . $createdTeaching->id . "/edit";
+
+                return redirect($url)->with('success', 'Teaching has been saved');
+
+            } else {
+
+               return redirect()->route('teachings.index')->with('success', 'Teaching has been published');
+            }
+
+        } else {
+            return redirect()->back()->with('danger', 'Teaching could not be created!');
+        }
 
     }
 
@@ -80,9 +104,25 @@ class TeachingController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(StoreTeaching $request, $id)
     {
         //
+
+        $input = $request->validated();
+
+
+        $teaching = Teaching::find($id);
+
+        $updatedTeaching = $teaching->update($input);
+
+
+        if($updatedTeaching) {
+            return redirect()->back()->with('success', 'Teaching has been updated!');
+        } else {
+            return redirect()->back()->with('danger', 'Teaching has failed to update!');
+        }
+
+
     }
 
     /**
@@ -95,4 +135,22 @@ class TeachingController extends Controller
     {
         //
     }
+
+    // returns file name for database storage
+
+    private function storeImage($imageFile) {
+
+
+        if($imageFile->isValid()) {
+
+          $path = $imageFile->store('images');
+
+          return $path;
+
+        }
+
+        return false;
+
+    }
+
 }

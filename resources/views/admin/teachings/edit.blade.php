@@ -14,7 +14,11 @@
 
 
 
-<teachings-form-component teaching-data="{{ json_encode($teaching) }}" csrf={{ csrf_token() }} action={{ route('teachings.store') }}></teachings-form-component>
+<teachings-form-component
+    teaching-data="{{ json_encode($teaching) }}"
+    csrf={{ csrf_token() }}
+    action={{ route('teachings.update', $teaching->id) }}
+></teachings-form-component>
 
 
 

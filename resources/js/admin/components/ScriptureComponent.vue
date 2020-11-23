@@ -12,7 +12,7 @@
     <p class="text-secondary"><em>Book and chapters are required <span class="text-danger">*</span></em></p>
 
     <div class="scripture__input-container"></div>
-    <textarea name="scripture" id="scripture-input" hidden></textarea>
+
 
     <div @click="rotateSvg()" id="add-scripture-btn" class="scripture__add-verse">
         <span data-feather="plus-square"></span>
@@ -25,8 +25,9 @@
             <span class="sr-only">Loading...</span>
         </div>
     </div>
+    <textarea name="scripture" id="scripture-input" hidden></textarea>
     <div class="scripture__text">
-        <div id="scripture__insert" class="bg-light text-secondary p-4 scripture__insert"><p class="mb-0" v-if="!jsonLoad.length">No scriptures generated...</p></div>
+        <div id="scripture__insert" class="bg-light text-secondary p-4 scripture__insert"><span v-html="scripture"></span><p class="mb-0" v-if="!jsonLoad.length && !scripture">No scriptures generated...</p></div>
     </div>
 
 </div>
@@ -52,6 +53,7 @@ export default {
             loader: false,
             genLoader: false,
             jsonLoad: [],
+            scripture: '',
             stopGen: false,
             teachingTitle: ""
         }
@@ -88,6 +90,7 @@ export default {
     // GENERATE SCRIPTURE =============
     // ==================================
  // Get all select input values and organize them in an object
+
 
         generateScripture(e, removeData = false) {
             e.preventDefault();
@@ -188,14 +191,18 @@ export default {
     // ==============================
 
 
-        addNoScripturesHtml() {
+        addNoScripturesHtml(addNow = false) {
 
-            if(!this.jsonLoad.length) {
+            const html = `<p class="mb-0">No scriptures generated...</p>`;
 
-                const html = `<p class="mb-0">No scriptures generated...</p>`;
-
+            if(addNow) {
                 $("#scripture__insert").html(html);
+                return;
             }
+
+            if(!this.jsonLoad.length)
+                $("#scripture__insert").html(html);
+
 
         },
 
@@ -295,12 +302,21 @@ export default {
         },
 
         editScriptureInsert() {
-            $('.scripture_insert').html(this.scriptureHtml);
 
+            setTimeout( () => {
+
+                if(this.scriptureHtml) {
+
+                    this.scripture = this.scriptureHtml;
+                    $("#scripture-input").html(this.scriptureHtml);
+                }
+
+            }, 250 );
 
         },
 
         removeVerse(e) {
+
 
             // Fix bug where if the Rect or Line was clicked on svg it will make sure that it relates to the svg itself
                 if(e.target.localName === "line" || e.target.localName === "rect") e.target = e.target.parentNode;
@@ -344,7 +360,6 @@ export default {
 
             // edit the textarea #scripture-input
                     this.createTextAreaValue();
-
 
                 }, 1500);
 
@@ -573,8 +588,13 @@ export default {
                 } )
                 .then( () => {
                      this.genLoader=false;
-                     // create description for post
+
+                // create description for post
                     this.createTheDescription();
+
+                if( !this.jsonLoad.length )
+                    this.addNoScripturesHtml(true);
+
                 } );
 
         },
@@ -632,10 +652,13 @@ export default {
     }, // #-methods
 
 
-
     mounted() {
-        console.log(this.scriptureHtml);
-    } // #-mounted
+        this.editScriptureInsert();
+    }, // #-mounted
+
+
+
+
 
 
 }

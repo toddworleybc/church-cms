@@ -11112,6 +11112,7 @@ body {
 
 .scripture__text {
   position: relative;
+  overflow: hidden;
 }
 
 .scripture__text h2 {
@@ -11324,6 +11325,10 @@ body {
   flex-wrap: wrap;
 }
 
+.admin-form__image {
+  overflow: hidden;
+}
+
 .admin-form__image-preview {
   max-width: 20rem;
   margin: 1rem 0;
@@ -11360,7 +11365,6 @@ body {
   width: 30%;
   border-left: 1px solid #ced4da;
   padding-left: 2rem;
-  overflow: hidden;
 }
 
 @media only screen and (max-width: 62em) {

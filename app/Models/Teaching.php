@@ -12,6 +12,7 @@ class Teaching extends Model
 
 
     protected $fillable = [
+        'type',
         'title',
         'staff_id',
         'speaker',
@@ -20,7 +21,7 @@ class Teaching extends Model
         'scripture',
         'publish_date',
         'description',
-        'ft_img',
+        'ft_image',
         'status'
     ];
 
