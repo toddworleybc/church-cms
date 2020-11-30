@@ -406,6 +406,9 @@ export default {
 
         setSelectInput(e) {
 
+        // disables generate button when options is searching
+            $("#scripture-gen").prop('disabled', true);
+
         // Stop extra request on end_verse onChange
             if(e.target.name === 'end_verse') return;
 
@@ -456,6 +459,8 @@ export default {
                 this.getBibleHtmlOptions( slug, optionsHtml => {
                     $(selectToAddOptionsTo).html(optionsHtml);
                     this.enableSelect(selectToAddOptionsTo);
+                // re-enable generate button when options is searching
+                    $("#scripture-gen").prop('disabled', false);
                 } );
         },
         // ####--- END SELECT INPUT CONFIG ------------/

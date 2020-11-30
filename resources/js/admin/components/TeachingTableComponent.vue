@@ -3,25 +3,30 @@
     <table class="table table-hover admin-table__table">
             <thead class="admin-table__head">
                 <tr>
-                    <th scope="col">Id</th>
                     <th scope="col">Title</th>
+                    <th scope="col">Image</th>
                     <th scope="col">Speaker</th>
-                    <th scope="col">Status</th>
                     <th scope="col">Published</th>
                     <th scope="col">Created</th>
                     <th scope="col">Updated</th>
+                    <th scope="col">Status</th>
                 </tr>
             </thead>
             <tbody>
 
-            <tr scope="row" @click="editTeaching" :id="`teaching-${teaching.id}`"  v-for="teaching in teachings" :data-teaching-id="teaching.id" :key="teaching.id">
-                <td>{{ teaching.id }}</td>
+            <tr scope="row" @click="editTeaching" class="teaching-row" :id="`teaching-${teaching.id}`"  v-for="teaching in teachings" :data-teaching-id="teaching.id" :key="teaching.id">
                 <td>{{ teaching.title.substr(0, 50) }}</td>
+                <td>
+                    <img v-if="teaching.ft_image" :src="`${baseUrl}/${teaching.ft_image}`" alt="" width="50px">
+                    <svg v-else width="50px" height="25px" viewBox="0 0 17 16" class="bi bi-image" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M14.002 2h-12a1 1 0 0 0-1 1v9l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094L15.002 9.5V3a1 1 0 0 0-1-1zm-12-1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm4 4.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                    </svg>
                 <td>{{ teaching.speaker ? teaching.speaker : teaching.staff_id }}</td>
-                <td>{{ teaching.status }}</td>
+
                 <td>{{ teaching.publish_date }}</td>
                 <td>{{ teaching.created_at }}</td>
                 <td>{{ teaching.updated_at }}</td>
+                <td><span :class="teaching.status === 'Draft' ? 'alert alert-danger m-1 p-1 px-4' : 'alert alert-success m-1 p-1 px-4'" >{{ teaching.status }}</span></td>
             </tr>
 
             </tbody>
@@ -38,6 +43,8 @@ export default {
     data() {
         return {
             created_at: "",
+            ftImg: "",
+            baseUrl: location.origin,
             publish_date: "",
             teachings: [],
             updated_at:"",
@@ -47,6 +54,7 @@ export default {
     props: [
         "teachingsData"
     ],
+
 
     methods: {
 
@@ -72,19 +80,16 @@ export default {
             window.location = `teachings/${id}/edit `;
         },
 
+
+
     },
 
 
 
     mounted() {
         this.teachings = JSON.parse(this.teachingsData);
-        this.teachings = this.teachings.reverse(); // ORDER BY DESENDING
         this.dateConvert();
-
     }
-
-
-
 
 
 }

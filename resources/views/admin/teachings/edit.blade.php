@@ -1,6 +1,6 @@
 
 
-@extends('../layouts/admin/admin-app')
+@extends('admin.layouts.admin-app')
 
 
 @section('content')

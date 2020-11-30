@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreTeaching;
 use App\Models\Teaching;
+use Illuminate\Support\Facades\Storage;
 
 class TeachingController extends Controller
 {
@@ -16,9 +17,11 @@ class TeachingController extends Controller
     public function index()
     {
 
-        $teachings = Teaching::all();
+        $teachings = Teaching::orderBy('created_at', 'DESC')->simplePaginate(10);
 
-        return view('admin.teachings.index', compact('teachings') );
+        $teachingsAll = $teachings->all();
+
+        return view('admin.teachings.index', compact('teachings', 'teachingsAll') );
     }
 
     /**
@@ -110,11 +113,22 @@ class TeachingController extends Controller
 
         $input = $request->validated();
 
-
         $teaching = Teaching::find($id);
 
-        $updatedTeaching = $teaching->update($input);
+        if($request->hasFile('ft_image')) {
 
+            if(Storage::exists($teaching->ft_image)) {
+
+                Storage::delete($teaching->ft_image);
+
+            }
+
+            $input['ft_image'] = $this->storeImage($request->file('ft_image'));
+
+        }
+
+
+        $updatedTeaching = $teaching->update($input);
 
         if($updatedTeaching) {
             return redirect()->back()->with('success', 'Teaching has been updated!');
@@ -134,16 +148,38 @@ class TeachingController extends Controller
     public function destroy($id)
     {
         //
+
+       $teaching = Teaching::find($id);
+       $imagePath = $teaching->ft_image;
+
+        $teachingDestroyed = $teaching->delete();
+
+
+        if($teachingDestroyed) {
+
+            Storage::delete($imagePath);
+
+            $teachings = Teaching::all();
+
+          return redirect()->route('teachings.index')->with('success', 'Teaching has been deleted!');
+
+        } else {
+
+           return redirect()->back()->with('danger', 'Error: Teaching could not be deleted!');
+
+        }
+
+
     }
 
     // returns file name for database storage
 
-    private function storeImage($imageFile) {
+    private function storeImage($imagePath) {
 
 
-        if($imageFile->isValid()) {
+        if($imagePath->isValid()) {
 
-          $path = $imageFile->store('images');
+          $path = $imagePath->store('images');
 
           return $path;
 

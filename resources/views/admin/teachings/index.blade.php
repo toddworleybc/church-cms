@@ -1,4 +1,4 @@
-@extends('../layouts/admin/admin-app')
+@extends('admin.layouts.admin-app')
 
 
 @section('content')
@@ -10,8 +10,15 @@
     </div>
 </div>
 
-@if (count($teachings))
-    <teaching-table-component teachings-data="{{ json_encode($teachings) }}"></teaching-table-component>
+
+
+@if (count($teachingsAll))
+    <teaching-table-component teachings-data="{{ json_encode($teachingsAll) }}"></teaching-table-component>
+    <div class="d-flex justify-content-end border-top">
+        <div class="my-4">
+            {{ $teachings->links() }}
+        </div>
+    </div>
     @else
     <div class="bg-light px-2 py-4 text-secondary">
         Create Your First Teaching!

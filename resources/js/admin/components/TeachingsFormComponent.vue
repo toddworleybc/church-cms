@@ -3,7 +3,7 @@
 
     <form id="teaching-form" method="POST" :action="action" accept-charset="UTF-8" enctype="multipart/form-data">
         <input name="_token" type="hidden" :value="csrf">
-        <input v-if="editMode" name="_method" type="hidden" value="PATCH">
+        <input id="form-method" v-if="editMode" name="_method" type="hidden" value="PATCH">
         <div class="admin-form__wrapper">
             <div class="admin-form__main">
                 <div class="form-group">
@@ -70,12 +70,12 @@
 
             <aside class="admin-form__sidebar">
                 <p class="admin-form__time">Today's Date: <span id="today"></span></p>
-                <p class="admin-form__time" v-if="status && teaching">Teaching Status: <span>{{ status }}</span></p>
+                <p :class="setStatusCssStyling" v-if="status && teaching">Teaching Status: <span>{{ status }}</span></p>
                 <div class="form-group admin-form__btns">
                     <input id="status" type="hidden" name="status" :value="status">
-                    <button @click="setStatusValue" data-status="Draft" type="submit" class="btn btn-info btns__icon admin-form__publish-btn"><span
+                    <button @click.prevent="teachingSubmitForm" data-status="Draft" type="submit" class="btn btn-info btns__icon admin-form__publish-btn"><span
                             data-feather="save"></span>Save Draft</button>
-                    <button @click="setStatusValue" data-status="Published" type="submit" class="btn btn-primary btns__icon admin-form__publish-btn"><span
+                    <button @click.prevent="teachingSubmitForm" data-status="Published" type="submit" class="btn btn-primary btns__icon admin-form__publish-btn"><span
                             data-feather="send"></span>{{ editMode && statusPublished() ? 'Update' : 'Publish' }} Teaching</button>
                 </div>
 
@@ -137,6 +137,9 @@
                         <button v-if="ftImg" @click.prevent="removeImg" id="remove-img" class="btn btn-light admin-form__remove-img-btn">&times; Remove Image</button>
                     </div>
                 </div>
+                <div v-if="editMode" class="admin-form__delete">
+                    <button @click.prevent="deleteTeaching" class="btn btn-danger d-block w-100">Delete Teaching</button>
+                </div>
             </aside>
         </div>
     </form>
@@ -184,8 +187,8 @@ export default {
             description: '',
             editMode: false,
             enterSpeaker: false,
+            formSubmitting: false,
             ftImg: '',
-            ftImgInfo: {},
             loader: false,
             loadMoreBtn: false,
             mediaSelected: false,
@@ -212,10 +215,25 @@ export default {
 
     props: [ 'action', 'csrf', 'teachingData', 'imageUrl' ],
 
+
+    computed: {
+
+        setStatusCssStyling() {
+
+            const statusClass = "admin-form__time d-inline-block alert alert-";
+
+            return this.status === "Draft" ?
+                        statusClass + "danger" :
+                        statusClass + "success"
+        }
+
+
+
+    },
+
+
+
     methods: {
-
-
-
 
     // Event methods =========/
         // ========================
@@ -244,6 +262,7 @@ export default {
             $("#loadMediaModal").on('hide.bs.modal', this.emptyModal);
         },
 
+
     // add event for select media
         selectedMediaEvent() {
             // add event handler
@@ -259,11 +278,21 @@ export default {
         },
 
 
-        setStatusValue(e) {
-                const status = $(e.target).attr("data-status");
-                this.status = status;
-        },
+        teachingSubmitForm(e) {
 
+            if(!this.formSubmitting) {
+
+               this.formSubmitting = true;
+
+               this.status = $(e.target).attr("data-status");
+
+                setTimeout(() => {
+                    $('#teaching-form').submit();
+                }, 500);
+
+            }
+
+        },
 
 
     // add event for video input change
@@ -318,6 +347,17 @@ export default {
                     $(input).attr('value', date);
         },
 
+
+
+        deleteTeaching() {
+
+            const confirmed = confirm(`Are you sure you want to delete teaching ${this.teachingTitle}`);
+
+            if(confirmed) {
+                $('#form-method').val('DELETE');
+                $('#teaching-form').submit();
+            }
+        },
 
 
 
@@ -388,8 +428,8 @@ export default {
                 this.status = this.teaching.status;
                 this.setEditStaffSpeakerValues(this.teaching);
 
-                if(imagePath)
-                    this.ftImg = `${location.origin}/${imagePath}`;
+            // set featured image if present for edit mode
+                this.ftImg = imagePath !== "null" ? `${location.origin}/${imagePath}` :  "";
 
 
             } else {

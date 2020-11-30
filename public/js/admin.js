@@ -2188,7 +2188,9 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
     setSelectInput: function setSelectInput(e) {
       var _this6 = this;
 
-      // Stop extra request on end_verse onChange
+      // disables generate button when options is searching
+      $("#scripture-gen").prop('disabled', true); // Stop extra request on end_verse onChange
+
       if (e.target.name === 'end_verse') return;
 
       if (e.target.name === 'book') {
@@ -2228,7 +2230,10 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       this.getBibleHtmlOptions(slug, function (optionsHtml) {
         $(selectToAddOptionsTo).html(optionsHtml);
 
-        _this6.enableSelect(selectToAddOptionsTo);
+        _this6.enableSelect(selectToAddOptionsTo); // re-enable generate button when options is searching
+
+
+        $("#scripture-gen").prop('disabled', false);
       });
     },
     // ####--- END SELECT INPUT CONFIG ------------/
@@ -2425,12 +2430,19 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       created_at: "",
+      ftImg: "",
+      baseUrl: location.origin,
       publish_date: "",
       teachings: [],
       updated_at: ""
@@ -2454,8 +2466,6 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
   },
   mounted: function mounted() {
     this.teachings = JSON.parse(this.teachingsData);
-    this.teachings = this.teachings.reverse(); // ORDER BY DESENDING
-
     this.dateConvert();
   }
 });
@@ -2642,6 +2652,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 var ScriptureComponent = Vue.component('scripture-component', __webpack_require__(/*! ./ScriptureComponent.vue */ "./resources/js/admin/components/ScriptureComponent.vue")["default"]);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -2652,8 +2665,8 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
       description: '',
       editMode: false,
       enterSpeaker: false,
+      formSubmitting: false,
       ftImg: '',
-      ftImgInfo: {},
       loader: false,
       loadMoreBtn: false,
       mediaSelected: false,
@@ -2677,6 +2690,12 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
     ScriptureComponent: ScriptureComponent
   },
   props: ['action', 'csrf', 'teachingData', 'imageUrl'],
+  computed: {
+    setStatusCssStyling: function setStatusCssStyling() {
+      var statusClass = "admin-form__time d-inline-block alert alert-";
+      return this.status === "Draft" ? statusClass + "danger" : statusClass + "success";
+    }
+  },
   methods: {
     // Event methods =========/
     // ========================
@@ -2710,9 +2729,14 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
         });
       });
     },
-    setStatusValue: function setStatusValue(e) {
-      var status = $(e.target).attr("data-status");
-      this.status = status;
+    teachingSubmitForm: function teachingSubmitForm(e) {
+      if (!this.formSubmitting) {
+        this.formSubmitting = true;
+        this.status = $(e.target).attr("data-status");
+        setTimeout(function () {
+          $('#teaching-form').submit();
+        }, 500);
+      }
     },
     // add event for video input change
     vidValueChange: function vidValueChange() {
@@ -2746,6 +2770,14 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
       date = date.toISOString().split("T")[0]; // set date value attr
 
       $(input).attr('value', date);
+    },
+    deleteTeaching: function deleteTeaching() {
+      var confirmed = confirm("Are you sure you want to delete teaching ".concat(this.teachingTitle));
+
+      if (confirmed) {
+        $('#form-method').val('DELETE');
+        $('#teaching-form').submit();
+      }
     },
     // deselect the media
     deselectAllMedia: function deselectAllMedia() {
@@ -2791,8 +2823,9 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
         this.insertEditVideoValues(this.teaching.video);
         this.audioUrl = this.teaching.audio;
         this.status = this.teaching.status;
-        this.setEditStaffSpeakerValues(this.teaching);
-        if (imagePath) this.ftImg = "".concat(location.origin, "/").concat(imagePath);
+        this.setEditStaffSpeakerValues(this.teaching); // set featured image if present for edit mode
+
+        this.ftImg = imagePath !== "null" ? "".concat(location.origin, "/").concat(imagePath) : "";
       } else {
         // set default for staff on create teaching page.
         this.staffId = '1';
@@ -68075,6 +68108,7 @@ var render = function() {
             "tr",
             {
               key: teaching.id,
+              staticClass: "teaching-row",
               attrs: {
                 scope: "row",
                 id: "teaching-" + teaching.id,
@@ -68083,10 +68117,40 @@ var render = function() {
               on: { click: _vm.editTeaching }
             },
             [
-              _c("td", [_vm._v(_vm._s(teaching.id))]),
-              _vm._v(" "),
               _c("td", [_vm._v(_vm._s(teaching.title.substr(0, 50)))]),
               _vm._v(" "),
+              _c("td", [
+                teaching.ft_image
+                  ? _c("img", {
+                      attrs: {
+                        src: _vm.baseUrl + "/" + teaching.ft_image,
+                        alt: "",
+                        width: "50px"
+                      }
+                    })
+                  : _c(
+                      "svg",
+                      {
+                        staticClass: "bi bi-image",
+                        attrs: {
+                          width: "50px",
+                          height: "25px",
+                          viewBox: "0 0 17 16",
+                          fill: "currentColor",
+                          xmlns: "http://www.w3.org/2000/svg"
+                        }
+                      },
+                      [
+                        _c("path", {
+                          attrs: {
+                            "fill-rule": "evenodd",
+                            d:
+                              "M14.002 2h-12a1 1 0 0 0-1 1v9l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094L15.002 9.5V3a1 1 0 0 0-1-1zm-12-1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm4 4.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"
+                          }
+                        })
+                      ]
+                    )
+              ]),
               _c("td", [
                 _vm._v(
                   _vm._s(
@@ -68095,13 +68159,24 @@ var render = function() {
                 )
               ]),
               _vm._v(" "),
-              _c("td", [_vm._v(_vm._s(teaching.status))]),
-              _vm._v(" "),
               _c("td", [_vm._v(_vm._s(teaching.publish_date))]),
               _vm._v(" "),
               _c("td", [_vm._v(_vm._s(teaching.created_at))]),
               _vm._v(" "),
-              _c("td", [_vm._v(_vm._s(teaching.updated_at))])
+              _c("td", [_vm._v(_vm._s(teaching.updated_at))]),
+              _vm._v(" "),
+              _c("td", [
+                _c(
+                  "span",
+                  {
+                    class:
+                      teaching.status === "Draft"
+                        ? "alert alert-danger m-1 p-1 px-4"
+                        : "alert alert-success m-1 p-1 px-4"
+                  },
+                  [_vm._v(_vm._s(teaching.status))]
+                )
+              ])
             ]
           )
         }),
@@ -68117,19 +68192,19 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("thead", { staticClass: "admin-table__head" }, [
       _c("tr", [
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Id")]),
-        _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Title")]),
         _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Speaker")]),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Image")]),
         _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Status")]),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Speaker")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Published")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Created")]),
         _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Updated")])
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Updated")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Status")])
       ])
     ])
   }
@@ -68175,7 +68250,12 @@ var render = function() {
         _vm._v(" "),
         _vm.editMode
           ? _c("input", {
-              attrs: { name: "_method", type: "hidden", value: "PATCH" }
+              attrs: {
+                id: "form-method",
+                name: "_method",
+                type: "hidden",
+                value: "PATCH"
+              }
             })
           : _vm._e(),
         _vm._v(" "),
@@ -68540,7 +68620,7 @@ var render = function() {
             _vm._m(0),
             _vm._v(" "),
             _vm.status && _vm.teaching
-              ? _c("p", { staticClass: "admin-form__time" }, [
+              ? _c("p", { class: _vm.setStatusCssStyling }, [
                   _vm._v("Teaching Status: "),
                   _c("span", [_vm._v(_vm._s(_vm.status))])
                 ])
@@ -68558,7 +68638,12 @@ var render = function() {
                   staticClass:
                     "btn btn-info btns__icon admin-form__publish-btn",
                   attrs: { "data-status": "Draft", type: "submit" },
-                  on: { click: _vm.setStatusValue }
+                  on: {
+                    click: function($event) {
+                      $event.preventDefault()
+                      return _vm.teachingSubmitForm($event)
+                    }
+                  }
                 },
                 [
                   _c("span", { attrs: { "data-feather": "save" } }),
@@ -68572,7 +68657,12 @@ var render = function() {
                   staticClass:
                     "btn btn-primary btns__icon admin-form__publish-btn",
                   attrs: { "data-status": "Published", type: "submit" },
-                  on: { click: _vm.setStatusValue }
+                  on: {
+                    click: function($event) {
+                      $event.preventDefault()
+                      return _vm.teachingSubmitForm($event)
+                    }
+                  }
                 },
                 [
                   _c("span", { attrs: { "data-feather": "send" } }),
@@ -68919,7 +69009,25 @@ var render = function() {
                     )
                   : _vm._e()
               ])
-            ])
+            ]),
+            _vm._v(" "),
+            _vm.editMode
+              ? _c("div", { staticClass: "admin-form__delete" }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-danger d-block w-100",
+                      on: {
+                        click: function($event) {
+                          $event.preventDefault()
+                          return _vm.deleteTeaching($event)
+                        }
+                      }
+                    },
+                    [_vm._v("Delete Teaching")]
+                  )
+                ])
+              : _vm._e()
           ])
         ])
       ]
