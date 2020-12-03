@@ -35,7 +35,7 @@ class StoreTeaching extends FormRequest
             'status'        => 'string|max:50',
             'publish_date'  => 'required|date',
             'description'   => 'required|string|max:255',
-            'ft_image'      => 'image|max:2000'
+            'ft_image'      => 'file|mimes:jpeg,png,jpg|max:2048'
         ];
     }
 
@@ -51,7 +51,8 @@ class StoreTeaching extends FormRequest
             'speaker.max'          => 'Speaker name too long',
             'staff_id.integer'     => 'Staff invalid',
             'ft_image.max'         => 'Featured image can\'t be over 2MB',
-            'ft_image.image'       => 'Files have to be an image only'
+            'ft_image.mimes'       => 'Featured image must be jpeg, jpg, or png',
+            'ft_image.file'        => 'Featured image an invalid file'
         ];
     }
 }

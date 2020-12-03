@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TeachingController;
 
@@ -25,11 +26,9 @@ Route::view('/admin', 'admin.index')->name('admin.index');
 
 //Admin Resources ===/
 Route::resources([
-    'admin/teachings' => TeachingController::class
+    'admin/teachings' => TeachingController::class,
+    'admin/staff'     => StaffController::class
 ]);
-
-
-
 
 
 
@@ -37,5 +36,8 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
+// DONT FORGET TO ADD AUTH MIDDLEWARE FOR FILEMANAGER BELOW!!!!!!!!!!
 
-
+Route::group(['prefix' => 'laravel-filemanager'], function () {
+    \UniSharp\LaravelFilemanager\Lfm::routes();
+});

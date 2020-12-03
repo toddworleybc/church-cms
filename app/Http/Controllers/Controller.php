@@ -10,4 +10,23 @@ use Illuminate\Routing\Controller as BaseController;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
+
+    // returns file name for database storage
+
+    protected function storeImage($image)
+    {
+
+
+        if ($image->isValid()) {
+
+            $path = $image->store('images');
+
+            return $path;
+        }
+
+        return false;
+    }
+
+
 }

@@ -14,7 +14,7 @@
 
 @if (count($teachingsAll))
     <teaching-table-component teachings-data="{{ json_encode($teachingsAll) }}"></teaching-table-component>
-    <div class="d-flex justify-content-end border-top">
+    <div class="border-top">
         <div class="my-4">
             {{ $teachings->links() }}
         </div>

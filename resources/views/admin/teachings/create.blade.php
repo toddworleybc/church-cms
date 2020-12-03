@@ -13,6 +13,7 @@
 
 
 <teachings-form-component
+     img-path = {{ url('ui-imgs/svgs/select-image.svg') }}
      csrf = {{ csrf_token() }}
      action = {{ route('teachings.store') }}
 ></teachings-form-component>

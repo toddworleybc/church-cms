@@ -44,8 +44,6 @@ class TeachingController extends Controller
     public function store(StoreTeaching $request)
     {
 
-
-
         $input = $request->validated();
 
         if($request->hasFile('ft_image'))
@@ -159,8 +157,6 @@ class TeachingController extends Controller
 
             Storage::delete($imagePath);
 
-            $teachings = Teaching::all();
-
           return redirect()->route('teachings.index')->with('success', 'Teaching has been deleted!');
 
         } else {
@@ -172,21 +168,6 @@ class TeachingController extends Controller
 
     }
 
-    // returns file name for database storage
 
-    private function storeImage($imagePath) {
-
-
-        if($imagePath->isValid()) {
-
-          $path = $imagePath->store('images');
-
-          return $path;
-
-        }
-
-        return false;
-
-    }
 
 }

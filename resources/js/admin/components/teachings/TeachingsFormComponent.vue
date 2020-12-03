@@ -93,46 +93,7 @@
                     <label for="image">Featured Image</label>
                     <input @change="imagePreview" class="form-control-file admin-form__ft-img-input" name="ft_image" type="file" id="ft_image">
                     <div class="admin-form__image-preview">
-                        <svg v-if="!ftImg" viewBox="0 0 507.99999 285.75001">
-                            <defs id="defs2">
-                                <filter id="filter4639" style="color-interpolation-filters:sRGB;">
-                                    <feConvolveMatrix id="feConvolveMatrix4635" order="3 3"
-                                        kernelMatrix="1 1 1 1 -8 1 1 1 1" in="SourceGraphic" divisor="1" targetX="1"
-                                        targetY="1" preserveAlpha="true" result="result0" bias="0" />
-                                    <feColorMatrix id="feColorMatrix4637" result="result3"
-                                        values="-0.15 -0.3 -0.05 0 1 -0.15 -0.3 -0.05 0 1 -0.15 -0.3 -0.05 0 1 0 0 0 1 0" />
-                                </filter>
-                            </defs>
-                            <metadata id="metadata5">
-                                <rdf:RDF>
-                                    <cc:Work rdf:about="">
-                                        <dc:format>image/svg+xml</dc:format>
-                                        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-                                        <dc:title></dc:title>
-                                    </cc:Work>
-                                </rdf:RDF>
-                            </metadata>
-                            <g transform="translate(0,-11.249983)" id="layer1">
-                                <g transform="translate(-1.4157104,1.2974741)" id="g4646">
-                                    <rect
-                                        style="opacity:1;fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:0.93530208;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-                                        id="rect4518" width="508.88116" height="287.58203" x="0.53454089" y="9.9525089" />
-                                    <text xml:space="preserve"
-                                        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:70.20953369px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.75523829;stroke-opacity:0.21531101;"
-                                        x="217.01743" y="109.48398" id="text4545" transform="scale(1.156635,0.86457698)">
-                                        <tspan id="tspan4543" x="229.35895" y="109.48398"
-                                            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:70.20953369px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:1.75523829;stroke:#000000;stroke-opacity:0.21531101;fill:#ffffff;fill-opacity:1;">
-                                            Select </tspan>
-                                        <tspan x="229.35895" y="197.2459"
-                                            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:70.20953369px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:1.75523829;stroke:#000000;stroke-opacity:0.21531101;fill:#ffffff;fill-opacity:1;"
-                                            id="tspan4547">Feature </tspan>
-                                        <tspan x="217.01743" y="285.00781"
-                                            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:70.20953369px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:1.75523829;stroke:#000000;stroke-opacity:0.21531101;fill:#ffffff;fill-opacity:1;"
-                                            id="tspan4549">Image</tspan>
-                                    </text>
-                                </g>
-                            </g>
-                        </svg>
+                        <img v-if="!ftImg" class="img-fluid" :src="imgPath" alt="select-image">
                         <img v-else :src="ftImg" class="img-fluid d-block">
                         <button v-if="ftImg" @click.prevent="removeImg" id="remove-img" class="btn btn-light admin-form__remove-img-btn">&times; Remove Image</button>
                     </div>
@@ -213,7 +174,7 @@ export default {
         ScriptureComponent
     },
 
-    props: [ 'action', 'csrf', 'teachingData', 'imageUrl' ],
+    props: [ 'action', 'csrf', 'teachingData', 'imgPath' ],
 
 
     computed: {
