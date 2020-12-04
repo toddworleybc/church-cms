@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -26,6 +27,20 @@ class Controller extends BaseController
         }
 
         return false;
+    }
+
+
+    protected function editStoreImage($imagePath, $imageFile) {
+
+        if (Storage::exists($imagePath)) {
+
+            Storage::delete($imagePath);
+        }
+
+        $path = $this->storeImage($imageFile);
+
+        return $path;
+
     }
 
 

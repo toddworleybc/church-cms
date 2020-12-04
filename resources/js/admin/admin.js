@@ -12,6 +12,7 @@ window.Vue = require('vue');
 const feather = require('feather-icons');
 
 
+
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue

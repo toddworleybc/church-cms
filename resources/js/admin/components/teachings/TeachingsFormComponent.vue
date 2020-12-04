@@ -137,6 +137,8 @@
 
 const ScriptureComponent = Vue.component('scripture-component', require('./ScriptureComponent.vue').default);
 
+const moment = require('moment');
+
 export default {
 
 
@@ -149,7 +151,7 @@ export default {
             editMode: false,
             enterSpeaker: false,
             formSubmitting: false,
-            ftImg: '',
+            ftImg: "",
             loader: false,
             loadMoreBtn: false,
             mediaSelected: false,
@@ -722,7 +724,8 @@ export default {
 
 
         todaysDate() {
-             const today = new Date().toDateString();
+            const today = moment().format('dddd MMM Do, YYYY');
+
              $('#today').text(today);
         }
 

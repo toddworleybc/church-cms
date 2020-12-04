@@ -16,7 +16,7 @@
 
 
 <staff-table-component
-staff = "{{ json_encode($staffAll) }}"
+staff-data = "{{ json_encode($staffAll) }}"
 ></staff-table-component>
 
 @else

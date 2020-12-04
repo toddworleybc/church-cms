@@ -4,17 +4,17 @@
         <form id="staff-form" method="post" :action="action" accept-charset="UTF-8" enctype="multipart/form-data">
 
         <input type="hidden" name="_token" :value="csrf">
-
+        <input id="form-method" v-if="editMode" type="hidden" name="_method" value="PATCH">
 
         <div class="admin-form__wrapper">
             <div class="admin-form__main">
                 <div class="form-group">
                     <label for="name">Enter Name</label>
-                    <input id="name" class="form-control" type="text" name="name">
+                    <input id="name" class="form-control" type="text" name="name" v-model="name">
                 </div>
                 <div class="form-group">
                     <label for="position">Enter Position</label>
-                    <input id="position" class="form-control" type="text" name="position">
+                    <input id="position" class="form-control" type="text" name="position" v-model="position">
                     <div class="mb-2"><em>Is this staff member a pastor? if so click yes to display on front of website!</em></div>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="pastor" id="yes" value="1">
@@ -34,25 +34,30 @@
 
                 <div class="form-group">
                     <label for="bio">Enter Bio</label>
-                    <textarea id="bio" rows="30" class="form-control" type="text" name="bio"></textarea>
+                    <textarea id="bio" rows="25" class="form-control" type="text" name="bio" v-model="bio"></textarea>
                 </div>
             </div>
             <!-- end of main  -->
             <div class="admin-form__sidebar">
+                <p class="admin-form__time">Today's Date: <span id="today"></span></p>
+                <div class="form-group admin-form__btns">
+                    <button type="submit" class="btn btn-primary btns__icon"><span data-feather="user-plus"></span> {{editMode ? 'Update' : 'Create'}} Staff Member</button>
+                </div>
                 <div class="form-group admin-form__image">
                     <label for="image">Profile Pic</label>
                     <input @change="imagePreview" class="form-control-file admin-form__ft-img-input" name="image" type="file" id="image">
                     <div class="admin-form__image-preview">
 
-                        <img v-if="!ftImg" class="img-fluid" :src="imgPath" alt="select-image">
+                        <img v-if="!image" class="img-fluid" :src="imgPath" alt="select-image">
 
-                        <img v-else :src="ftImg" class="img-fluid d-block">
-                        <button v-if="ftImg" @click.prevent="removeImg" id="remove-img" class="btn btn-light admin-form__remove-img-btn">&times; Remove Image</button>
+                        <img v-else :src="image" class="img-fluid d-block">
+                        <button v-if="image" @click.prevent="removeImg" id="remove-img" class="btn btn-light admin-form__remove-img-btn">&times; Remove Image</button>
                     </div>
                 </div>
-                <div class="admin-form__btns">
-                    <button type="submit" class="btn btn-primary btns__icon"><span data-feather="user-plus"></span> Create Staff Member</button>
+                <div v-if="editMode" class="admin-form__delete">
+                    <button @click.prevent="deleteStaffMember" class="btn btn-danger d-block w-100">Delete Staff Member</button>
                 </div>
+
             </div>
         </div>
 
@@ -69,19 +74,76 @@
 </template>
 
 <script>
+
+const moment = require('moment');
+
+
 export default {
 
     data() {
         return {
-            ftImg: ''
+            bio: "",
+            editMode: false,
+            image: '',
+            name: "",
+            position: "",
+            staffMember: ""
         }
     },
 
 
 
-    props: [ 'action', 'csrf', 'imgPath' ],
+    props: [ 'action', 'csrf', 'imgPath', 'staffData' ],
 
     methods: {
+
+
+         deleteStaffMember() {
+
+            const confirmed = confirm(`Are you sure you want to delete staff member ${this.staffMember.name}`);
+
+            if(confirmed) {
+                $('#form-method').val('DELETE');
+                $('#staff-form').submit();
+            }
+        },
+
+
+
+        editStaffMemberSettings() {
+
+
+        // check if we are not on teaching create
+            if(this.staffData) {
+
+
+            // get the data
+                this.staffMember = JSON.parse(this.staffData);
+
+
+                const imagePath = `${this.staffMember.image}`;
+
+            // switch template to edit mode
+                this.editMode = true;
+
+
+            // set values
+                this.bio = this.staffMember.bio;
+                this.name = this.staffMember.name;
+                this.position = this.staffMember.position;
+
+            // set staff member is pastor
+                if(this.staffMember.pastor)
+                    $("#yes").prop('checked', true);
+
+
+
+
+            // set bio image if present for edit mode
+                this.image = imagePath !== "null" ? `${location.origin}/${imagePath}` :  "";
+
+            }
+        },
 
 
     // insert featured image onto screen before loading into the database
@@ -95,7 +157,7 @@ export default {
             const reader = new FileReader();
 
             $(reader).on('load', (e) => {
-                this.ftImg = e.target.result;
+                this.image = e.target.result;
             });
 
              reader.readAsDataURL(file);
@@ -103,7 +165,12 @@ export default {
 
          removeImg() {
             $('#image').val('');
-            this.ftImg = '';
+            this.image = '';
+        },
+
+         todaysDate() {
+            const today = moment().format('dddd MMM Do, YYYY');
+             $('#today').text(today);
         },
 
 
@@ -152,6 +219,8 @@ export default {
 
     mounted() {
         this.tinymceInit();
+        this.editStaffMemberSettings();
+        this.todaysDate();
     }
 
 

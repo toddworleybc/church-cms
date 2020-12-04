@@ -113,17 +113,9 @@ class TeachingController extends Controller
 
         $teaching = Teaching::find($id);
 
-        if($request->hasFile('ft_image')) {
+        if($request->hasFile('ft_image'))
+            $input['ft_image'] = $this->editStoreImage($teaching->ft_image, $request->file('ft_image'));
 
-            if(Storage::exists($teaching->ft_image)) {
-
-                Storage::delete($teaching->ft_image);
-
-            }
-
-            $input['ft_image'] = $this->storeImage($request->file('ft_image'));
-
-        }
 
 
         $updatedTeaching = $teaching->update($input);
@@ -155,7 +147,8 @@ class TeachingController extends Controller
 
         if($teachingDestroyed) {
 
-            Storage::delete($imagePath);
+            if(Storage::exists($imagePath))
+                Storage::delete($imagePath);
 
           return redirect()->route('teachings.index')->with('success', 'Teaching has been deleted!');
 
@@ -164,7 +157,6 @@ class TeachingController extends Controller
            return redirect()->back()->with('danger', 'Error: Teaching could not be deleted!');
 
         }
-
 
     }
 

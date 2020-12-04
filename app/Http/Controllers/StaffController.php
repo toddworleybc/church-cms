@@ -82,6 +82,12 @@ class StaffController extends Controller
     public function edit($id)
     {
         //
+        $staffMember = Staff::find($id);
+
+
+        return view('admin.staff.edit', compact('staffMember'));
+
+
     }
 
     /**
@@ -91,9 +97,28 @@ class StaffController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(StoreStaff $request, $id)
     {
         //
+
+        $input = $request->validated();
+
+
+        $staffMember = Staff::find($id);
+
+
+        if ($request->hasFile('image'))
+                $input['image'] = $this->editStoreImage($staffMember->image, $request->file('image'));
+
+
+        $staffMemberUpdated = $staffMember->update($input);
+
+        if($staffMemberUpdated) {
+           return redirect()->back()->with('success', 'Staff member updated!');
+        } else {
+            return redirect()->back()-with('danger', 'Failed to update staff member!');
+        }
+
     }
 
     /**
@@ -105,5 +130,24 @@ class StaffController extends Controller
     public function destroy($id)
     {
         //
+        $staffMember = Staff::find($id);
+
+
+        $deletedStaffMember = $staffMember->delete();
+
+
+        if($deletedStaffMember) {
+
+            if(Storage::exists($staffMember->image))
+                Storage::delete($staffMember->image);
+
+            return redirect()->route('staff.index')->with('success', 'Staff member has been deleted!');
+
+        } else {
+
+            return redirect()->back()->with('danger', 'Failed to delete staff member');
+
+        }
+
     }
 }

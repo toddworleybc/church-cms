@@ -1978,14 +1978,52 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      ftImg: ''
+      bio: "",
+      editMode: false,
+      image: '',
+      name: "",
+      position: "",
+      staffMember: ""
     };
   },
-  props: ['action', 'csrf', 'imgPath'],
+  props: ['action', 'csrf', 'imgPath', 'staffData'],
   methods: {
+    deleteStaffMember: function deleteStaffMember() {
+      var confirmed = confirm("Are you sure you want to delete staff member ".concat(this.staffMember.name));
+
+      if (confirmed) {
+        $('#form-method').val('DELETE');
+        $('#staff-form').submit();
+      }
+    },
+    editStaffMemberSettings: function editStaffMemberSettings() {
+      // check if we are not on teaching create
+      if (this.staffData) {
+        // get the data
+        this.staffMember = JSON.parse(this.staffData);
+        var imagePath = "".concat(this.staffMember.image); // switch template to edit mode
+
+        this.editMode = true; // set values
+
+        this.bio = this.staffMember.bio;
+        this.name = this.staffMember.name;
+        this.position = this.staffMember.position; // set staff member is pastor
+
+        if (this.staffMember.pastor) $("#yes").prop('checked', true); // set bio image if present for edit mode
+
+        this.image = imagePath !== "null" ? "".concat(location.origin, "/").concat(imagePath) : "";
+      }
+    },
     // insert featured image onto screen before loading into the database
     imagePreview: function imagePreview(e) {
       var file = e.target.files[0];
@@ -1996,13 +2034,17 @@ __webpack_require__.r(__webpack_exports__);
 
       var reader = new FileReader();
       $(reader).on('load', function (e) {
-        _this.ftImg = e.target.result;
+        _this.image = e.target.result;
       });
       reader.readAsDataURL(file);
     },
     removeImg: function removeImg() {
       $('#image').val('');
-      this.ftImg = '';
+      this.image = '';
+    },
+    todaysDate: function todaysDate() {
+      var today = moment().format('dddd MMM Do, YYYY');
+      $('#today').text(today);
     },
     // install tinymce
     tinymceInit: function tinymceInit() {
@@ -2041,6 +2083,8 @@ __webpack_require__.r(__webpack_exports__);
   },
   mounted: function mounted() {
     this.tinymceInit();
+    this.editStaffMemberSettings();
+    this.todaysDate();
   }
 }); // end of export default
 
@@ -2075,11 +2119,41 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['staff'],
-  methods: {},
+  data: function data() {
+    return {
+      baseUrl: location.origin,
+      staffMembers: []
+    };
+  },
+  props: ['staffData'],
+  methods: {
+    // convert table dates
+    dateConvert: function dateConvert() {
+      $(this.staffMembers).each(function (i, staffMember) {
+        staffMember.created_at = moment(staffMember.created_at).fromNow();
+        staffMember.publish_date = moment(staffMember.publish_date).format("MMM Do, YYYY");
+        staffMember.updated_at = moment(staffMember.updated_at).fromNow();
+      });
+    },
+    // set edit url for each table row
+    editStaffMember: function editStaffMember(e) {
+      var id = $(e.target).parents("tr").attr('data-staff-id');
+      window.location = "staff/".concat(id, "/edit ");
+    }
+  },
   mounted: function mounted() {
-    console.log(this.staff);
+    this.staffMembers = JSON.parse(this.staffData);
+    this.dateConvert();
   }
 });
 
@@ -2803,6 +2877,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 var ScriptureComponent = Vue.component('scripture-component', __webpack_require__(/*! ./ScriptureComponent.vue */ "./resources/js/admin/components/teachings/ScriptureComponent.vue")["default"]);
+
+var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2813,7 +2890,7 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
       editMode: false,
       enterSpeaker: false,
       formSubmitting: false,
-      ftImg: '',
+      ftImg: "",
       loader: false,
       loadMoreBtn: false,
       mediaSelected: false,
@@ -3185,7 +3262,7 @@ var ScriptureComponent = Vue.component('scripture-component', __webpack_require_
       return this.status !== "Published" ? false : true;
     },
     todaysDate: function todaysDate() {
-      var today = new Date().toDateString();
+      var today = moment().format('dddd MMM Do, YYYY');
       $('#today').text(today);
     }
   },
@@ -68135,10 +68212,127 @@ var render = function() {
           domProps: { value: _vm.csrf }
         }),
         _vm._v(" "),
+        _vm.editMode
+          ? _c("input", {
+              attrs: {
+                id: "form-method",
+                type: "hidden",
+                name: "_method",
+                value: "PATCH"
+              }
+            })
+          : _vm._e(),
+        _vm._v(" "),
         _c("div", { staticClass: "admin-form__wrapper" }, [
-          _vm._m(0),
+          _c("div", { staticClass: "admin-form__main" }, [
+            _c("div", { staticClass: "form-group" }, [
+              _c("label", { attrs: { for: "name" } }, [_vm._v("Enter Name")]),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.name,
+                    expression: "name"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { id: "name", type: "text", name: "name" },
+                domProps: { value: _vm.name },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.name = $event.target.value
+                  }
+                }
+              })
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "form-group" }, [
+              _c("label", { attrs: { for: "position" } }, [
+                _vm._v("Enter Position")
+              ]),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.position,
+                    expression: "position"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { id: "position", type: "text", name: "position" },
+                domProps: { value: _vm.position },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.position = $event.target.value
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _vm._m(0),
+              _vm._v(" "),
+              _vm._m(1),
+              _vm._v(" "),
+              _vm._m(2)
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "form-group" }, [
+              _c("label", { attrs: { for: "bio" } }, [_vm._v("Enter Bio")]),
+              _vm._v(" "),
+              _c("textarea", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.bio,
+                    expression: "bio"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { id: "bio", rows: "25", type: "text", name: "bio" },
+                domProps: { value: _vm.bio },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.bio = $event.target.value
+                  }
+                }
+              })
+            ])
+          ]),
           _vm._v(" "),
           _c("div", { staticClass: "admin-form__sidebar" }, [
+            _vm._m(3),
+            _vm._v(" "),
+            _c("div", { staticClass: "form-group admin-form__btns" }, [
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-primary btns__icon",
+                  attrs: { type: "submit" }
+                },
+                [
+                  _c("span", { attrs: { "data-feather": "user-plus" } }),
+                  _vm._v(
+                    " " +
+                      _vm._s(_vm.editMode ? "Update" : "Create") +
+                      " Staff Member"
+                  )
+                ]
+              )
+            ]),
+            _vm._v(" "),
             _c("div", { staticClass: "form-group admin-form__image" }, [
               _c("label", { attrs: { for: "image" } }, [_vm._v("Profile Pic")]),
               _vm._v(" "),
@@ -68149,17 +68343,17 @@ var render = function() {
               }),
               _vm._v(" "),
               _c("div", { staticClass: "admin-form__image-preview" }, [
-                !_vm.ftImg
+                !_vm.image
                   ? _c("img", {
                       staticClass: "img-fluid",
                       attrs: { src: _vm.imgPath, alt: "select-image" }
                     })
                   : _c("img", {
                       staticClass: "img-fluid d-block",
-                      attrs: { src: _vm.ftImg }
+                      attrs: { src: _vm.image }
                     }),
                 _vm._v(" "),
-                _vm.ftImg
+                _vm.image
                   ? _c(
                       "button",
                       {
@@ -68178,7 +68372,23 @@ var render = function() {
               ])
             ]),
             _vm._v(" "),
-            _vm._m(1)
+            _vm.editMode
+              ? _c("div", { staticClass: "admin-form__delete" }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-danger d-block w-100",
+                      on: {
+                        click: function($event) {
+                          $event.preventDefault()
+                          return _vm.deleteStaffMember($event)
+                        }
+                      }
+                    },
+                    [_vm._v("Delete Staff Member")]
+                  )
+                ])
+              : _vm._e()
           ])
         ])
       ]
@@ -68190,72 +68400,11 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "admin-form__main" }, [
-      _c("div", { staticClass: "form-group" }, [
-        _c("label", { attrs: { for: "name" } }, [_vm._v("Enter Name")]),
-        _vm._v(" "),
-        _c("input", {
-          staticClass: "form-control",
-          attrs: { id: "name", type: "text", name: "name" }
-        })
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "form-group" }, [
-        _c("label", { attrs: { for: "position" } }, [_vm._v("Enter Position")]),
-        _vm._v(" "),
-        _c("input", {
-          staticClass: "form-control",
-          attrs: { id: "position", type: "text", name: "position" }
-        }),
-        _vm._v(" "),
-        _c("div", { staticClass: "mb-2" }, [
-          _c("em", [
-            _vm._v(
-              "Is this staff member a pastor? if so click yes to display on front of website!"
-            )
-          ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "form-check form-check-inline" }, [
-          _c("input", {
-            staticClass: "form-check-input",
-            attrs: { type: "radio", name: "pastor", id: "yes", value: "1" }
-          }),
-          _vm._v(" "),
-          _c(
-            "label",
-            { staticClass: "form-check-label", attrs: { for: "yes" } },
-            [_vm._v("\n                        Yes\n                    ")]
-          )
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "form-check form-check-inline" }, [
-          _c("input", {
-            staticClass: "form-check-input",
-            attrs: {
-              type: "radio",
-              name: "pastor",
-              id: "no",
-              value: "0",
-              checked: ""
-            }
-          }),
-          _vm._v(" "),
-          _c(
-            "label",
-            { staticClass: "form-check-label", attrs: { for: "no" } },
-            [_vm._v("\n                        No\n                    ")]
-          )
-        ])
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "form-group" }, [
-        _c("label", { attrs: { for: "bio" } }, [_vm._v("Enter Bio")]),
-        _vm._v(" "),
-        _c("textarea", {
-          staticClass: "form-control",
-          attrs: { id: "bio", rows: "30", type: "text", name: "bio" }
-        })
+    return _c("div", { staticClass: "mb-2" }, [
+      _c("em", [
+        _vm._v(
+          "Is this staff member a pastor? if so click yes to display on front of website!"
+        )
       ])
     ])
   },
@@ -68263,18 +68412,45 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "admin-form__btns" }, [
-      _c(
-        "button",
-        {
-          staticClass: "btn btn-primary btns__icon",
-          attrs: { type: "submit" }
-        },
-        [
-          _c("span", { attrs: { "data-feather": "user-plus" } }),
-          _vm._v(" Create Staff Member")
-        ]
-      )
+    return _c("div", { staticClass: "form-check form-check-inline" }, [
+      _c("input", {
+        staticClass: "form-check-input",
+        attrs: { type: "radio", name: "pastor", id: "yes", value: "1" }
+      }),
+      _vm._v(" "),
+      _c("label", { staticClass: "form-check-label", attrs: { for: "yes" } }, [
+        _vm._v("\n                        Yes\n                    ")
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-check form-check-inline" }, [
+      _c("input", {
+        staticClass: "form-check-input",
+        attrs: {
+          type: "radio",
+          name: "pastor",
+          id: "no",
+          value: "0",
+          checked: ""
+        }
+      }),
+      _vm._v(" "),
+      _c("label", { staticClass: "form-check-label", attrs: { for: "no" } }, [
+        _vm._v("\n                        No\n                    ")
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("p", { staticClass: "admin-form__time" }, [
+      _vm._v("Today's Date: "),
+      _c("span", { attrs: { id: "today" } })
     ])
   }
 ]
@@ -68299,32 +68475,91 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
+  return _c("div", { staticClass: "table-responsive admin-table" }, [
+    _c("table", { staticClass: "table table-hover admin-table__table" }, [
+      _vm._m(0),
+      _vm._v(" "),
+      _c(
+        "tbody",
+        _vm._l(_vm.staffMembers, function(staffMember) {
+          return _c(
+            "tr",
+            {
+              key: staffMember.id,
+              attrs: { "data-staff-id": staffMember.id, scope: "row" },
+              on: { click: _vm.editStaffMember }
+            },
+            [
+              _c("td", [_vm._v(_vm._s(staffMember.id))]),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(staffMember.name))]),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(staffMember.position))]),
+              _vm._v(" "),
+              _c("td", [
+                staffMember.image
+                  ? _c("img", {
+                      attrs: {
+                        src: _vm.baseUrl + "/" + staffMember.image,
+                        width: "50px"
+                      }
+                    })
+                  : _c(
+                      "svg",
+                      {
+                        staticClass: "feather feather-user",
+                        attrs: {
+                          xmlns: "http://www.w3.org/2000/svg",
+                          width: "24",
+                          height: "24",
+                          viewBox: "0 0 24 24",
+                          fill: "none",
+                          stroke: "currentColor",
+                          "stroke-width": "2",
+                          "stroke-linecap": "round",
+                          "stroke-linejoin": "round"
+                        }
+                      },
+                      [
+                        _c("path", {
+                          attrs: {
+                            d: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+                          }
+                        }),
+                        _c("circle", { attrs: { cx: "12", cy: "7", r: "4" } })
+                      ]
+                    )
+              ]),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(staffMember.created_at))]),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(staffMember.updated_at))])
+            ]
+          )
+        }),
+        0
+      )
+    ])
+  ])
 }
 var staticRenderFns = [
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "table-responsive admin-table" }, [
-      _c("table", { staticClass: "table table-hover admin-table__table" }, [
-        _c("thead", { staticClass: "admin-table__head" }, [
-          _c("tr", [
-            _c("th", { attrs: { scope: "col" } }, [_vm._v("Id")]),
-            _vm._v(" "),
-            _c("th", { attrs: { scope: "col" } }, [_vm._v("Name")]),
-            _vm._v(" "),
-            _c("th", { attrs: { scope: "col" } }, [_vm._v("Position")]),
-            _vm._v(" "),
-            _c("th", { attrs: { scope: "col" } }, [_vm._v("Profile Pic")]),
-            _vm._v(" "),
-            _c("th", { attrs: { scope: "col" } }, [_vm._v("Created")]),
-            _vm._v(" "),
-            _c("th", { attrs: { scope: "col" } }, [_vm._v("Updated")])
-          ])
-        ]),
+    return _c("thead", { staticClass: "admin-table__head" }, [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Id")]),
         _vm._v(" "),
-        _c("tbody")
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Name")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Position")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Profile Pic")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Created")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Updated")])
       ])
     ])
   }
