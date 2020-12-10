@@ -1,12 +1,49 @@
 .admin-table {
 
+
+     border-bottom: 2px solid $border-color;
+
+
     & th {
-        border-top: none;
+        border-top: 2px solid $border-color;
+        border-bottom: 2px solid $border-color !important;
     }
 
 
     & tr {
         cursor: pointer;
     }
+
+    & td {
+        width: 20%;
+    }
+
+    & td span.alert {
+        max-width: 7.5rem;
+        display: block;
+        text-align: center;
+    }
+
+    &__pagination {
+        margin-top: 2rem;
+        margin-bottom: 4rem;
+    }
+
+    &__pag-filters {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+
+
+    &__table {
+        margin-bottom: 0;
+    }
+
+
+
+
 
 }

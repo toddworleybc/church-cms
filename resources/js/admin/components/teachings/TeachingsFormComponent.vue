@@ -25,7 +25,7 @@
                     <label for="speaker">Speaker</label>
                     <div class="custom-control custom-checkbox mb-2">
 
-                        <input type="checkbox" class="custom-control-input" id="enterSpeaker" v-on:change="enterSpeaker = !enterSpeaker">
+                        <input type="checkbox" class="custom-control-input" id="enterSpeaker" @change="speakerCheckbox" value="1" name="checkbox_speaker">
 
                         <label class="custom-control-label" for="enterSpeaker">Enter speaker manually</label>
                     </div>
@@ -33,10 +33,8 @@
 
                         <input type="text" name="speaker" v-if="enterSpeaker" class="form-control mb-0" v-model="speaker" placeholder="Enter Speaker">
 
-                        <select class="custom-select" v-if="!enterSpeaker" name="staff_id" :value="staffId">
-                            <option data-staff="Pastor James Wafer" value="1" selected="selected">Pastor James Wafer</option>
-                            <option data-staff="Pastor Dale Richmond" value="2">Pastor Dale Richmond</option>
-                            <option data-staff="Reciptionist Kelly Munsion" value="3">Reciptionist Kelly Munsion</option>
+                        <select id="staff-select" class="custom-select" v-if="!enterSpeaker" name="staff_id">
+                            <option selected disabled hidden>-- choose from staff members --</option>
                         </select>
 
                     </div>
@@ -75,7 +73,7 @@
                     <input id="status" type="hidden" name="status" :value="status">
                     <button @click.prevent="teachingSubmitForm" data-status="Draft" type="submit" class="btn btn-info btns__icon admin-form__publish-btn"><span
                             data-feather="save"></span>Save Draft</button>
-                    <button @click.prevent="teachingSubmitForm" data-status="Published" type="submit" class="btn btn-primary btns__icon admin-form__publish-btn"><span
+                    <button @click.prevent="teachingSubmitForm" data-status="Published" type="submit" class="ml-1 btn btn-primary btns__icon admin-form__publish-btn"><span
                             data-feather="send"></span>{{ editMode && statusPublished() ? 'Update' : 'Publish' }} Teaching</button>
                 </div>
 
@@ -100,6 +98,13 @@
                 </div>
                 <div v-if="editMode" class="admin-form__delete">
                     <button @click.prevent="deleteTeaching" class="btn btn-danger d-block w-100">Delete Teaching</button>
+                </div>
+                <div v-if="editMode" class="card bg-light mt-3 admin-form__timestamps">
+                    <div class="card-body">
+                         <p class="border-bottom"><span class="font-weight-bold">Publish Date:</span> <br/>{{ publishDate }}</p>
+                        <p class="border-bottom"><span class="font-weight-bold">Date Created:</span> <br/>{{ createdDate }}</p>
+                         <p><span class="font-weight-bold">Modified Last:</span> <br/>{{ modifiedDate }}</p>
+                    </div>
                 </div>
             </aside>
         </div>
@@ -147,18 +152,20 @@ export default {
             audioId: '',
             audioUrl: '',
             baseUrl: location.origin + "/api/",
+            createdDate: "",
             description: '',
             editMode: false,
             enterSpeaker: false,
             formSubmitting: false,
             ftImg: "",
             loader: false,
+            loadmore: true,
             loadMoreBtn: false,
             mediaSelected: false,
             mediaType: '',
-            loadmore: true,
+            modifiedDate: "",
+            publishDate: "",
             scriptureHtml: '',
-            staffId: '',
             status: '',
             speaker: '',
             teaching: '',
@@ -176,7 +183,7 @@ export default {
         ScriptureComponent
     },
 
-    props: [ 'action', 'csrf', 'teachingData', 'imgPath' ],
+    props: [ 'action', 'csrf', 'teachingData', 'imgPath', 'staffMembers' ],
 
 
     computed: {
@@ -215,6 +222,7 @@ export default {
 
     // insert featured image onto screen before loading into the database
         imagePreview(e) {
+
             const file = e.target.files[0];
             this.readFile(file);
         },
@@ -223,6 +231,21 @@ export default {
     // emptyModal when backdrop is clicked
         modalBackdropClickCancel() {
             $("#loadMediaModal").on('hide.bs.modal', this.emptyModal);
+        },
+
+        speakerCheckbox() {
+
+            console.log('hello');
+
+            this.enterSpeaker ?
+                this.enterSpeaker = false :
+                this.enterSpeaker = true;
+
+            setTimeout(() => {
+                this.setStaffOptions();
+            }, 50);
+
+
         },
 
 
@@ -297,17 +320,19 @@ export default {
             }
         },
 
-        dateDefaultVal() {
-            let     date = new Date();
 
-            const   offset = date.getTimezoneOffset(),
-                    input = $('#publish-date');
+        dateDefaultVal(editModeDate = "") {
 
-                    date = new Date(date.getTime() - (offset*60*1000));
-                    date = date.toISOString().split("T")[0];
+            const input = $("#publish-date");
 
-                    // set date value attr
-                    $(input).attr('value', date);
+            let date = editModeDate ?
+
+                    editModeDate :
+                    moment().format("YYYY-MM-DD");
+
+
+            $(input).attr('value', date);
+
         },
 
 
@@ -382,6 +407,9 @@ export default {
 
             // set values
                 this.setEditTeachingTitle(this.teaching);
+
+
+
                 this.description = this.teaching.description;
                 this.scriptureHtml = this.teaching.scripture;
 
@@ -390,27 +418,32 @@ export default {
                 this.audioUrl = this.teaching.audio;
                 this.status = this.teaching.status;
                 this.setEditStaffSpeakerValues(this.teaching);
+                this.dateDefaultVal(this.teaching.publish_date);
 
             // set featured image if present for edit mode
                 this.ftImg = imagePath !== "null" ? `${location.origin}/${imagePath}` :  "";
 
 
-            } else {
+            // set date meta at end of sidebar
+                this.createdDate = moment(this.teaching.created_at).format("dddd, MMMM Do YYYY, h:mm:ss a");
 
-            // set default for staff on create teaching page.
-                 this.staffId = '1';
+                this.publishDate = moment(this.teaching.publish_date).format("dddd, MMMM Do YYYY");
+
+                this.modifiedDate = moment(this.teaching.updated_at).format("dddd, MMMM Do YYYY, h:mm:ss a");
             }
         },
 
         setEditStaffSpeakerValues(teaching) {
 
+        // NEED TO FIX THE STAFF ID AND SPEAKER. NOT RECOGNIZING WHEN BOTH SPEAKER AND STAFF ID ARE PRESENT WHAT TO DO!!!!!!!!!
+
             if(!teaching.staff_id) {
                 this.speaker = teaching.speaker;
                 this.enterSpeaker = true;
                 $("#enterSpeaker").prop('checked', true);
-                this.staffId = "1";
             } else {
-                this.staffId = teaching.staff_id;
+                const staffId = teaching.staff_id;
+                $(`[value=${staffId}]`).prop('selected', true);
                 this.enterSpeaker = false;
                 $("#enterSpeaker").prop('checked', false);
             }
@@ -713,6 +746,24 @@ export default {
         },
 
 
+        setStaffOptions() {
+
+            const staffSelect = $('#staff-select'),
+                  staffData = JSON.parse(this.staffMembers);
+            let   html = "";
+
+
+                  $(staffData).each( ( i, staffMember ) => {
+
+                      html += `<option value="${staffMember.id}">${staffMember.position} - ${staffMember.name}</option>`;
+
+                  } );
+
+                $(staffSelect).append(html);
+
+        },
+
+
         setTeachingTitle(title) {
             this.teachingTitle = title;
         },
@@ -735,10 +786,14 @@ export default {
     mounted() {
         this.audioValueChange();
         this.dateDefaultVal();
-        this.editTeachingSettings();
         this.modalBackdropClickCancel();
+        this.setStaffOptions();
         this.todaysDate();
         this.vidValueChange();
+
+
+        // Run to set all values last
+        this.editTeachingSettings();
     }
 
 }

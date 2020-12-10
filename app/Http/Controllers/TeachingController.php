@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreTeaching;
 use App\Models\Teaching;
+use App\Models\Staff;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Pagination\Paginator;
 
 class TeachingController extends Controller
 {
@@ -14,14 +16,42 @@ class TeachingController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        Paginator::useBootstrap();
 
-        $teachings = Teaching::orderBy('created_at', 'DESC')->simplePaginate(10);
 
-        $teachingsAll = $teachings->all();
 
-        return view('admin.teachings.index', compact('teachings', 'teachingsAll') );
+        $teachings = "";
+        $statusType = "";
+        $filter = $request->query('filter') !== 'all' ? $request->query('filter')  : "";
+        $orderBy = $request->query('order_by') ?? "created_at";
+        $direction = $request->query('direction') ?? "desc";
+
+
+        if($filter) {
+
+                if($filter === 'teaching') {
+                    $statusType = 'type';
+
+                } elseif ($filter === 'topical') {
+
+                    $statusType = 'type';
+
+                } else {
+                    $statusType = 'status';
+                }
+
+            $teachings = Teaching::where($statusType, $filter)->orderBy($orderBy, $direction)->paginate(12);
+
+        } else {
+             $teachings = Teaching::orderBy($orderBy, $direction)->paginate(12);
+        }
+
+
+        $teachings->withQueryString();
+
+        return view('admin.teachings.index', compact('teachings', 'filter', 'orderBy', 'direction') );
     }
 
     /**
@@ -32,7 +62,11 @@ class TeachingController extends Controller
     public function create()
     {
         //
-        return view('admin.teachings.create');
+
+        $staffMembers = Staff::all();
+
+
+        return view('admin.teachings.create', compact('staffMembers'));
     }
 
     /**
@@ -46,8 +80,18 @@ class TeachingController extends Controller
 
         $input = $request->validated();
 
+
+// set staff id or speaker for database
+        if ($request->has('checkbox_speaker')) {
+            $input['staff_id'] = null;
+            $request->except('checkbox_speaker');
+        } else {
+            $input['speaker'] = null;
+        }
+
         if($request->hasFile('ft_image'))
             $input['ft_image'] = $this->storeImage($request->file("ft_image"));
+
 
 
        $createdTeaching = Teaching::create($input);
@@ -93,8 +137,9 @@ class TeachingController extends Controller
     {
 
         $teaching = Teaching::find($id);
+        $staffMembers = Staff::all();
 
-        return view('admin.teachings.edit', compact('teaching'));
+        return view('admin.teachings.edit', compact('teaching', 'staffMembers'));
 
     }
 
@@ -110,6 +155,16 @@ class TeachingController extends Controller
         //
 
         $input = $request->validated();
+
+
+// set staff id or speaker for database
+        if ($request->has('checkbox_speaker')) {
+            $input['staff_id'] = null;
+            $request->except('checkbox_speaker');
+        } else {
+            $input['speaker'] = null;
+        }
+
 
         $teaching = Teaching::find($id);
 

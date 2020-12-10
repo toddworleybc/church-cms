@@ -12,6 +12,9 @@
      &__btns {
       padding-top: 0 !important;
       @include flex-between();
+      @include res(992) {
+          justify-content: flex-start;
+      }
     }
 
 
@@ -55,6 +58,14 @@
 
         font-size: $font-size-lg;
 
+    }
+
+    &__timestamps .card-body {
+            padding: .5rem;
+
+            p {
+                padding-bottom: .25rem;
+            }
     }
 
 

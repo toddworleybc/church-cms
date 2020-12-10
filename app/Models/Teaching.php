@@ -26,4 +26,11 @@ class Teaching extends Model
     ];
 
 
+
+    public function staff() {
+        return $this->belongsTo('App\Models\Staff');
+    }
+
+
+
 }

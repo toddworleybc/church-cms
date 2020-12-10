@@ -55,7 +55,7 @@ class StaffController extends Controller
 
 
        if($createdStaffMemeber) {
-            return redirect()->back()->with('success', 'New staff member created');
+            return redirect()->route('staff.index')->with('success', 'New staff member created');
        } else {
            return redirect()->back()->with('danger', 'Staff member could not be created');
        }

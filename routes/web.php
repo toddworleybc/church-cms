@@ -30,6 +30,16 @@ Route::resources([
     'admin/staff'     => StaffController::class
 ]);
 
+// Route::get( '/admin/teachings/filter_by/{filter?}/{orderBy?}/{direction}', function($filter, $orderBy, $direction) {
+
+//     return view('admin.teachings.index', [
+//         'filter' => $filter,
+//         'orderBy' => $orderBy,
+//         'direction' => $direction
+//     ]);
+
+// } );
+
 
 
 Auth::routes();

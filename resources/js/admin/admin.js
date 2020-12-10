@@ -30,6 +30,8 @@ const StaffFormComponent = Vue.component('staff-form-component', require('./comp
 
 const StaffTableComponent = Vue.component('staff-table-component', require('./components/staff/StaffTableComponent.vue').default);
 
+const TeachingsFilterComponent = Vue.component('teachings-filter-component', require('./components/teachings/TeachingsFilterComponent.vue').default);
+
 const TeachingsFormComponent = Vue.component('teachings-form-component', require('./components/teachings/TeachingsFormComponent.vue').default);
 
 const TeachingTableComponent = Vue.component('teaching-table-component', require('./components/teachings/TeachingTableComponent.vue').default);
@@ -46,6 +48,7 @@ const app = new Vue({
     components: {
         StaffFormComponent,
         StaffTableComponent,
+        TeachingsFilterComponent,
         TeachingsFormComponent,
         TeachingTableComponent
     },

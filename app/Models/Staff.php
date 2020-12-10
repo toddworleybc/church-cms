@@ -19,4 +19,11 @@ class Staff extends Model
     ];
 
 
+
+    public function teachings() {
+        return $this->hasMany('App\Models\Teaching');
+    }
+
+
+
 }

@@ -11329,6 +11329,12 @@ body {
   flex-wrap: wrap;
 }
 
+@media only screen and (max-width: 62em) {
+  .admin-form__btns {
+    justify-content: flex-start;
+  }
+}
+
 .admin-form__image {
   overflow: hidden;
   padding-bottom: 0 !important;
@@ -11366,9 +11372,17 @@ body {
   font-size: 1.1rem;
 }
 
+.admin-form__timestamps .card-body {
+  padding: 0.5rem;
+}
+
+.admin-form__timestamps .card-body p {
+  padding-bottom: 0.25rem;
+}
+
 .admin-form__sidebar {
   width: 30%;
-  border-left: 1px solid #ced4da;
+  border-left: 1px solid #dee2e6;
   padding-left: 2rem;
 }
 
@@ -11391,11 +11405,43 @@ body {
   }
 }
 
+.admin-table {
+  border-bottom: 2px solid #dee2e6;
+}
+
 .admin-table th {
-  border-top: none;
+  border-top: 2px solid #dee2e6;
+  border-bottom: 2px solid #dee2e6 !important;
 }
 
 .admin-table tr {
   cursor: pointer;
+}
+
+.admin-table td {
+  width: 20%;
+}
+
+.admin-table td span.alert {
+  max-width: 7.5rem;
+  display: block;
+  text-align: center;
+}
+
+.admin-table__pagination {
+  margin-top: 2rem;
+  margin-bottom: 4rem;
+}
+
+.admin-table__pag-filters {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.admin-table__table {
+  margin-bottom: 0;
 }
 

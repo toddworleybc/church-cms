@@ -13,6 +13,7 @@
 
 
 <teachings-form-component
+     staff-members = "{{ json_encode($staffMembers) }}"
      img-path = {{ url('ui-imgs/svgs/select-image.svg') }}
      csrf = {{ csrf_token() }}
      action = {{ route('teachings.store') }}
