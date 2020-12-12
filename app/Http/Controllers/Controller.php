@@ -13,6 +13,9 @@ class Controller extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
 
+    protected $perPage = 12;
+
+
     // returns file name for database storage
 
     protected function storeImage($image)

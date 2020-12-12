@@ -57,7 +57,12 @@
                 <div v-if="editMode" class="admin-form__delete">
                     <button @click.prevent="deleteStaffMember" class="btn btn-danger d-block w-100">Delete Staff Member</button>
                 </div>
-
+                <div v-if="editMode" class="card bg-light mt-3 admin-form__timestamps">
+                    <div class="card-body">
+                        <p class="border-bottom"><span class="font-weight-bold">Date Created:</span> <br/>{{ createdDate }}</p>
+                         <p><span class="font-weight-bold">Modified Last:</span> <br/>{{ modifiedDate }}</p>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -83,8 +88,10 @@ export default {
     data() {
         return {
             bio: "",
+            createdDate: "",
             editMode: false,
             image: '',
+            modifiedDate: "",
             name: "",
             position: "",
             staffMember: ""
@@ -141,6 +148,9 @@ export default {
 
             // set bio image if present for edit mode
                 this.image = imagePath !== "null" ? `${location.origin}/${imagePath}` :  "";
+
+                this.createdDate = moment(this.staffMember.created_at).format("dddd, MMMM Do YYYY, h:mm:ss a");
+                this.modifiedDate = moment(this.staffMember.updated_at).format("dddd, MMMM Do YYYY, h:mm:ss a");
 
             }
         },

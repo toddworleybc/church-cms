@@ -6,6 +6,7 @@ use App\Models\Staff;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreStaff;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Pagination\Paginator;
 
 class StaffController extends Controller
 {
@@ -14,13 +15,35 @@ class StaffController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         //
+         Paginator::useBootstrap();
 
-        $staffAll = Staff::all();
 
-        return view('admin.staff.index', compact('staffAll'));
+        $staffMembers = "";
+        $statusType = "position";
+        $filter = $request->query('filter') !== 'all' ? $request->query('filter')  : "";
+        $orderBy = $request->query('order_by') ?? "created_at";
+        $direction = $request->query('direction') ?? "desc";
+        $perPage = $this->perPage;
+
+
+        if($filter) {
+
+            $staffMembers = Staff::where($statusType, $filter)->orderBy($orderBy, $direction)->paginate($perPage);
+
+        } else {
+             $staffMembers = Staff::orderBy($orderBy, $direction)->paginate($perPage);
+        }
+
+
+        $staffPositions = Staff::pluck('position')->unique();
+
+
+        $staffMembers->withQueryString();
+
+        return view('admin.staff.index', compact('staffMembers', 'staffPositions', 'filter', 'orderBy', 'direction'));
     }
 
     /**

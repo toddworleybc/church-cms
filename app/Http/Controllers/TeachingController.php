@@ -25,8 +25,9 @@ class TeachingController extends Controller
         $teachings = "";
         $statusType = "";
         $filter = $request->query('filter') !== 'all' ? $request->query('filter')  : "";
-        $orderBy = $request->query('order_by') ?? "created_at";
+        $orderBy = $request->query('order_by') ?? "publish_date";
         $direction = $request->query('direction') ?? "desc";
+        $perPage = $this->perPage;
 
 
         if($filter) {
@@ -42,10 +43,10 @@ class TeachingController extends Controller
                     $statusType = 'status';
                 }
 
-            $teachings = Teaching::where($statusType, $filter)->orderBy($orderBy, $direction)->paginate(12);
+            $teachings = Teaching::where($statusType, $filter)->orderBy($orderBy, $direction)->paginate($perPage);
 
         } else {
-             $teachings = Teaching::orderBy($orderBy, $direction)->paginate(12);
+             $teachings = Teaching::orderBy($orderBy, $direction)->paginate($perPage);
         }
 
 

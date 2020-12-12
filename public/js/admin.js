@@ -1899,6 +1899,128 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/components/staff/StaffFilterComponent.vue?vue&type=script&lang=js&":
+/*!*******************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/components/staff/StaffFilterComponent.vue?vue&type=script&lang=js& ***!
+  \*******************************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      baseUrl: "".concat(location.origin, "/admin/staff?"),
+      filterPositions: ""
+    };
+  },
+  props: ['direction', 'filter', 'orderBy', 'staffPositions'],
+  methods: {
+    filterTable: function filterTable(e) {
+      var filterSelectVal = $(e.target).val(),
+          filterSelectParam = $(e.target).attr('id'),
+          url = this.getUrlWithQuerys(filterSelectParam, filterSelectVal);
+      window.location = encodeURI(url);
+    },
+    getUrlWithQuerys: function getUrlWithQuerys(filterSelectParam, filterSelectVal) {
+      var url = "".concat(this.baseUrl); // Attach filter query param
+
+      if (filterSelectParam === "filter") {
+        url += "filter=".concat(filterSelectVal, "&");
+      } else {
+        if (this.filter) {
+          url += "filter=".concat(this.filter, "&");
+        }
+      } // Attach order by query param
+
+
+      if (filterSelectParam === "order_by") {
+        url += "order_by=".concat(filterSelectVal, "&");
+      } else {
+        url += "order_by=".concat(this.orderBy, "&");
+      } // Attach direction query param
+
+
+      if (filterSelectParam === "direction") {
+        url += "direction=".concat(filterSelectVal);
+      } else {
+        url += "direction=".concat(this.direction);
+      }
+
+      return url;
+    },
+    setFilterSelectHtml: function setFilterSelectHtml() {
+      var filterSelect = $("#filter");
+      var html = "";
+      $(this.filterPositions).each(function (i, position) {
+        html += "<option value=\"".concat(position, "\">").concat(position, "</option>");
+      });
+      $(filterSelect).append(html);
+    },
+    setFilterOptions: function setFilterOptions() {
+      var _this = this;
+
+      if (this.filter) {
+        // Since filter inputs are based of user input on staff page we are comparing the inner text to set the prop to the correct value.
+        var filterInputs = $("#filter").children();
+        $(filterInputs).each(function (i, input) {
+          var value = $(input).text();
+
+          if (value === _this.filter) {
+            $(input).prop('selected', true);
+          }
+        });
+      }
+
+      if (this.orderBy) {
+        $("option[value=".concat(this.orderBy, "]")).prop('selected', true);
+      }
+
+      if (this.direction) {
+        $("option[value=".concat(this.direction, "]")).prop('selected', true);
+      }
+    }
+  },
+  mounted: function mounted() {
+    this.filterPositions = JSON.parse(this.staffPositions);
+    this.setFilterSelectHtml(); // Goes last to make sure DOM is in place
+
+    this.setFilterOptions();
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/components/staff/StaffFormComponent.vue?vue&type=script&lang=js&":
 /*!*****************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/components/staff/StaffFormComponent.vue?vue&type=script&lang=js& ***!
@@ -1983,14 +2105,21 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       bio: "",
+      createdDate: "",
       editMode: false,
       image: '',
+      modifiedDate: "",
       name: "",
       position: "",
       staffMember: ""
@@ -2022,6 +2151,8 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
         if (this.staffMember.pastor) $("#yes").prop('checked', true); // set bio image if present for edit mode
 
         this.image = imagePath !== "null" ? "".concat(location.origin, "/").concat(imagePath) : "";
+        this.createdDate = moment(this.staffMember.created_at).format("dddd, MMMM Do YYYY, h:mm:ss a");
+        this.modifiedDate = moment(this.staffMember.updated_at).format("dddd, MMMM Do YYYY, h:mm:ss a");
       }
     },
     // insert featured image onto screen before loading into the database
@@ -2099,9 +2230,6 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-//
-//
-//
 //
 //
 //
@@ -68306,6 +68434,92 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/components/staff/StaffFilterComponent.vue?vue&type=template&id=2da1779f&":
+/*!***********************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/components/staff/StaffFilterComponent.vue?vue&type=template&id=2da1779f& ***!
+  \***********************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "admin-table__filters" }, [
+    _c("div", { staticClass: "form-row" }, [
+      _c("div", { staticClass: "form-group mr-2" }, [
+        _c("label", { attrs: { for: "order-by" } }, [_vm._v("Filter Only:")]),
+        _vm._v(" "),
+        _c(
+          "select",
+          {
+            staticClass: "custom-select",
+            attrs: { id: "filter" },
+            on: { change: _vm.filterTable }
+          },
+          [_c("option", { attrs: { value: "all" } }, [_vm._v("All Staff")])]
+        )
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "form-group mr-2" }, [
+        _c("label", { attrs: { for: "order-by" } }, [_vm._v("Order By:")]),
+        _vm._v(" "),
+        _c(
+          "select",
+          {
+            staticClass: "custom-select",
+            attrs: { id: "order_by" },
+            on: { change: _vm.filterTable }
+          },
+          [
+            _c("option", { attrs: { value: "name" } }, [_vm._v("Name")]),
+            _vm._v(" "),
+            _c("option", { attrs: { value: "created_at" } }, [
+              _vm._v("Created Date")
+            ]),
+            _vm._v(" "),
+            _c("option", { attrs: { value: "updated_at" } }, [
+              _vm._v("Modified Date")
+            ])
+          ]
+        )
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "form-group" }, [
+        _c("label", { attrs: { for: "order-direction" } }, [
+          _vm._v("Order Direction:")
+        ]),
+        _vm._v(" "),
+        _c(
+          "select",
+          {
+            staticClass: "custom-select",
+            attrs: { id: "direction" },
+            on: { change: _vm.filterTable }
+          },
+          [
+            _c("option", { attrs: { value: "desc" } }, [
+              _vm._v("Last To First")
+            ]),
+            _vm._v(" "),
+            _c("option", { attrs: { value: "asc" } }, [_vm._v("First To Last")])
+          ]
+        )
+      ])
+    ])
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/components/staff/StaffFormComponent.vue?vue&type=template&id=41f1db5a&":
 /*!*********************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/components/staff/StaffFormComponent.vue?vue&type=template&id=41f1db5a& ***!
@@ -68515,6 +68729,34 @@ var render = function() {
                     [_vm._v("Delete Staff Member")]
                   )
                 ])
+              : _vm._e(),
+            _vm._v(" "),
+            _vm.editMode
+              ? _c(
+                  "div",
+                  { staticClass: "card bg-light mt-3 admin-form__timestamps" },
+                  [
+                    _c("div", { staticClass: "card-body" }, [
+                      _c("p", { staticClass: "border-bottom" }, [
+                        _c("span", { staticClass: "font-weight-bold" }, [
+                          _vm._v("Date Created:")
+                        ]),
+                        _vm._v(" "),
+                        _c("br"),
+                        _vm._v(_vm._s(_vm.createdDate))
+                      ]),
+                      _vm._v(" "),
+                      _c("p", [
+                        _c("span", { staticClass: "font-weight-bold" }, [
+                          _vm._v("Modified Last:")
+                        ]),
+                        _vm._v(" "),
+                        _c("br"),
+                        _vm._v(_vm._s(_vm.modifiedDate))
+                      ])
+                    ])
+                  ]
+                )
               : _vm._e()
           ])
         ])
@@ -68617,12 +68859,6 @@ var render = function() {
               on: { click: _vm.editStaffMember }
             },
             [
-              _c("td", [_vm._v(_vm._s(staffMember.id))]),
-              _vm._v(" "),
-              _c("td", [_vm._v(_vm._s(staffMember.name))]),
-              _vm._v(" "),
-              _c("td", [_vm._v(_vm._s(staffMember.position))]),
-              _vm._v(" "),
               _c("td", [
                 staffMember.image
                   ? _c("img", {
@@ -68658,9 +68894,11 @@ var render = function() {
                     )
               ]),
               _vm._v(" "),
-              _c("td", [_vm._v(_vm._s(staffMember.created_at))]),
+              _c("td", [_vm._v(_vm._s(staffMember.name))]),
               _vm._v(" "),
-              _c("td", [_vm._v(_vm._s(staffMember.updated_at))])
+              _c("td", [_vm._v(_vm._s(staffMember.position))]),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(staffMember.created_at))])
             ]
           )
         }),
@@ -68676,17 +68914,13 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("thead", { staticClass: "admin-table__head" }, [
       _c("tr", [
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Id")]),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Profile Pic")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Name")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Position")]),
         _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Profile Pic")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Created")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Updated")])
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Created")])
       ])
     ])
   }
@@ -69036,7 +69270,7 @@ var render = function() {
             ]),
             _vm._v(" "),
             _c("option", { attrs: { value: "updated_at" } }, [
-              _vm._v("Updated Date")
+              _vm._v("Modified Date")
             ])
           ]
         )
@@ -81949,6 +82183,7 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
 // Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 
 
+var StaffFilterComponent = Vue.component('staff-filter-component', __webpack_require__(/*! ./components/staff/StaffFilterComponent.vue */ "./resources/js/admin/components/staff/StaffFilterComponent.vue")["default"]);
 var StaffFormComponent = Vue.component('staff-form-component', __webpack_require__(/*! ./components/staff/StaffFormComponent.vue */ "./resources/js/admin/components/staff/StaffFormComponent.vue")["default"]);
 var StaffTableComponent = Vue.component('staff-table-component', __webpack_require__(/*! ./components/staff/StaffTableComponent.vue */ "./resources/js/admin/components/staff/StaffTableComponent.vue")["default"]);
 var TeachingsFilterComponent = Vue.component('teachings-filter-component', __webpack_require__(/*! ./components/teachings/TeachingsFilterComponent.vue */ "./resources/js/admin/components/teachings/TeachingsFilterComponent.vue")["default"]);
@@ -81962,6 +82197,7 @@ var TeachingTableComponent = Vue.component('teaching-table-component', __webpack
 var app = new Vue({
   el: '#admin-app',
   components: {
+    StaffFilterComponent: StaffFilterComponent,
     StaffFormComponent: StaffFormComponent,
     StaffTableComponent: StaffTableComponent,
     TeachingsFilterComponent: TeachingsFilterComponent,
@@ -81972,6 +82208,75 @@ var app = new Vue({
     feather.replace();
   }
 });
+
+/***/ }),
+
+/***/ "./resources/js/admin/components/staff/StaffFilterComponent.vue":
+/*!**********************************************************************!*\
+  !*** ./resources/js/admin/components/staff/StaffFilterComponent.vue ***!
+  \**********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _StaffFilterComponent_vue_vue_type_template_id_2da1779f___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./StaffFilterComponent.vue?vue&type=template&id=2da1779f& */ "./resources/js/admin/components/staff/StaffFilterComponent.vue?vue&type=template&id=2da1779f&");
+/* harmony import */ var _StaffFilterComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./StaffFilterComponent.vue?vue&type=script&lang=js& */ "./resources/js/admin/components/staff/StaffFilterComponent.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _StaffFilterComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _StaffFilterComponent_vue_vue_type_template_id_2da1779f___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _StaffFilterComponent_vue_vue_type_template_id_2da1779f___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/admin/components/staff/StaffFilterComponent.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/admin/components/staff/StaffFilterComponent.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************************!*\
+  !*** ./resources/js/admin/components/staff/StaffFilterComponent.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_StaffFilterComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./StaffFilterComponent.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/components/staff/StaffFilterComponent.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_StaffFilterComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/admin/components/staff/StaffFilterComponent.vue?vue&type=template&id=2da1779f&":
+/*!*****************************************************************************************************!*\
+  !*** ./resources/js/admin/components/staff/StaffFilterComponent.vue?vue&type=template&id=2da1779f& ***!
+  \*****************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_StaffFilterComponent_vue_vue_type_template_id_2da1779f___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./StaffFilterComponent.vue?vue&type=template&id=2da1779f& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/components/staff/StaffFilterComponent.vue?vue&type=template&id=2da1779f&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_StaffFilterComponent_vue_vue_type_template_id_2da1779f___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_StaffFilterComponent_vue_vue_type_template_id_2da1779f___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
 
 /***/ }),
 

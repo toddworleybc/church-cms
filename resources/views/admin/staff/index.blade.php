@@ -10,14 +10,44 @@
     </div>
 </div>
 
+@php
+    $positions = [];
+
+    foreach ($staffPositions as $position) {
+        $positions[] = $position;
+    }
 
 
-@if (count($staffAll))
+    // fix pagintion range top of the table to the left - blue box
+    $showRange = ($staffMembers->lastItem() - $staffMembers->count()) + 1;
+@endphp
 
+
+
+@if (count($staffMembers->items()))
+
+<div class="admin-table__pag-filters">
+    <p class="alert alert-info">Showing {{ $showRange }} - {{ $staffMembers->lastItem() }} staff members out of
+    {{ $staffMembers->total() }}</p>
+    <staff-filter-component
+    staff-positions = "{{ json_encode($positions) }}"
+    filter = "{{ $filter }}"
+    order-by = "{{ $orderBy }}"
+    direction = "{{ $direction }}"
+    ></staff-filter-component>
+</div>
 
 <staff-table-component
-staff-data = "{{ json_encode($staffAll) }}"
+staff-data = "{{ json_encode($staffMembers->items()) }}"
 ></staff-table-component>
+
+<div class="admin-table__pagination">
+    @if ($staffMembers->hasPages())
+    <p class="text-secondary mb-1">Pages:</p>
+    @endif
+
+    {{ $staffMembers->links() }}
+</div>
 
 @else
 
@@ -26,25 +56,6 @@ staff-data = "{{ json_encode($staffAll) }}"
 </div>
 
 @endif
-
-
-
-
-
-{{-- Teaching Example --}}
-{{-- @if (count($teachingsAll))
-<teaching-table-component teachings-data="{{ json_encode($teachingsAll) }}"></teaching-table-component>
-<div class="d-flex justify-content-end border-top">
-    <div class="my-4">
-        {{ $teachings->links() }}
-    </div>
-</div>
-@else
-<div class="bg-light px-2 py-4 text-secondary">
-    Create Your First Teaching!
-</div>
-@endif --}}
-
 
 
 

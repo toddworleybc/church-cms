@@ -4,18 +4,13 @@
             <div class="form-group mr-2">
                 <label for="order-by">Filter Only:</label>
                 <select @change="filterTable" id="filter" class="custom-select">
-                    <option value="all">All Teachings</option>
-                    <option value="Published">Published</option>
-                    <option value="Draft">Draft</option>
-                    <option value="teaching">Teachings</option>
-                    <option value="topical">Topical Teachings</option>
+                    <option value="all">All Staff</option>
                 </select>
             </div>
             <div class="form-group mr-2">
                 <label for="order-by">Order By:</label>
                 <select @change="filterTable" id="order_by" class="custom-select">
-                    <option value="publish_date">Publish Date</option>
-                    <option value="title">Title</option>
+                    <option value="name">Name</option>
                     <option value="created_at">Created Date</option>
                     <option value="updated_at">Modified Date</option>
                 </select>
@@ -37,17 +32,18 @@ export default {
 
     data() {
         return {
-            baseUrl: `${location.origin}/admin/teachings?`
+            baseUrl: `${location.origin}/admin/staff?`,
+            filterPositions: ""
         }
     },
-
-
 
     props: [
         'direction',
         'filter',
-        'orderBy'
+        'orderBy',
+        'staffPositions'
         ],
+
 
     methods: {
 
@@ -105,11 +101,46 @@ export default {
 
         },
 
+
+        setFilterSelectHtml() {
+
+            const filterSelect = $("#filter");
+
+            let html = "";
+
+
+            $(this.filterPositions).each( ( i, position ) => {
+
+                html += `<option value="${position}">${position}</option>`;
+
+            } );
+
+
+            $(filterSelect).append(html);
+
+
+        },
+
+
+
+
+
         setFilterOptions() {
 
-
             if(this.filter) {
-                $(`option[value=${this.filter}]`).prop('selected', true);
+
+            // Since filter inputs are based of user input on staff page we are comparing the inner text to set the prop to the correct value.
+                const filterInputs = $("#filter").children();
+
+                $(filterInputs).each( (i, input) => {
+
+                    let value = $(input).text();
+
+                    if(value === this.filter) {
+                        $(input).prop('selected', true);
+                    }
+
+                } );
             }
 
             if(this.orderBy) {
@@ -121,13 +152,22 @@ export default {
                 $(`option[value=${this.direction}]`).prop('selected', true);
             }
 
-        }
+        },
+
+
 
 
     },
 
     mounted() {
-        this.setFilterOptions();
+
+        this.filterPositions = JSON.parse(this.staffPositions);
+        this.setFilterSelectHtml();
+
+
+
+        // Goes last to make sure DOM is in place
+            this.setFilterOptions();
     }
 }
 </script>

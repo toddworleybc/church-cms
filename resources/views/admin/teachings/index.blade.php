@@ -56,7 +56,10 @@
     ></teaching-table-component>
 
     <div class="admin-table__pagination">
-        <p class="text-secondary mb-1">Pages:</p>
+        @if ($teachings->hasPages())
+            <p class="text-secondary mb-1">Pages:</p>
+        @endif
+
         {{ $teachings->links() }}
     </div>
 
