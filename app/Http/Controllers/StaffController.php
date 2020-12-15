@@ -51,10 +51,15 @@ class StaffController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
-        return view('admin.staff.create');
+
+
+        $submittedValues = $request->old();
+
+
+
+        return view('admin.staff.create', compact('submittedValues'));
     }
 
     /**
@@ -78,7 +83,8 @@ class StaffController extends Controller
 
 
        if($createdStaffMemeber) {
-            return redirect()->route('staff.index')->with('success', 'New staff member created');
+            // return redirect()->route('staff.index')->with('success', 'New staff member created');
+             return redirect()->back()->with('danger', 'Staff member could not be created');
        } else {
            return redirect()->back()->with('danger', 'Staff member could not be created');
        }
@@ -102,11 +108,10 @@ class StaffController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($id, Request $request)
     {
         //
         $staffMember = Staff::find($id);
-
 
         return view('admin.staff.edit', compact('staffMember'));
 

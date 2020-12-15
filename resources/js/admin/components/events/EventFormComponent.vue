@@ -1,7 +1,7 @@
 <template>
 
-    <div class="admin-form staff-create">
-        <form id="staff-form" method="post" :action="action" accept-charset="UTF-8" enctype="multipart/form-data">
+    <div class="admin-form event-create">
+        <form id="event-form" method="post" :action="action" accept-charset="UTF-8" enctype="multipart/form-data">
 
         <input type="hidden" name="_token" :value="csrf">
         <input id="form-method" v-if="editMode" type="hidden" name="_method" value="PATCH">
@@ -10,73 +10,36 @@
             <div class="admin-form__main">
                 <div class="form-group">
                     <label for="name">Enter Name</label>
-                    <div v-if="errors.name.length" class="invalid-feedback d-block">
-                        {{ errors.name[0] }}
-                    </div>
-                    <input id="name" :class="[{'is-invalid': errors.name.length}, 'form-control']" type="text" name="name" v-model="name">
-                </div>
-
-                <div class="form-group">
-                    <label for="position">Enter Position</label>
-                    <div v-if="errors.position.length" class="invalid-feedback d-block">
-                        {{ errors.position[0] }}
-                    </div>
-                    <input id="position" :class="[{'is-invalid': errors.position.length}, 'form-control']" type="text" name="position" v-model="position">
-
-                    <div class="mb-2"><em>Is this staff member a pastor? if so click yes to display on front of website!</em></div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="pastor" id="yes" value="1">
-                        <label class="form-check-label" for="yes">
-                            Yes
-                        </label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="pastor" id="no" value="0" checked>
-                        <label class="form-check-label" for="no">
-                            No
-                        </label>
-                    </div>
+                    <input id="name" class="form-control" type="text" name="name" v-model="name">
                 </div>
 
 
 
+
                 <div class="form-group">
-                    <label for="bio">Enter Bio</label>
-                    <div v-if="errors.bio.length" class="invalid-feedback">
-                        {{ errors.bio[0] }}
-                    </div>
-                    <textarea id="bio" rows="25" :class="[{'is-invalid': errors.bio.length}, 'form-control']" type="text" name="bio" v-model="bio"></textarea>
+                    <label for="details">Enter Event Details</label>
+                    <textarea id="event-details" rows="25" class="form-control" type="text" name="details" v-model="details"></textarea>
                 </div>
             </div>
             <!-- end of main  -->
             <div class="admin-form__sidebar">
                 <p class="admin-form__time">Today's Date: <span id="today"></span></p>
                 <div class="form-group admin-form__btns">
-                    <button type="submit" class="btn btn-primary btns__icon"><span data-feather="user-plus"></span> {{editMode ? 'Update' : 'Create'}} Staff Member</button>
+                    <button type="submit" class="btn btn-primary btns__icon"><span data-feather="user-plus"></span> {{editMode ? 'Update' : 'Create'}} Event</button>
                 </div>
                 <div class="form-group admin-form__image">
                     <label for="image">Profile Pic</label>
-                    <div class="custom-file">
-                        <input @change="imagePreview"  class="form-control-file admin-form__ft-img-input" name="image" type="file" id="image">
-                    </div>
-
+                    <input @change="imagePreview" class="form-control-file admin-form__ft-img-input" name="image" type="file" id="image">
                     <div class="admin-form__image-preview">
 
-                        <img v-if="!image" aria-describedby="image-feedback" :class="[{ 'is-invalid': errors.image.length }, 'img-fluid']" :src="imgPath" alt="select-image">
+                        <img v-if="!image" class="img-fluid" :src="imgPath" alt="select-image">
 
-
-
-                        <img v-else :src="image" :class="[{ 'is-invalid': errors.image.length }, 'img-fluid d-block']">
-
-                        <div id="image-feedback" class="invalid-feedback">
-                            {{ errors.image[0] }}
-                        </div>
-
+                        <img v-else :src="image" class="img-fluid d-block">
                         <button v-if="image" @click.prevent="removeImg" id="remove-img" class="btn btn-light admin-form__remove-img-btn">&times; Remove Image</button>
                     </div>
                 </div>
                 <div v-if="editMode" class="admin-form__delete">
-                    <button @click.prevent="deleteStaffMember" class="btn btn-danger d-block w-100">Delete Staff Member</button>
+                    <button @click.prevent="deleteEvent" class="btn btn-danger d-block w-100">Delete Event</button>
                 </div>
                 <div v-if="editMode" class="card bg-light mt-3 admin-form__timestamps">
                     <div class="card-body">
@@ -108,69 +71,58 @@ export default {
 
     data() {
         return {
-            bio: "",
             createdDate: "",
             editMode: false,
-            errors: "",
+            event: "",
             image: '',
-            modifiedDate: "",
-            name: "",
-            position: "",
-            staffMember: "",
-            oldValues: ""
+            modifiedDate: ""
         }
     },
 
 
-    props: [
-        'action',
-        'csrf',
-        'imgPath',
-        'staffData',
-        'submittedValues',
-        'formErrors'
-    ],
+
+    props: [ 'action', 'csrf', 'imgPath', 'eventData' ],
 
     methods: {
 
 
-         deleteStaffMember() {
+         deleteEvent() {
 
-            const confirmed = confirm(`Are you sure you want to delete staff member ${this.staffMember.name}`);
+            const confirmed = confirm(`Are you sure you want to delete event ${this.event.name}`);
 
             if(confirmed) {
                 $('#form-method').val('DELETE');
-                $('#staff-form').submit();
+                $('#event-form').submit();
             }
         },
 
 
 
-        editStaffMemberSettings() {
+        editEventSettings() {
 
 
         // check if we are not on teaching create
-            if(this.staffData) {
+            if(this.eventData) {
 
 
             // get the data
-                this.staffMember = JSON.parse(this.staffData);
+                this.event = JSON.parse(this.eventData);
 
 
-                const imagePath = `${this.staffMember.image}`;
+                const imagePath = `${this.event.image}`;
 
             // switch template to edit mode
                 this.editMode = true;
 
 
             // set values
-                this.bio = this.staffMember.bio;
-                this.name = this.staffMember.name;
-                this.position = this.staffMember.position;
+                // this.bio = this.staffMember.bio;
+                // this.name = this.staffMember.name;
+                // this.position = this.staffMember.position;
 
             // set staff member is pastor
-                if(this.staffMember.pastor)
-                    $("#yes").prop('checked', true);
+                // if(this.staffMember.pastor)
+                //     $("#yes").prop('checked', true);
 
 
 
@@ -191,7 +143,6 @@ export default {
             this.readFile(file);
         },
 
-
         readFile(file) {
 
             const reader = new FileReader();
@@ -208,24 +159,6 @@ export default {
             this.image = '';
         },
 
-
-         setFormErrors() {
-
-            this.errors = JSON.parse(this.formErrors);
-        },
-
-        setSubmittedValues() {
-            this.oldValues = JSON.parse(this.submittedValues);
-
-            this.name = this.oldValues.name;
-            this.position = this.oldValues.position;
-            this.bio = this.oldValues.bio;
-
-            this.oldValues.pastor === '1' ?
-                $('#yes').prop('checked', true) :
-                $('#no').prop('checked', true);
-        },
-
          todaysDate() {
             const today = moment().format('dddd MMM Do, YYYY');
              $('#today').text(today);
@@ -237,7 +170,7 @@ export default {
         tinymceInit() {
             var editor_config = {
                 path_absolute : "/",
-                selector: '#bio',
+                selector: '#event-details',
                 relative_urls: false,
                 plugins: [
                 "advlist autolink lists link image charmap print preview hr anchor pagebreak",
@@ -275,15 +208,10 @@ export default {
         }
     },
 
-    created() {
-        this.setFormErrors();
-    },
-
     mounted() {
         this.tinymceInit();
-        this.editStaffMemberSettings();
+        this.editEventSettings();
         this.todaysDate();
-        this.editMode ?? this.setSubmittedValues();
     }
 
 

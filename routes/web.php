@@ -1,7 +1,8 @@
 <?php
-
-use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\StaffController;
 use App\Http\Controllers\TeachingController;
 
 /*
@@ -27,18 +28,9 @@ Route::view('/admin', 'admin.index')->name('admin.index');
 //Admin Resources ===/
 Route::resources([
     'admin/teachings' => TeachingController::class,
-    'admin/staff'     => StaffController::class
+    'admin/staff'     => StaffController::class,
+    'admin/events'    => EventController::class
 ]);
-
-// Route::get( '/admin/teachings/filter_by/{filter?}/{orderBy?}/{direction}', function($filter, $orderBy, $direction) {
-
-//     return view('admin.teachings.index', [
-//         'filter' => $filter,
-//         'orderBy' => $orderBy,
-//         'direction' => $direction
-//     ]);
-
-// } );
 
 
 

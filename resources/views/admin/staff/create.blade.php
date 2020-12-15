@@ -1,4 +1,6 @@
+
 @extends('admin.layouts.admin-app')
+
 
 
 @section('scripts')
@@ -17,9 +19,19 @@
     </div>
 </div>
 
+@php
+    $formErrors = [
+        'name'     => $errors->get('name'),
+        'position' => $errors->get('position'),
+        'bio'      => $errors->get('bio'),
+        'image'    => $errors->get('image')
+    ];
+@endphp
 
 
 <staff-form-component
+submitted-values = "{{ json_encode($submittedValues) }}"
+form-errors = "{{ json_encode($formErrors) }}"
 img-path = {{ url('ui-imgs/svgs/select-image.svg') }}
 action = {{ route('staff.store') }}
 csrf = {{ csrf_token() }}

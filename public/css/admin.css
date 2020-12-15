@@ -11341,8 +11341,18 @@ body {
 }
 
 .admin-form__image-preview {
-  max-width: 20rem;
   margin: 1rem 0;
+}
+
+@media only screen and (max-width: 62em) {
+  .admin-form__image-preview {
+    max-width: 20rem;
+  }
+}
+
+.admin-form__image .is-invalid {
+  border: 1px solid red;
+  padding: 10px;
 }
 
 .admin-form .form-group {

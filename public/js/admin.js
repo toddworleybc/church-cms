@@ -1899,6 +1899,188 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/components/events/EventFormComponent.vue?vue&type=script&lang=js&":
+/*!******************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/components/events/EventFormComponent.vue?vue&type=script&lang=js& ***!
+  \******************************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      createdDate: "",
+      editMode: false,
+      event: "",
+      image: '',
+      modifiedDate: ""
+    };
+  },
+  props: ['action', 'csrf', 'imgPath', 'eventData'],
+  methods: {
+    deleteEvent: function deleteEvent() {
+      var confirmed = confirm("Are you sure you want to delete event ".concat(this.event.name));
+
+      if (confirmed) {
+        $('#form-method').val('DELETE');
+        $('#event-form').submit();
+      }
+    },
+    editEventSettings: function editEventSettings() {
+      // check if we are not on teaching create
+      if (this.eventData) {
+        // get the data
+        this.event = JSON.parse(this.eventData);
+        var imagePath = "".concat(this.event.image); // switch template to edit mode
+
+        this.editMode = true; // set values
+        // this.bio = this.staffMember.bio;
+        // this.name = this.staffMember.name;
+        // this.position = this.staffMember.position;
+        // set staff member is pastor
+        // if(this.staffMember.pastor)
+        //     $("#yes").prop('checked', true);
+        // set bio image if present for edit mode
+
+        this.image = imagePath !== "null" ? "".concat(location.origin, "/").concat(imagePath) : "";
+        this.createdDate = moment(this.staffMember.created_at).format("dddd, MMMM Do YYYY, h:mm:ss a");
+        this.modifiedDate = moment(this.staffMember.updated_at).format("dddd, MMMM Do YYYY, h:mm:ss a");
+      }
+    },
+    // insert featured image onto screen before loading into the database
+    imagePreview: function imagePreview(e) {
+      var file = e.target.files[0];
+      this.readFile(file);
+    },
+    readFile: function readFile(file) {
+      var _this = this;
+
+      var reader = new FileReader();
+      $(reader).on('load', function (e) {
+        _this.image = e.target.result;
+      });
+      reader.readAsDataURL(file);
+    },
+    removeImg: function removeImg() {
+      $('#image').val('');
+      this.image = '';
+    },
+    todaysDate: function todaysDate() {
+      var today = moment().format('dddd MMM Do, YYYY');
+      $('#today').text(today);
+    },
+    // install tinymce
+    tinymceInit: function tinymceInit() {
+      var editor_config = {
+        path_absolute: "/",
+        selector: '#event-details',
+        relative_urls: false,
+        plugins: ["advlist autolink lists link image charmap print preview hr anchor pagebreak", "searchreplace wordcount visualblocks visualchars code fullscreen", "insertdatetime media nonbreaking save table directionality", "emoticons template paste textpattern"],
+        toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media",
+        file_picker_callback: function file_picker_callback(callback, value, meta) {
+          var x = window.innerWidth || document.documentElement.clientWidth || document.getElementsByTagName('body')[0].clientWidth;
+          var y = window.innerHeight || document.documentElement.clientHeight || document.getElementsByTagName('body')[0].clientHeight;
+          var cmsURL = editor_config.path_absolute + 'laravel-filemanager?editor=' + meta.fieldname;
+
+          if (meta.filetype == 'image') {
+            cmsURL = cmsURL + "&type=Images";
+          } else {
+            cmsURL = cmsURL + "&type=Files";
+          }
+
+          tinyMCE.activeEditor.windowManager.openUrl({
+            url: cmsURL,
+            title: 'Filemanager',
+            width: x * 0.8,
+            height: y * 0.8,
+            resizable: "yes",
+            close_previous: "no",
+            onMessage: function onMessage(api, message) {
+              callback(message.content);
+            }
+          });
+        }
+      };
+      tinymce.init(editor_config);
+    }
+  },
+  mounted: function mounted() {
+    this.tinymceInit();
+    this.editEventSettings();
+    this.todaysDate();
+  }
+}); // end of export default
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/components/staff/StaffFilterComponent.vue?vue&type=script&lang=js&":
 /*!*******************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/components/staff/StaffFilterComponent.vue?vue&type=script&lang=js& ***!
@@ -2110,6 +2292,27 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2118,14 +2321,16 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
       bio: "",
       createdDate: "",
       editMode: false,
+      errors: "",
       image: '',
       modifiedDate: "",
       name: "",
       position: "",
-      staffMember: ""
+      staffMember: "",
+      oldValues: ""
     };
   },
-  props: ['action', 'csrf', 'imgPath', 'staffData'],
+  props: ['action', 'csrf', 'imgPath', 'staffData', 'submittedValues', 'formErrors'],
   methods: {
     deleteStaffMember: function deleteStaffMember() {
       var confirmed = confirm("Are you sure you want to delete staff member ".concat(this.staffMember.name));
@@ -2173,6 +2378,16 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
       $('#image').val('');
       this.image = '';
     },
+    setFormErrors: function setFormErrors() {
+      this.errors = JSON.parse(this.formErrors);
+    },
+    setSubmittedValues: function setSubmittedValues() {
+      this.oldValues = JSON.parse(this.submittedValues);
+      this.name = this.oldValues.name;
+      this.position = this.oldValues.position;
+      this.bio = this.oldValues.bio;
+      this.oldValues.pastor === '1' ? $('#yes').prop('checked', true) : $('#no').prop('checked', true);
+    },
     todaysDate: function todaysDate() {
       var today = moment().format('dddd MMM Do, YYYY');
       $('#today').text(today);
@@ -2212,10 +2427,16 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
       tinymce.init(editor_config);
     }
   },
+  created: function created() {
+    this.setFormErrors();
+  },
   mounted: function mounted() {
+    var _this$editMode;
+
     this.tinymceInit();
     this.editStaffMemberSettings();
     this.todaysDate();
+    (_this$editMode = this.editMode) !== null && _this$editMode !== void 0 ? _this$editMode : this.setSubmittedValues();
   }
 }); // end of export default
 
@@ -68434,6 +68655,238 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/components/events/EventFormComponent.vue?vue&type=template&id=5df810fa&":
+/*!**********************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/components/events/EventFormComponent.vue?vue&type=template&id=5df810fa& ***!
+  \**********************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "admin-form event-create" }, [
+    _c(
+      "form",
+      {
+        attrs: {
+          id: "event-form",
+          method: "post",
+          action: _vm.action,
+          "accept-charset": "UTF-8",
+          enctype: "multipart/form-data"
+        }
+      },
+      [
+        _c("input", {
+          attrs: { type: "hidden", name: "_token" },
+          domProps: { value: _vm.csrf }
+        }),
+        _vm._v(" "),
+        _vm.editMode
+          ? _c("input", {
+              attrs: {
+                id: "form-method",
+                type: "hidden",
+                name: "_method",
+                value: "PATCH"
+              }
+            })
+          : _vm._e(),
+        _vm._v(" "),
+        _c("div", { staticClass: "admin-form__wrapper" }, [
+          _c("div", { staticClass: "admin-form__main" }, [
+            _c("div", { staticClass: "form-group" }, [
+              _c("label", { attrs: { for: "name" } }, [_vm._v("Enter Name")]),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.name,
+                    expression: "name"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { id: "name", type: "text", name: "name" },
+                domProps: { value: _vm.name },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.name = $event.target.value
+                  }
+                }
+              })
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "form-group" }, [
+              _c("label", { attrs: { for: "details" } }, [
+                _vm._v("Enter Event Details")
+              ]),
+              _vm._v(" "),
+              _c("textarea", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.details,
+                    expression: "details"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: {
+                  id: "event-details",
+                  rows: "25",
+                  type: "text",
+                  name: "details"
+                },
+                domProps: { value: _vm.details },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.details = $event.target.value
+                  }
+                }
+              })
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "admin-form__sidebar" }, [
+            _vm._m(0),
+            _vm._v(" "),
+            _c("div", { staticClass: "form-group admin-form__btns" }, [
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-primary btns__icon",
+                  attrs: { type: "submit" }
+                },
+                [
+                  _c("span", { attrs: { "data-feather": "user-plus" } }),
+                  _vm._v(
+                    " " + _vm._s(_vm.editMode ? "Update" : "Create") + " Event"
+                  )
+                ]
+              )
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "form-group admin-form__image" }, [
+              _c("label", { attrs: { for: "image" } }, [_vm._v("Profile Pic")]),
+              _vm._v(" "),
+              _c("input", {
+                staticClass: "form-control-file admin-form__ft-img-input",
+                attrs: { name: "image", type: "file", id: "image" },
+                on: { change: _vm.imagePreview }
+              }),
+              _vm._v(" "),
+              _c("div", { staticClass: "admin-form__image-preview" }, [
+                !_vm.image
+                  ? _c("img", {
+                      staticClass: "img-fluid",
+                      attrs: { src: _vm.imgPath, alt: "select-image" }
+                    })
+                  : _c("img", {
+                      staticClass: "img-fluid d-block",
+                      attrs: { src: _vm.image }
+                    }),
+                _vm._v(" "),
+                _vm.image
+                  ? _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-light admin-form__remove-img-btn",
+                        attrs: { id: "remove-img" },
+                        on: {
+                          click: function($event) {
+                            $event.preventDefault()
+                            return _vm.removeImg($event)
+                          }
+                        }
+                      },
+                      [_vm._v("× Remove Image")]
+                    )
+                  : _vm._e()
+              ])
+            ]),
+            _vm._v(" "),
+            _vm.editMode
+              ? _c("div", { staticClass: "admin-form__delete" }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-danger d-block w-100",
+                      on: {
+                        click: function($event) {
+                          $event.preventDefault()
+                          return _vm.deleteEvent($event)
+                        }
+                      }
+                    },
+                    [_vm._v("Delete Event")]
+                  )
+                ])
+              : _vm._e(),
+            _vm._v(" "),
+            _vm.editMode
+              ? _c(
+                  "div",
+                  { staticClass: "card bg-light mt-3 admin-form__timestamps" },
+                  [
+                    _c("div", { staticClass: "card-body" }, [
+                      _c("p", { staticClass: "border-bottom" }, [
+                        _c("span", { staticClass: "font-weight-bold" }, [
+                          _vm._v("Date Created:")
+                        ]),
+                        _vm._v(" "),
+                        _c("br"),
+                        _vm._v(_vm._s(_vm.createdDate))
+                      ]),
+                      _vm._v(" "),
+                      _c("p", [
+                        _c("span", { staticClass: "font-weight-bold" }, [
+                          _vm._v("Modified Last:")
+                        ]),
+                        _vm._v(" "),
+                        _c("br"),
+                        _vm._v(_vm._s(_vm.modifiedDate))
+                      ])
+                    ])
+                  ]
+                )
+              : _vm._e()
+          ])
+        ])
+      ]
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("p", { staticClass: "admin-form__time" }, [
+      _vm._v("Today's Date: "),
+      _c("span", { attrs: { id: "today" } })
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/components/staff/StaffFilterComponent.vue?vue&type=template&id=2da1779f&":
 /*!***********************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/admin/components/staff/StaffFilterComponent.vue?vue&type=template&id=2da1779f& ***!
@@ -68569,6 +69022,16 @@ var render = function() {
             _c("div", { staticClass: "form-group" }, [
               _c("label", { attrs: { for: "name" } }, [_vm._v("Enter Name")]),
               _vm._v(" "),
+              _vm.errors.name.length
+                ? _c("div", { staticClass: "invalid-feedback d-block" }, [
+                    _vm._v(
+                      "\n                    " +
+                        _vm._s(_vm.errors.name[0]) +
+                        "\n                "
+                    )
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
               _c("input", {
                 directives: [
                   {
@@ -68578,7 +69041,10 @@ var render = function() {
                     expression: "name"
                   }
                 ],
-                staticClass: "form-control",
+                class: [
+                  { "is-invalid": _vm.errors.name.length },
+                  "form-control"
+                ],
                 attrs: { id: "name", type: "text", name: "name" },
                 domProps: { value: _vm.name },
                 on: {
@@ -68597,6 +69063,16 @@ var render = function() {
                 _vm._v("Enter Position")
               ]),
               _vm._v(" "),
+              _vm.errors.position.length
+                ? _c("div", { staticClass: "invalid-feedback d-block" }, [
+                    _vm._v(
+                      "\n                    " +
+                        _vm._s(_vm.errors.position[0]) +
+                        "\n                "
+                    )
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
               _c("input", {
                 directives: [
                   {
@@ -68606,7 +69082,10 @@ var render = function() {
                     expression: "position"
                   }
                 ],
-                staticClass: "form-control",
+                class: [
+                  { "is-invalid": _vm.errors.position.length },
+                  "form-control"
+                ],
                 attrs: { id: "position", type: "text", name: "position" },
                 domProps: { value: _vm.position },
                 on: {
@@ -68629,6 +69108,16 @@ var render = function() {
             _c("div", { staticClass: "form-group" }, [
               _c("label", { attrs: { for: "bio" } }, [_vm._v("Enter Bio")]),
               _vm._v(" "),
+              _vm.errors.bio.length
+                ? _c("div", { staticClass: "invalid-feedback" }, [
+                    _vm._v(
+                      "\n                    " +
+                        _vm._s(_vm.errors.bio[0]) +
+                        "\n                "
+                    )
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
               _c("textarea", {
                 directives: [
                   {
@@ -68638,7 +69127,10 @@ var render = function() {
                     expression: "bio"
                   }
                 ],
-                staticClass: "form-control",
+                class: [
+                  { "is-invalid": _vm.errors.bio.length },
+                  "form-control"
+                ],
                 attrs: { id: "bio", rows: "25", type: "text", name: "bio" },
                 domProps: { value: _vm.bio },
                 on: {
@@ -68677,22 +69169,49 @@ var render = function() {
             _c("div", { staticClass: "form-group admin-form__image" }, [
               _c("label", { attrs: { for: "image" } }, [_vm._v("Profile Pic")]),
               _vm._v(" "),
-              _c("input", {
-                staticClass: "form-control-file admin-form__ft-img-input",
-                attrs: { name: "image", type: "file", id: "image" },
-                on: { change: _vm.imagePreview }
-              }),
+              _c("div", { staticClass: "custom-file" }, [
+                _c("input", {
+                  staticClass: "form-control-file admin-form__ft-img-input",
+                  attrs: { name: "image", type: "file", id: "image" },
+                  on: { change: _vm.imagePreview }
+                })
+              ]),
               _vm._v(" "),
               _c("div", { staticClass: "admin-form__image-preview" }, [
                 !_vm.image
                   ? _c("img", {
-                      staticClass: "img-fluid",
-                      attrs: { src: _vm.imgPath, alt: "select-image" }
+                      class: [
+                        { "is-invalid": _vm.errors.image.length },
+                        "img-fluid"
+                      ],
+                      attrs: {
+                        "aria-describedby": "image-feedback",
+                        src: _vm.imgPath,
+                        alt: "select-image"
+                      }
                     })
                   : _c("img", {
-                      staticClass: "img-fluid d-block",
+                      class: [
+                        { "is-invalid": _vm.errors.image.length },
+                        "img-fluid d-block"
+                      ],
                       attrs: { src: _vm.image }
                     }),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  {
+                    staticClass: "invalid-feedback",
+                    attrs: { id: "image-feedback" }
+                  },
+                  [
+                    _vm._v(
+                      "\n                        " +
+                        _vm._s(_vm.errors.image[0]) +
+                        "\n                    "
+                    )
+                  ]
+                ),
                 _vm._v(" "),
                 _vm.image
                   ? _c(
@@ -82183,6 +82702,7 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
 // Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 
 
+var EventFormComponent = Vue.component('event-form-component', __webpack_require__(/*! ./components/events/EventFormComponent.vue */ "./resources/js/admin/components/events/EventFormComponent.vue")["default"]);
 var StaffFilterComponent = Vue.component('staff-filter-component', __webpack_require__(/*! ./components/staff/StaffFilterComponent.vue */ "./resources/js/admin/components/staff/StaffFilterComponent.vue")["default"]);
 var StaffFormComponent = Vue.component('staff-form-component', __webpack_require__(/*! ./components/staff/StaffFormComponent.vue */ "./resources/js/admin/components/staff/StaffFormComponent.vue")["default"]);
 var StaffTableComponent = Vue.component('staff-table-component', __webpack_require__(/*! ./components/staff/StaffTableComponent.vue */ "./resources/js/admin/components/staff/StaffTableComponent.vue")["default"]);
@@ -82197,6 +82717,7 @@ var TeachingTableComponent = Vue.component('teaching-table-component', __webpack
 var app = new Vue({
   el: '#admin-app',
   components: {
+    EventFormComponent: EventFormComponent,
     StaffFilterComponent: StaffFilterComponent,
     StaffFormComponent: StaffFormComponent,
     StaffTableComponent: StaffTableComponent,
@@ -82208,6 +82729,75 @@ var app = new Vue({
     feather.replace();
   }
 });
+
+/***/ }),
+
+/***/ "./resources/js/admin/components/events/EventFormComponent.vue":
+/*!*********************************************************************!*\
+  !*** ./resources/js/admin/components/events/EventFormComponent.vue ***!
+  \*********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _EventFormComponent_vue_vue_type_template_id_5df810fa___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./EventFormComponent.vue?vue&type=template&id=5df810fa& */ "./resources/js/admin/components/events/EventFormComponent.vue?vue&type=template&id=5df810fa&");
+/* harmony import */ var _EventFormComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./EventFormComponent.vue?vue&type=script&lang=js& */ "./resources/js/admin/components/events/EventFormComponent.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _EventFormComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _EventFormComponent_vue_vue_type_template_id_5df810fa___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _EventFormComponent_vue_vue_type_template_id_5df810fa___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/admin/components/events/EventFormComponent.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/admin/components/events/EventFormComponent.vue?vue&type=script&lang=js&":
+/*!**********************************************************************************************!*\
+  !*** ./resources/js/admin/components/events/EventFormComponent.vue?vue&type=script&lang=js& ***!
+  \**********************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_EventFormComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./EventFormComponent.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/components/events/EventFormComponent.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_EventFormComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/admin/components/events/EventFormComponent.vue?vue&type=template&id=5df810fa&":
+/*!****************************************************************************************************!*\
+  !*** ./resources/js/admin/components/events/EventFormComponent.vue?vue&type=template&id=5df810fa& ***!
+  \****************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_EventFormComponent_vue_vue_type_template_id_5df810fa___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./EventFormComponent.vue?vue&type=template&id=5df810fa& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/admin/components/events/EventFormComponent.vue?vue&type=template&id=5df810fa&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_EventFormComponent_vue_vue_type_template_id_5df810fa___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_EventFormComponent_vue_vue_type_template_id_5df810fa___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
 
 /***/ }),
 

@@ -21,9 +21,17 @@
     &__image {
         overflow: hidden;
         padding-bottom: 0 !important;
+
         &-preview {
-            max-width: 20rem;
             margin: 1rem 0;
+            @include res(992) {
+                max-width: 20rem;
+            }
+        }
+
+        & .is-invalid {
+            border: 1px solid red;
+            padding: 10px;
         }
 
     }

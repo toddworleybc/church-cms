@@ -17,10 +17,18 @@
                 data-feather="arrow-left-circle"></span> Back To Staff Members</a>
     </div>
 </div>
-
+@php
+    $formErrors = [
+        'name'     => $errors->get('name'),
+        'position' => $errors->get('position'),
+        'bio'      => $errors->get('bio'),
+        'image'    => $errors->get('image')
+    ];
+@endphp
 
 
 <staff-form-component
+    form-errors = "{{ json_encode($formErrors) }}"
     staff-data = "{{ json_encode($staffMember) }}"
     img-path={{ url('ui-imgs/svgs/select-image.svg') }}
     action={{ route('staff.update', $staffMember->id) }}

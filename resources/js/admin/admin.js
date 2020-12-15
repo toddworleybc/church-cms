@@ -25,6 +25,7 @@ const feather = require('feather-icons');
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 // Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+const EventFormComponent = Vue.component('event-form-component', require('./components/events/EventFormComponent.vue').default);
 
 const StaffFilterComponent = Vue.component('staff-filter-component', require('./components/staff/StaffFilterComponent.vue').default);
 
@@ -48,6 +49,7 @@ const app = new Vue({
     el: '#admin-app',
 
     components: {
+        EventFormComponent,
         StaffFilterComponent,
         StaffFormComponent,
         StaffTableComponent,
