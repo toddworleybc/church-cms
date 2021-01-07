@@ -7,22 +7,33 @@
         <div class="admin-form__wrapper">
             <div class="admin-form__main">
                 <div class="form-group">
-                    <label>Teaching Title</label>
-                    <div class="custom-control custom-radio">
-                        <input type="radio" id="teaching" v-on:change="topical = 0" value="teaching" name="type" class="custom-control-input" checked>
-                        <label class="custom-control-label" for="teaching">Use bible scripture specified below for
-                            title</label>
+                    <div :class="{'noinput-invalid': errors.title.length}">
+
+                        <label>Teaching Title</label>
+                        <div v-if="errors.title.length" class="invalid-feedback d-block">
+                            {{ errors.title[0] }}
+                        </div>
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="teaching" v-on:change="topical = 0" value="teaching" name="type" class="custom-control-input" checked>
+                            <label class="custom-control-label" for="teaching">Use bible scripture specified below for
+                                title</label>
+                        </div>
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="topical" v-on:change="topical = 1" value="topical" name="type" class="custom-control-input">
+                            <label class="custom-control-label" for="topical">Enter a title for topical teaching</label>
+                        </div>
+                        <input v-if="topical" name="title" v-model="topicalTitle" type="text" placeholder="Enter Topical Title" class="form-control mb-0 mt-2">
+                        <input v-if="teachingTitle && !topical" name="title" type="text" placeholder="Enter Title" v-model="teachingTitle" class="form-control mb-0 mt-2">
+
                     </div>
-                    <div class="custom-control custom-radio">
-                        <input type="radio" id="topical" v-on:change="topical = 1" value="topical" name="type" class="custom-control-input">
-                        <label class="custom-control-label" for="topical">Enter a title for topical teaching</label>
-                    </div>
-                    <input v-if="topical" name="title" v-model="topicalTitle" type="text" placeholder="Enter Topical Title" class="form-control mb-0 mt-2">
-                    <input v-if="teachingTitle && !topical" name="title" type="text" placeholder="Enter Title" v-model="teachingTitle" class="form-control mb-0 mt-2">
+
                 </div>
 
                 <div class="form-group">
                     <label for="speaker">Speaker</label>
+                    <div v-if="errors.speaker.length" class="invalid-feedback d-block">
+                            {{ errors.speaker[0] }}
+                        </div>
                     <div class="custom-control custom-checkbox mb-2">
 
                         <input type="checkbox" class="custom-control-input" id="enterSpeaker" @change="speakerCheckbox" value="1" name="checkbox_speaker">
@@ -33,7 +44,7 @@
 
                         <input type="text" name="speaker" v-if="enterSpeaker" class="form-control mb-0" v-model="speaker" placeholder="Enter Speaker">
 
-                        <select id="staff-select" class="custom-select" v-if="!enterSpeaker" name="staff_id">
+                        <select id="staff-select" :class="[{'is-invalid' : errors.speaker.length},'custom-select']" v-if="!enterSpeaker" name="staff_id">
                             <option selected disabled hidden>-- choose from staff members --</option>
                         </select>
 
@@ -48,7 +59,10 @@
                             allowfullscreen>
                         </iframe>
                     </div>
-                    <input class="form-control" :value="videoValue" placeholder="Enter Video Url" name="video" type="text" id="video">
+                     <div v-if="errors.video.length" class="invalid-feedback d-block">
+                            {{ errors.video[0] }}
+                        </div>
+                    <input :class="[{'is-invalid' : errors.video.length},'form-control']" :value="videoValue" placeholder="Enter Video Url" name="video" type="text" id="video">
                     <div class="teachings-create__media-btns">
                         <button @click="getYoutubeVideos" data-toggle="modal" data-target="#loadMediaModal" type="button" class="btn btn-light btns__icon"><span data-feather="youtube"></span>Get From Youtube</button>
                     </div>
@@ -57,12 +71,31 @@
                     <label v-if="!audioUrl" for="audio">Enter Audio</label>
                     <iframe v-if="audioUrl" id="audio_iframe" :src="audioUrl" width="100%" height="100" frameborder="0" scrolling="no">
                     </iframe>
-                    <input class="form-control" :value="audioUrl" name="audio" type="text" id="audio" placeholder="Enter Audio Url">
+                    <div v-if="errors.audio.length" class="invalid-feedback d-block">
+                            {{ errors.audio[0] }}
+                        </div>
+                    <input :class="[{'is-invalid' : errors.audio.length },'form-control']" :value="audioUrl" name="audio" type="text" id="audio" placeholder="Enter Audio Url">
                     <div class="teachings-create__media-btns">
                         <button @click="getPodbeanAudio" type="button" class="btn btn-light btns__icon" data-toggle="modal" data-target="#loadMediaModal"><span data-feather="volume-2"></span>Get From Podbean</button>
                     </div>
 
                 </div>
+                <div class="form-group">
+                    <label for="textSelector">Add Text To Teaching</label>
+                    <p class="text-secondary">
+                        <em>Choose to add text before or after scripture. If you only want text then select "Before Scripture OR Text Only" option and simply don't generate any scripture!</em>
+                    </p>
+                    <select @change="selectBeforeAfterText" class="custom-select" id="textSelector">
+                        <option value="none" selected>No Text</option>
+                        <option value="before">Before Scripture OR Only Text</option>
+                        <option value="after">After Scripture</option>
+                        <option value="both">Before and After Scripture</option>
+                    </select>
+                </div>
+
+         <!-- select before and after text container  -->
+                <div id="select-text-container" class="admin-form__select-text-container"></div>
+
                 <scripture-component :scriptureHtml="scriptureHtml" @description="setDescription($event)" @teachingTitle="setTeachingTitle($event)"></scripture-component>
             </div>
 
@@ -84,16 +117,26 @@
 
                 <div class="form-group">
                     <label for="description">Description</label>
-                    <textarea v-model="description" class="form-control" rows="4" name="description" cols="50" id="description"></textarea>
+                    <div v-if="errors.description.length" class="invalid-feedback d-block">
+                            {{ errors.description[0] }}
+                        </div>
+                    <textarea v-model="description" :class="[{'is-invalid' : errors.description.length},'form-control']" rows="4" name="description" cols="50" id="description"></textarea>
+                    <button v-if="description" @click.prevent="clearDescription" id="clear-description" class="btn btn-light admin-form__sidebar-btn">&times; Clear Description</button>
                 </div>
 
                 <div class="form-group admin-form__image">
                     <label for="image">Featured Image</label>
                     <input @change="imagePreview" class="form-control-file admin-form__ft-img-input" name="ft_image" type="file" id="ft_image">
                     <div class="admin-form__image-preview">
-                        <img v-if="!ftImg" class="img-fluid" :src="imgPath" alt="select-image">
-                        <img v-else :src="ftImg" class="img-fluid d-block">
-                        <button v-if="ftImg" @click.prevent="removeImg" id="remove-img" class="btn btn-light admin-form__remove-img-btn">&times; Remove Image</button>
+                        <div v-if="!ftImg" :class="[{'noinput-invalid': errors.ft_image.length}]">
+                            <img class="img-fluid" :src="imgPath" alt="select-image">
+                        </div>
+
+                        <img v-else :src="ftImg" :class="[{'noinput-invalid':errors.ft_image.length},'img-fluid', 'd-block']">
+                        <div v-if="errors.ft_image.length" class="invalid-feedback d-block">
+                                {{ errors.ft_image[0] }}
+                        </div>
+                        <button v-if="ftImg" @click.prevent="removeImg" id="remove-img" class="btn btn-light admin-form__sidebar-btn">&times; Remove Image</button>
                     </div>
                 </div>
                 <div v-if="editMode" class="admin-form__delete">
@@ -140,27 +183,37 @@
 
 <script>
 
-const ScriptureComponent = Vue.component('scripture-component', require('./ScriptureComponent.vue').default);
 
 const moment = require('moment');
 
+import { tinymceInit } from '../../mixins/tinymceEditor';
+
+const ScriptureComponent = Vue.component('scripture-component', require('./ScriptureComponent.vue').default);
+
+
+
 export default {
 
+    mixins: ['tinymceInit'],
 
     data() {
         return {
+            afterText: "",
             audioId: '',
             audioUrl: '',
             baseUrl: location.origin + "/api/",
+            beforeText: "",
             createdDate: "",
             description: '',
             editMode: false,
             enterSpeaker: false,
+            errors: "",
             formSubmitting: false,
             ftImg: "",
             loader: false,
             loadmore: true,
             loadMoreBtn: false,
+            oldValues: "",
             mediaSelected: false,
             mediaType: '',
             modifiedDate: "",
@@ -183,7 +236,15 @@ export default {
         ScriptureComponent
     },
 
-    props: [ 'action', 'csrf', 'teachingData', 'imgPath', 'staffMembers' ],
+    props: {
+        action: String,
+        csrf: String,
+        teachingData: String,
+        imgPath: String,
+        staffMembers: String,
+        formErrors: String,
+        submittedValues: String
+    },
 
 
     computed: {
@@ -220,8 +281,14 @@ export default {
         },
 
 
+        clearDescription() {
+            $("#description").val("");
+        },
+
     // insert featured image onto screen before loading into the database
         imagePreview(e) {
+
+            this.errors.ft_image = [];
 
             const file = e.target.files[0];
             this.readFile(file);
@@ -234,8 +301,6 @@ export default {
         },
 
         speakerCheckbox() {
-
-            console.log('hello');
 
             this.enterSpeaker ?
                 this.enterSpeaker = false :
@@ -261,6 +326,117 @@ export default {
                 });
             } );
 
+        },
+
+    // and event for select before after text
+        selectBeforeAfterText(e = null, value="") {
+
+            const selectValue = e ? $(e.target).val() : value,
+                  beforeText = $("#before-text"),
+                  afterText = $("#after-text"),
+                  htmlContainer = $("#select-text-container");
+
+            let beforeHtml = `<div id="before-text" class="form-group">
+
+                    <label for="before">Before Scripture Text</label>
+                    <textarea class="form-control wysiwyg" name="before_text" id="before" cols="30" rows="15"></textarea>
+
+                </div>`;
+
+            let afterHtml = `<div id="after-text" class="form-group">
+
+                    <label for="after">After Scripture Text</label>
+                    <textarea class="form-control wysiwyg" name="after_text" id="after" cols="30" rows="15"></textarea>
+
+                </div>`;
+
+
+
+            switch (selectValue) {
+                case 'before':
+
+                    $('#after-text').remove();
+
+                    if(!$(beforeText).length)
+                        $(htmlContainer).prepend(beforeHtml);
+
+                    if(this.beforeText) {
+
+                        $('#before').html(this.beforeText);
+                        this.beforeText = "";
+
+                        $("[value=before]").prop('selected', true);
+
+                    }
+                    break;
+
+                case 'after':
+
+                    $('#before-text').remove();
+
+                    if(!$(afterText).length)
+                        $(htmlContainer).append(afterHtml);
+
+                    if(this.afterText) {
+
+                            $('#after').html(this.afterText);
+
+                            this.afterText = "";
+
+                            $("[value=after]").prop('selected', true);
+
+                        }
+
+                    break;
+
+
+                case 'both':
+
+                        if($(beforeText).length) {
+                            $(htmlContainer).append(afterHtml);
+                            break;
+                        }
+
+                        if($(afterText).length) {
+                            $(htmlContainer).prepend(beforeHtml);
+                            break;
+                        }
+
+
+                        $(htmlContainer).prepend(beforeHtml);
+                        $(htmlContainer).append(afterHtml);
+
+
+
+                         $('#before').html(this.beforeText);
+                        this.beforeText = "";
+
+                         $('#after').html(this.afterText);
+                        this.afterText = "";
+
+
+                        $("[value=both]").prop('selected', true);
+
+
+                    break;
+
+                default:
+
+                    $(htmlContainer).html('');
+
+                    $("[value=none]").prop('selected', true);
+
+                    break;
+            }
+
+
+        // Remove previous instances for re-rendering on toggle
+            tinymce.remove();
+
+
+            setTimeout(() => {
+                tinymceInit();
+            }, 100);
         },
 
 
@@ -389,20 +565,28 @@ export default {
                   }
         },
 
+    // WOKING HERE====================
+
 
         editTeachingSettings() {
 
         // check if we are not on teaching create
             if(this.teachingData) {
 
-            // get the data
+
+
+            // switch template to edit mode
+                this.editMode = true;
+
+                 // get the data
                 this.teaching = JSON.parse(this.teachingData);
+
+
 
 
                 const imagePath = `${this.teaching.ft_image}`;
 
-            // switch template to edit mode
-                this.editMode = true;
+
 
 
             // set values
@@ -418,6 +602,13 @@ export default {
                 this.audioUrl = this.teaching.audio;
                 this.status = this.teaching.status;
                 this.setEditStaffSpeakerValues(this.teaching);
+
+
+            // set the before and after scripture text
+                this.setSelectTextValues(this.teaching);
+
+
+
                 this.dateDefaultVal(this.teaching.publish_date);
 
             // set featured image if present for edit mode
@@ -433,9 +624,76 @@ export default {
             }
         },
 
-        setEditStaffSpeakerValues(teaching) {
 
-        // NEED TO FIX THE STAFF ID AND SPEAKER. NOT RECOGNIZING WHEN BOTH SPEAKER AND STAFF ID ARE PRESENT WHAT TO DO!!!!!!!!!
+        setSubmittedValues() {
+
+            if(this.submittedValues) {
+
+                this.oldValues = JSON.parse(this.submittedValues);
+
+
+                if(this.oldValues.title)
+                        this.setEditTeachingTitle(this.oldValues);
+
+
+                if(this.oldValues.staff_id || this.oldValues.speaker)
+                        this.setEditStaffSpeakerValues(this.oldValues);
+
+
+                if(this.oldValues.video)
+                        this.insertEditVideoValues(this.oldValues.video);
+
+
+                if(this.oldValues.audio)
+                        this.audioUrl = this.oldValues.audio;
+
+
+                if( this.oldValues.before_text || this.oldValues.after_text )
+                    this.setSelectTextValues(this.oldValues);
+
+
+                if(this.oldValues.scripture)
+                    this.scriptureHtml = this.oldValues.scripture;
+
+                if(this.oldValues.description)
+                    this.description = this.oldValues.description;
+
+
+                if(this.oldValues.publish_date)
+                    this.dateDefaultVal(this.oldValues.publish_date);
+
+            }
+
+
+
+        },
+
+
+        setSelectTextValues(teaching) {
+
+            // select text options
+                this.beforeText = teaching.before_text;
+                this.afterText =  teaching.after_text;
+
+            if(this.beforeText && this.afterText) {
+                this.selectBeforeAfterText(null, 'both');
+                return;
+            }
+
+            if(this.beforeText) {
+                this.selectBeforeAfterText(null, 'before');
+                return;
+            }
+
+
+            if(this.afterText) {
+                this.selectBeforeAfterText(null, 'after');
+                return;
+            }
+
+        },
+
+        setEditStaffSpeakerValues(teaching) {
 
             if(!teaching.staff_id) {
                 this.speaker = teaching.speaker;
@@ -563,12 +821,23 @@ export default {
 
             if(e.type === 'change') {
 
+                const regEx = /\w{5}-\w{6}/;
+
                 let audioValue = $(e.target).val();
 
-                    audioValue = audioValue.replace('share', 'player');
-                    audioValue = audioValue.replace('pb-', '');
+                    if(audioValue.includes('www.podbean.com')) {
 
-                    this.audioUrl = audioValue;
+                        const audioId = audioValue.match(regEx)[0],
+                              audioUrl = `https://www.podbean.com/media/player/${audioId}`;
+
+
+                             this.audioUrl = audioUrl;
+                    } else {
+                        this.errors.audio.push('URL must come from Podbean!');
+                        this.audioUrl = "";
+                        $(e.target).val("");
+                    }
+
             }
 
         },
@@ -593,6 +862,7 @@ export default {
 
 
             if(e.type === 'change') {
+
             const vidVal = $('[name="video"]').val(),
                   regX = /(?<=https:\/\/youtu\.be\/).+$/;
 
@@ -604,8 +874,17 @@ export default {
                       return;
 
                   } else {
+                      if(vidVal.match(regX)) {
+                          this.vidId = vidVal.match(regX)[0];
+                      } else {
+                          $(e.target).val("");
+                          this.videoValue = "";
+                          this.vidId = "";
+                          this.vidSrc = "";
+                          this.errors.video.push('URL must be a share Youtube URL');
+                          return;
+                      }
 
-                      this.vidId = vidVal.match(regX)[0];
                   }
 
             }
@@ -746,6 +1025,15 @@ export default {
         },
 
 
+
+
+         setFormErrors() {
+            this.errors = JSON.parse(this.formErrors);
+        },
+
+
+
+
         setStaffOptions() {
 
             const staffSelect = $('#staff-select'),
@@ -783,14 +1071,19 @@ export default {
 
     }, // end of methods =========/
 
+    created() {
+         this.setFormErrors();
+    },
+
     mounted() {
+        tinymceInit();
         this.audioValueChange();
         this.dateDefaultVal();
         this.modalBackdropClickCancel();
         this.setStaffOptions();
         this.todaysDate();
         this.vidValueChange();
-
+        this.setSubmittedValues();
 
         // Run to set all values last
         this.editTeachingSettings();

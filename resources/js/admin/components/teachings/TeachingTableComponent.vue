@@ -45,10 +45,10 @@ export default {
         }
     },
 
-    props: [
-        "teachingsData",
-        "staffNamesData"
-    ],
+    props: {
+        teachingsData: String,
+        staffNamesData: String
+    },
 
 
     methods: {

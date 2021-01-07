@@ -37,12 +37,13 @@ export default {
         }
     },
 
-    props: [
-        'direction',
-        'filter',
-        'orderBy',
-        'staffPositions'
-        ],
+
+    props: {
+        direction: String,
+        filter: String,
+        orderBy: String,
+        staffPositions: String
+    },
 
 
     methods: {

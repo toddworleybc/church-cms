@@ -60,14 +60,16 @@ class TeachingController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         //
 
         $staffMembers = Staff::all();
 
+         // submitted values for form errors to repopulate form
+        $submittedValues = $request->old();
 
-        return view('admin.teachings.create', compact('staffMembers'));
+        return view('admin.teachings.create', compact('staffMembers', 'submittedValues'));
     }
 
     /**
@@ -79,7 +81,11 @@ class TeachingController extends Controller
     public function store(StoreTeaching $request)
     {
 
+
+
+
         $input = $request->validated();
+
 
 
 // set staff id or speaker for database
@@ -89,12 +95,21 @@ class TeachingController extends Controller
         } else {
             $input['speaker'] = null;
         }
-
+// set file value
         if($request->hasFile('ft_image'))
             $input['ft_image'] = $this->storeImage($request->file("ft_image"));
 
 
+// set before and after text values
+        if(!$request->has('before_text'))
+            $input['before_text'] = null;
 
+
+        if(!$request->has('after_text'))
+            $input['after_text'] = null;
+
+
+// CREATE TEACHING
        $createdTeaching = Teaching::create($input);
 
         if($createdTeaching) {
@@ -172,6 +187,14 @@ class TeachingController extends Controller
         if($request->hasFile('ft_image'))
             $input['ft_image'] = $this->editStoreImage($teaching->ft_image, $request->file('ft_image'));
 
+
+// set before and after text values
+        if(!$request->has('before_text'))
+            $input['before_text'] = null;
+
+
+        if(!$request->has('after_text'))
+            $input['after_text'] = null;
 
 
         $updatedTeaching = $teaching->update($input);

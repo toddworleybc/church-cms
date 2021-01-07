@@ -31,11 +31,13 @@ class StoreTeaching extends FormRequest
             'speaker'       => 'required_without:staff_id|string|max:255|nullable',
             'video'         => 'url|string|nullable',
             'audio'         => 'url|string|nullable',
-            'scripture'     => 'string',
+            'scripture'     => 'nullable|string',
             'status'        => 'string|max:50',
             'publish_date'  => 'required|date',
             'description'   => 'required|string|max:255',
-            'ft_image'      => 'file|mimes:jpeg,png,jpg|max:2048'
+            'ft_image'      => 'file|mimes:jpeg,png,jpg|max:2048',
+            'before_text'   => 'nullable|string',
+            'after_text'    => 'nullable|string'
         ];
     }
 
@@ -49,7 +51,12 @@ class StoreTeaching extends FormRequest
             'description.string'   => 'Description format invalid',
             'description.max'      => 'Description is too long',
             'speaker.max'          => 'Speaker name too long',
+            'speaker.required_without'  => 'You must choose either staff member or speaker',
             'staff_id.integer'     => 'Staff invalid',
+            'video.url'            => 'Youtube video must be a URL',
+            'video.string'         => 'Invalid video data type',
+            'audio.url'            => 'Podcast audio must be a URL',
+            'audio.string'         => 'Invalid audio data type',
             'ft_image.max'         => 'Featured image can\'t be over 2MB',
             'ft_image.mimes'       => 'Featured image must be jpeg, jpg, or png',
             'ft_image.file'        => 'Featured image an invalid file'

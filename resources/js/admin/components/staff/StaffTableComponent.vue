@@ -38,8 +38,9 @@ export default {
 
 
 
-    props: [ 'staffData' ],
-
+    props: {
+        staffData: String
+    },
 
     methods: {
 

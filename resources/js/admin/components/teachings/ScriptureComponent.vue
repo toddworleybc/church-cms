@@ -60,10 +60,9 @@ export default {
     }, //#-data
 
 
-
-    props: [
-        'scriptureHtml'
-    ],
+    props: {
+        scriptureHtml: String
+    },
 
 
     methods: {
@@ -410,7 +409,10 @@ export default {
             $("#scripture-gen").prop('disabled', true);
 
         // Stop extra request on end_verse onChange
-            if(e.target.name === 'end_verse') return;
+            if(e.target.name === 'end_verse') {
+                $("#scripture-gen").prop('disabled', false);
+                return;
+            }
 
             if(e.target.name === 'book' ) {
                 $(e.target).removeClass('is-invalid');

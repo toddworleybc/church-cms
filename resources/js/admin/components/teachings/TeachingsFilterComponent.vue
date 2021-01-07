@@ -41,13 +41,11 @@ export default {
         }
     },
 
-
-
-    props: [
-        'direction',
-        'filter',
-        'orderBy'
-        ],
+    props: {
+        direction: String,
+        filter: String,
+        orderBy: String
+    },
 
     methods: {
 

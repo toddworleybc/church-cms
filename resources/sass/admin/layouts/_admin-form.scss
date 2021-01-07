@@ -29,18 +29,28 @@
             }
         }
 
-        & .is-invalid {
-            border: 1px solid red;
-            padding: 10px;
-        }
-
     }
 
 
+    & .noinput-invalid {
+            border: 1px solid red;
+            padding: .625rem !important;
+            padding-bottom: 5px;
+        }
+
+    & .invalid-feedback {
+        font-size: 90%;
+    }
 
     & .form-group {
         padding: 1.5rem 0;
         border-bottom: 1px solid #576574;
+    }
+
+    & .form-row .form-group {
+        padding: 0 5px;
+        margin-bottom: 0;
+        border-bottom: none;
     }
 
 
@@ -57,7 +67,7 @@
         margin-top: 1rem;
     }
 
-    &__remove-img-btn {
+    &__sidebar-btn {
         margin-top: 1rem;
     }
 

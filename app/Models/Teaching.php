@@ -22,7 +22,9 @@ class Teaching extends Model
         'publish_date',
         'description',
         'ft_image',
-        'status'
+        'status',
+        'before_text',
+        'after_text'
     ];
 
 

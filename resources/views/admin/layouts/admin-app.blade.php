@@ -13,6 +13,9 @@
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
     <script src="{{ asset('js/admin.js') }}" defer></script>
 
+    <script src="https://cdn.tiny.cloud/1/yu92hhddx8t10u7t6y7tc30xxexavdzyi8x05s2w89vy1dq4/tinymce/5/tinymce.min.js"
+        referrerpolicy="origin"></script>
+
     @yield('scripts')
 
 </head>

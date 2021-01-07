@@ -5,6 +5,7 @@
 
         <input type="hidden" name="_token" :value="csrf">
         <input id="form-method" v-if="editMode" type="hidden" name="_method" value="PATCH">
+        <input v-if="deleteTeachings" type="hidden" name="delete_teachings" value="1">
 
         <div class="admin-form__wrapper">
             <div class="admin-form__main">
@@ -45,7 +46,7 @@
                     <div v-if="errors.bio.length" class="invalid-feedback">
                         {{ errors.bio[0] }}
                     </div>
-                    <textarea id="bio" rows="25" :class="[{'is-invalid': errors.bio.length}, 'form-control']" type="text" name="bio" v-model="bio"></textarea>
+                    <textarea id="bio" rows="25" :class="[{'is-invalid': errors.bio.length}, 'form-control wysiwyg']" type="text" name="bio" v-model="bio"></textarea>
                 </div>
             </div>
             <!-- end of main  -->
@@ -62,57 +63,88 @@
 
                     <div class="admin-form__image-preview">
 
-                        <img v-if="!image" aria-describedby="image-feedback" :class="[{ 'is-invalid': errors.image.length }, 'img-fluid']" :src="imgPath" alt="select-image">
+                        <img v-if="!image" aria-describedby="image-feedback" :class="[{ 'noinput-invalid': errors.image.length }, 'img-fluid']" :src="imgPath" alt="select-image">
 
 
 
                         <img v-else :src="image" :class="[{ 'is-invalid': errors.image.length }, 'img-fluid d-block']">
 
-                        <div id="image-feedback" class="invalid-feedback">
-                            {{ errors.image[0] }}
-                        </div>
+                        <div v-if="errors.image.length" id="image-feedback" class="invalid-feedback d-block">{{ errors.image[0] }}</div>
 
-                        <button v-if="image" @click.prevent="removeImg" id="remove-img" class="btn btn-light admin-form__remove-img-btn">&times; Remove Image</button>
+                        <button v-if="image" @click.prevent="removeImg" id="remove-img" class="btn btn-light admin-form__sidebar-btn">&times; Remove Image</button>
                     </div>
                 </div>
                 <div v-if="editMode" class="admin-form__delete">
-                    <button @click.prevent="deleteStaffMember" class="btn btn-danger d-block w-100">Delete Staff Member</button>
+                    <button @click.prevent="deleteStaffMember($event, false)" class="btn btn-danger d-block w-100">Delete Staff Member</button>
                 </div>
                 <div v-if="editMode" class="card bg-light mt-3 admin-form__timestamps">
                     <div class="card-body">
                         <p class="border-bottom"><span class="font-weight-bold">Date Created:</span> <br/>{{ createdDate }}</p>
-                         <p><span class="font-weight-bold">Modified Last:</span> <br/>{{ modifiedDate }}</p>
+                         <p class="border-bottom"><span class="font-weight-bold">Modified Last:</span> <br/>{{ modifiedDate }}</p>
+                         <p class="mb-0"><span class="font-weight-bold">Associated Teachings:</span> <br> {{ name }} has {{ teachingsCount }} teachings created</p>
                     </div>
                 </div>
             </div>
         </div>
 
-
-
-
         </form>
+
+
+
+            <div id="delete-staff" class="modal fade staff-create__delete-staff" tabindex="-1">
+                <div class="modal-dialog" style="max-width: 43.75rem">
+                    <div class="modal-content">
+                        <div class="modal-header d-flex align-items-center flex-column">
+                            <h5 class="modal-title my-3"></h5>
+                            <button v-if="!deleteConfirm" class="btn btn-light" data-dismiss="modal">Cancel</button>
+                        </div>
+
+
+                        <div class="modal-body center-block text-center"></div>
+
+                        <div v-if="!deleteConfirm" class="modal-footer justify-content-center">
+                            <button @click="deleteStaffMember($event, 'delete_staff')" type="button" class="btn btn-info">Delete Staff Member Only</button>
+                            <button @click="deleteStaffMember($event, 'delete_staff_teachings')" type="button" class="btn btn-danger">Delete Staff Member And Teachings</button>
+                        </div>
+
+                        <div v-else class="modal-footer justify-content-center">
+                            <button @click="dismissModal" type="button" class="btn btn-info">Cancel</button>
+                            <button @click="deleteSubmit" type="button" class="btn btn-danger">Yes, I am sure!</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+
+
     </div>
-
-
-
-
 
 </template>
 
 <script>
+
+import { tinymceInit } from '../../mixins/tinymceEditor';
 
 const moment = require('moment');
 
 
 export default {
 
+    mixins: ['tinymceInit'],
+
     data() {
         return {
             bio: "",
             createdDate: "",
+            deleteConfirm: false,
+            deleteTeachings: false,
             editMode: false,
             errors: "",
             image: '',
+            modalBody: '',
+            modalTitle: '',
             modifiedDate: "",
             name: "",
             position: "",
@@ -122,26 +154,122 @@ export default {
     },
 
 
-    props: [
-        'action',
-        'csrf',
-        'imgPath',
-        'staffData',
-        'submittedValues',
-        'formErrors'
-    ],
+
+    props: {
+        action: String,
+        csrf: String,
+        imgPath: String,
+        staffData: String,
+        submittedValues: String,
+        formErrors: String,
+        teachingsCount: String
+    },
+
 
     methods: {
 
 
-         deleteStaffMember() {
+        // Events ===============
 
-            const confirmed = confirm(`Are you sure you want to delete staff member ${this.staffMember.name}`);
+        dismissModal() {
+            $('#delete-staff').modal('hide');
+        },
 
-            if(confirmed) {
-                $('#form-method').val('DELETE');
+
+
+        cancelModalEvent() {
+            $('#delete-staff').on('hidden.bs.modal', () => {
+                this.deleteTeachings = false;
+                this.deleteConfirm = false;
+            });
+        },
+
+        deleteSubmit() {
+            $('#form-method').val('DELETE');
+
+            setTimeout(() => {
                 $('#staff-form').submit();
-            }
+            }, 100);
+        },
+
+
+        // ======================== #Events
+
+
+
+
+
+         deleteStaffMember(e, deleteTeachings) {
+
+
+              if(deleteTeachings) {
+
+                    this.deleteConfirm = true;
+
+                    if(deleteTeachings === 'delete_staff_teachings') this.deleteTeachings = true;
+
+
+                    let htmlTitle = `<span class="alert alert-danger">Confirm Permanent Delete!</span>`,
+
+                        htmlBody = `Are you sure you want to permanently delete staff member ${this.name}`;
+
+
+                    if(this.deleteTeachings) {
+                        htmlBody += ` and ${this.teachingsCount} teachings associated with staff member?`;
+                    } else {
+                        htmlBody += `?`;
+                    }
+
+
+
+                        $(this.modalTitle).html(htmlTitle);
+                        $(this.modalBody).html(htmlBody);
+
+
+
+
+                }
+
+
+                if(!deleteTeachings) {
+
+                    const htmlTitle = "Are you sure you want to delete this staff member?";
+
+
+                    let htmlBody = `
+                        <div class="w-50">
+                        <table class="table table-borderless border text-center mb-0">
+
+                            <tr>
+                                <td>Name:</td>
+                                <td>${this.name}</td>
+                            </tr>
+
+
+                            <tr>
+                                <td>Position:</td>
+                                <td>${this.position}</td>
+                            </tr>
+
+
+                            <tr>
+                                <td>Teachings:</td>
+                                <td>${this.teachingsCount}</td>
+                            </tr>
+
+                        </table>
+                        </div>
+                    `;
+
+
+                    $(this.modalTitle).html(htmlTitle);
+                    $(this.modalBody).html(htmlBody);
+
+
+                    $('#delete-staff').modal('show');
+
+                }
+
         },
 
 
@@ -214,6 +342,11 @@ export default {
             this.errors = JSON.parse(this.formErrors);
         },
 
+        setModalElValues() {
+            this.modalBody = $('.modal-body');
+            this.modalTitle = $('.modal-title');
+        },
+
         setSubmittedValues() {
             this.oldValues = JSON.parse(this.submittedValues);
 
@@ -231,56 +364,18 @@ export default {
              $('#today').text(today);
         },
 
-
-
-// install tinymce
-        tinymceInit() {
-            var editor_config = {
-                path_absolute : "/",
-                selector: '#bio',
-                relative_urls: false,
-                plugins: [
-                "advlist autolink lists link image charmap print preview hr anchor pagebreak",
-                "searchreplace wordcount visualblocks visualchars code fullscreen",
-                "insertdatetime media nonbreaking save table directionality",
-                "emoticons template paste textpattern"
-                ],
-                toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media",
-                file_picker_callback : function(callback, value, meta) {
-                var x = window.innerWidth || document.documentElement.clientWidth || document.getElementsByTagName('body')[0].clientWidth;
-                var y = window.innerHeight|| document.documentElement.clientHeight|| document.getElementsByTagName('body')[0].clientHeight;
-
-                var cmsURL = editor_config.path_absolute + 'laravel-filemanager?editor=' + meta.fieldname;
-                if (meta.filetype == 'image') {
-                    cmsURL = cmsURL + "&type=Images";
-                } else {
-                    cmsURL = cmsURL + "&type=Files";
-                }
-
-                tinyMCE.activeEditor.windowManager.openUrl({
-                    url : cmsURL,
-                    title : 'Filemanager',
-                    width : x * 0.8,
-                    height : y * 0.8,
-                    resizable : "yes",
-                    close_previous : "no",
-                    onMessage: (api, message) => {
-                    callback(message.content);
-                    }
-                });
-                }
-            };
-
-            tinymce.init(editor_config);
-        }
     },
 
     created() {
         this.setFormErrors();
     },
 
+
+
     mounted() {
-        this.tinymceInit();
+        tinymceInit();
+        this.setModalElValues();
+        this.cancelModalEvent();
         this.editStaffMemberSettings();
         this.todaysDate();
         this.editMode ?? this.setSubmittedValues();

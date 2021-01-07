@@ -18,9 +18,26 @@
     </div>
 </div>
 
+@php
 
+    $formErrors = [
+        'address' => $errors->get('address'),
+        'city' => $errors->get('city'),
+        'coordinator' => $errors->get('coordinator'),
+        'details' => $errors->get('details'),
+        'email'    => $errors->get('email'),
+        'name' => $errors->get('name'),
+        'phone' => $errors->get('phone'),
+        'image' => $errors->get('image'),
+        'zip'   => $errors->get('zip'),
+    ];
+
+
+
+@endphp
 
 <event-form-component
+    form-errors={{ json_encode($formErrors) }}
     img-path={{ url('ui-imgs/svgs/select-image.svg') }}
     action={{ route('events.store') }}
     csrf={{ csrf_token() }}

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Staff;
+use App\Models\Teaching;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreStaff;
 use Illuminate\Support\Facades\Storage;
@@ -83,8 +84,7 @@ class StaffController extends Controller
 
 
        if($createdStaffMemeber) {
-            // return redirect()->route('staff.index')->with('success', 'New staff member created');
-             return redirect()->back()->with('danger', 'Staff member could not be created');
+            return redirect()->route('staff.index')->with('success', 'New staff member created');
        } else {
            return redirect()->back()->with('danger', 'Staff member could not be created');
        }
@@ -155,10 +155,19 @@ class StaffController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
-        //
+
+
         $staffMember = Staff::find($id);
+        $staffMemberTeachings = $staffMember->teachings->all();
+
+
+        $request->has('delete_teachings') ?
+
+            $this->deleteStaffTeachings($staffMemberTeachings) :
+            $this->updateStaffTeachings($staffMemberTeachings, $staffMember->name);
+
 
 
         $deletedStaffMember = $staffMember->delete();
@@ -166,8 +175,7 @@ class StaffController extends Controller
 
         if($deletedStaffMember) {
 
-            if(Storage::exists($staffMember->image))
-                Storage::delete($staffMember->image);
+            $this->deleteImage($staffMember->image);
 
             return redirect()->route('staff.index')->with('success', 'Staff member has been deleted!');
 
@@ -178,4 +186,44 @@ class StaffController extends Controller
         }
 
     }
+
+
+    private function deleteStaffTeachings($teachings) {
+
+        foreach ($teachings as $teaching) {
+
+           $teaching = Teaching::find($teaching->id);
+
+
+           $this->deleteImage($teaching->ft_image);
+
+
+           $teaching->delete();
+
+
+        }
+
+    }
+
+    private function updateStaffTeachings($teachings, $name) {
+
+
+        foreach ($teachings as $teaching) {
+
+
+            $teaching = Teaching::find($teaching->id);
+            $teachingArray = $teaching->toArray();
+
+
+
+            $teachingArray['staff_id'] = null;
+            $teachingArray['speaker'] = $name;
+
+
+            $teaching->update($teachingArray);
+
+        }
+
+    }
+
 }

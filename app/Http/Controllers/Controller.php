@@ -35,14 +35,21 @@ class Controller extends BaseController
 
     protected function editStoreImage($imagePath, $imageFile) {
 
-        if (Storage::exists($imagePath)) {
-
-            Storage::delete($imagePath);
-        }
+        $this->deleteImage($imagePath);
 
         $path = $this->storeImage($imageFile);
 
         return $path;
+
+    }
+
+
+    protected function deleteImage($imagePath) {
+
+        if(Storage::exists($imagePath)) {
+
+            Storage::delete($imagePath);
+        }
 
     }
 

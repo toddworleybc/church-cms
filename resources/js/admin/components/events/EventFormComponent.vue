@@ -1,24 +1,78 @@
 <template>
 
-    <div class="admin-form event-create">
+    <div class="admin-form staff-create">
         <form id="event-form" method="post" :action="action" accept-charset="UTF-8" enctype="multipart/form-data">
 
         <input type="hidden" name="_token" :value="csrf">
         <input id="form-method" v-if="editMode" type="hidden" name="_method" value="PATCH">
 
+
         <div class="admin-form__wrapper">
             <div class="admin-form__main">
                 <div class="form-group">
-                    <label for="name">Enter Name</label>
-                    <input id="name" class="form-control" type="text" name="name" v-model="name">
+                    <label for="name">Event Name</label>
+                    <div v-if="errors.name.length" class="invalid-feedback d-block">
+                        {{ errors.name[0] }}
+                    </div>
+                    <input id="name" :class="[{'is-invalid': errors.name.length}, 'form-control']" type="text" name="name" v-model="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Coordinator Name/Host</label>
+                    <div v-if="errors.coordinator.length" class="invalid-feedback d-block">
+                        {{ errors.coordinator[0] }}
+                    </div>
+                    <input id="coordinator" :class="[{'is-invalid': errors.coordinator.length}, 'form-control']" type="text" name="coordinator" v-model="coordinator">
+                     <label for="phone">Coordinator Phone</label>
+                    <div v-if="errors.phone.length" class="invalid-feedback d-block">
+                        {{ errors.phone[0] }}
+                    </div>
+                    <input id="phone" :class="[{'is-invalid': errors.phone.length}, 'form-control']" type="phone" name="phone" v-model="phone">
+                    <label for="email">Coordinator Email</label>
+                    <div v-if="errors.email.length" class="invalid-feedback d-block">
+                        {{ errors.email[0] }}
+                    </div>
+                    <input id="email" :class="[{'is-invalid': errors.email.length}, 'form-control']" type="email" name="email" v-model="email">
+                </div>
+
+
+                <div class="form-group">
+                    <label for="address">Event Address</label>
+                    <div v-if="errors.address.length" class="invalid-feedback d-block">
+                        {{ errors.address[0] }}
+                    </div>
+                    <input id="address" :class="[{'is-invalid': errors.address.length}, 'form-control']" type="text" name="address" v-model="address">
+
+                     <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="city">City</label>
+                        <input type="text" class="form-control" id="city">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="state">State</label>
+                        <select id="state" class="form-control">
+                            <option selected>Choose...</option>
+                            <option>...</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="zip">Zip</label>
+                        <input type="text" class="form-control" id="zip">
+                    </div>
+                </div>
+
                 </div>
 
 
 
 
+
                 <div class="form-group">
-                    <label for="details">Enter Event Details</label>
-                    <textarea id="event-details" rows="25" class="form-control" type="text" name="details" v-model="details"></textarea>
+                    <label for="details">Event Details</label>
+                    <div v-if="errors.details.length" class="invalid-feedback">
+                        {{ errors.details[0] }}
+                    </div>
+                    <textarea id="details" rows="25" :class="[{'is-invalid': errors.details.length}, 'form-control wysiwyg']" type="text" name="details" v-model="details"></textarea>
                 </div>
             </div>
             <!-- end of main  -->
@@ -27,15 +81,31 @@
                 <div class="form-group admin-form__btns">
                     <button type="submit" class="btn btn-primary btns__icon"><span data-feather="user-plus"></span> {{editMode ? 'Update' : 'Create'}} Event</button>
                 </div>
+                <div class="form-group">
+                    <label for="event-date" class="d-block">Event Date</label>
+                    <input class="form-control" name="date" type="date" id="event-date">
+                </div>
+                <div class="form-group">
+                    <label for="event-time" class="d-block">Event time</label>
+                    <input class="form-control" name="time" type="time" id="event-time">
+                </div>
                 <div class="form-group admin-form__image">
-                    <label for="image">Profile Pic</label>
-                    <input @change="imagePreview" class="form-control-file admin-form__ft-img-input" name="image" type="file" id="image">
+                    <label for="image">Event Flyer</label>
+                    <div class="custom-file">
+                        <input @change="imagePreview"  class="form-control-file admin-form__ft-img-input" name="image" type="file" id="image">
+                    </div>
+
                     <div class="admin-form__image-preview">
 
-                        <img v-if="!image" class="img-fluid" :src="imgPath" alt="select-image">
+                        <img v-if="!image" aria-describedby="image-feedback" :class="[{ 'noinput-invalid': errors.image.length }, 'img-fluid']" :src="imgPath" alt="select-image">
 
-                        <img v-else :src="image" class="img-fluid d-block">
-                        <button v-if="image" @click.prevent="removeImg" id="remove-img" class="btn btn-light admin-form__remove-img-btn">&times; Remove Image</button>
+
+
+                        <img v-else :src="image" :class="[{ 'is-invalid': errors.image.length }, 'img-fluid d-block']">
+
+                        <div v-if="errors.image.length" id="image-feedback" class="invalid-feedback d-block">{{ errors.image[0] }}</div>
+
+                        <button v-if="image" @click.prevent="removeImg" id="remove-img" class="btn btn-light admin-form__sidebar-btn">&times; Remove Image</button>
                     </div>
                 </div>
                 <div v-if="editMode" class="admin-form__delete">
@@ -44,56 +114,99 @@
                 <div v-if="editMode" class="card bg-light mt-3 admin-form__timestamps">
                     <div class="card-body">
                         <p class="border-bottom"><span class="font-weight-bold">Date Created:</span> <br/>{{ createdDate }}</p>
-                         <p><span class="font-weight-bold">Modified Last:</span> <br/>{{ modifiedDate }}</p>
+                         <p class="border-bottom"><span class="font-weight-bold">Modified Last:</span> <br/>{{ modifiedDate }}</p>
                     </div>
                 </div>
             </div>
         </div>
 
-
-
-
         </form>
+
+
+
     </div>
-
-
-
-
 
 </template>
 
 <script>
+
+import { tinymceInit } from '../../mixins/tinymceEditor';
 
 const moment = require('moment');
 
 
 export default {
 
+    mixins: ['tinymceInit'],
+
     data() {
         return {
+            address: "",
+            city: "",
+            coordinator: "",
             createdDate: "",
+            date: "",
+            details: "",
             editMode: false,
+            email: "",
+            errors: "",
             event: "",
             image: '',
-            modifiedDate: ""
+            modifiedDate: "",
+            name: "",
+            oldValues: "",
+            phone: "",
+            state: "",
+            zip: ""
         }
     },
 
 
 
-    props: [ 'action', 'csrf', 'imgPath', 'eventData' ],
+    props: {
+        action: String,
+        csrf: String,
+        imgPath: String,
+        EventData: String,
+        submittedValues: String,
+        formErrors: String,
+    },
+
 
     methods: {
 
 
-         deleteEvent() {
+        // Events ===============
 
-            const confirmed = confirm(`Are you sure you want to delete event ${this.event.name}`);
+        dismissModal() {
+            $('#delete-staff').modal('hide');
+        },
 
-            if(confirmed) {
-                $('#form-method').val('DELETE');
+
+
+        deleteEvent() {
+            $('#form-method').val('DELETE');
+
+            setTimeout(() => {
                 $('#event-form').submit();
-            }
+            }, 100);
+        },
+
+
+        // ======================== #Events
+
+        dateDefaultVal(editModeDate = "") {
+
+            const input = $("#event-date");
+
+            let date = editModeDate ?
+
+                    editModeDate :
+                    moment().format("YYYY-MM-DD");
+
+
+            $(input).attr('value', date);
+
         },
 
 
@@ -101,7 +214,7 @@ export default {
         editEventSettings() {
 
 
-        // check if we are not on teaching create
+        // check if we are not on event create
             if(this.eventData) {
 
 
@@ -116,22 +229,21 @@ export default {
 
 
             // set values
-                // this.bio = this.staffMember.bio;
-                // this.name = this.staffMember.name;
-                // this.position = this.staffMember.position;
-
-            // set staff member is pastor
-                // if(this.staffMember.pastor)
-                //     $("#yes").prop('checked', true);
-
+                this.address = this.event.bio;
+                this.city = this.event.city;
+                this.details = this.event.details;
+                this.name = this.event.name;
+                this.state = this.event.state;
+                this.zip = this.event.zip;
 
 
+                this.dateDefaultVal(this.event.date);
 
             // set bio image if present for edit mode
                 this.image = imagePath !== "null" ? `${location.origin}/${imagePath}` :  "";
 
-                this.createdDate = moment(this.staffMember.created_at).format("dddd, MMMM Do YYYY, h:mm:ss a");
-                this.modifiedDate = moment(this.staffMember.updated_at).format("dddd, MMMM Do YYYY, h:mm:ss a");
+                this.createdDate = moment(this.event.created_at).format("dddd, MMMM Do YYYY, h:mm:ss a");
+                this.modifiedDate = moment(this.event.updated_at).format("dddd, MMMM Do YYYY, h:mm:ss a");
 
             }
         },
@@ -142,6 +254,7 @@ export default {
             const file = e.target.files[0];
             this.readFile(file);
         },
+
 
         readFile(file) {
 
@@ -159,59 +272,44 @@ export default {
             this.image = '';
         },
 
+
+         setFormErrors() {
+            this.errors = JSON.parse(this.formErrors);
+        },
+
+
+        setSubmittedValues() {
+            this.oldValues = JSON.parse(this.submittedValues);
+
+            this.address = this.event.bio;
+            this.city = this.event.city;
+            this.details = this.event.details;
+            this.name = this.event.name;
+            this.state = this.event.state;
+            this.zip = this.event.zip;
+
+
+        },
+
          todaysDate() {
             const today = moment().format('dddd MMM Do, YYYY');
              $('#today').text(today);
         },
 
-
-
-// install tinymce
-        tinymceInit() {
-            var editor_config = {
-                path_absolute : "/",
-                selector: '#event-details',
-                relative_urls: false,
-                plugins: [
-                "advlist autolink lists link image charmap print preview hr anchor pagebreak",
-                "searchreplace wordcount visualblocks visualchars code fullscreen",
-                "insertdatetime media nonbreaking save table directionality",
-                "emoticons template paste textpattern"
-                ],
-                toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media",
-                file_picker_callback : function(callback, value, meta) {
-                var x = window.innerWidth || document.documentElement.clientWidth || document.getElementsByTagName('body')[0].clientWidth;
-                var y = window.innerHeight|| document.documentElement.clientHeight|| document.getElementsByTagName('body')[0].clientHeight;
-
-                var cmsURL = editor_config.path_absolute + 'laravel-filemanager?editor=' + meta.fieldname;
-                if (meta.filetype == 'image') {
-                    cmsURL = cmsURL + "&type=Images";
-                } else {
-                    cmsURL = cmsURL + "&type=Files";
-                }
-
-                tinyMCE.activeEditor.windowManager.openUrl({
-                    url : cmsURL,
-                    title : 'Filemanager',
-                    width : x * 0.8,
-                    height : y * 0.8,
-                    resizable : "yes",
-                    close_previous : "no",
-                    onMessage: (api, message) => {
-                    callback(message.content);
-                    }
-                });
-                }
-            };
-
-            tinymce.init(editor_config);
-        }
     },
 
+    created() {
+        this.setFormErrors();
+    },
+
+
+
     mounted() {
-        this.tinymceInit();
+        tinymceInit();
+        this.dateDefaultVal();
         this.editEventSettings();
         this.todaysDate();
+        this.editMode ?? this.setSubmittedValues();
     }
 
 

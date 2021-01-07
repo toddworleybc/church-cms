@@ -11087,6 +11087,12 @@ body {
   font-size: 1rem;
 }
 
+.center-block {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
 .btns__icon {
   display: flex;
   justify-content: center;
@@ -11350,14 +11356,25 @@ body {
   }
 }
 
-.admin-form__image .is-invalid {
+.admin-form .noinput-invalid {
   border: 1px solid red;
-  padding: 10px;
+  padding: 0.625rem !important;
+  padding-bottom: 5px;
+}
+
+.admin-form .invalid-feedback {
+  font-size: 90%;
 }
 
 .admin-form .form-group {
   padding: 1.5rem 0;
   border-bottom: 1px solid #576574;
+}
+
+.admin-form .form-row .form-group {
+  padding: 0 5px;
+  margin-bottom: 0;
+  border-bottom: none;
 }
 
 .admin-form__main {
@@ -11374,7 +11391,7 @@ body {
   margin-top: 1rem;
 }
 
-.admin-form__remove-img-btn {
+.admin-form__sidebar-btn {
   margin-top: 1rem;
 }
 

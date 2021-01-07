@@ -1908,6 +1908,7 @@ module.exports = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _mixins_tinymceEditor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../mixins/tinymceEditor */ "./resources/js/admin/mixins/tinymceEditor.js");
 //
 //
 //
@@ -1972,47 +1973,145 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
 var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+  mixins: ['tinymceInit'],
   data: function data() {
     return {
+      address: "",
+      city: "",
+      coordinator: "",
       createdDate: "",
+      date: "",
+      details: "",
       editMode: false,
+      email: "",
+      errors: "",
       event: "",
       image: '',
-      modifiedDate: ""
+      modifiedDate: "",
+      name: "",
+      oldValues: "",
+      phone: "",
+      state: "",
+      zip: ""
     };
   },
-  props: ['action', 'csrf', 'imgPath', 'eventData'],
+  props: {
+    action: String,
+    csrf: String,
+    imgPath: String,
+    EventData: String,
+    submittedValues: String,
+    formErrors: String
+  },
   methods: {
+    // Events ===============
+    dismissModal: function dismissModal() {
+      $('#delete-staff').modal('hide');
+    },
     deleteEvent: function deleteEvent() {
-      var confirmed = confirm("Are you sure you want to delete event ".concat(this.event.name));
-
-      if (confirmed) {
-        $('#form-method').val('DELETE');
+      $('#form-method').val('DELETE');
+      setTimeout(function () {
         $('#event-form').submit();
-      }
+      }, 100);
+    },
+    // ======================== #Events
+    dateDefaultVal: function dateDefaultVal() {
+      var editModeDate = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+      var input = $("#event-date");
+      var date = editModeDate ? editModeDate : moment().format("YYYY-MM-DD");
+      $(input).attr('value', date);
     },
     editEventSettings: function editEventSettings() {
-      // check if we are not on teaching create
+      // check if we are not on event create
       if (this.eventData) {
         // get the data
         this.event = JSON.parse(this.eventData);
         var imagePath = "".concat(this.event.image); // switch template to edit mode
 
         this.editMode = true; // set values
-        // this.bio = this.staffMember.bio;
-        // this.name = this.staffMember.name;
-        // this.position = this.staffMember.position;
-        // set staff member is pastor
-        // if(this.staffMember.pastor)
-        //     $("#yes").prop('checked', true);
-        // set bio image if present for edit mode
+
+        this.address = this.event.bio;
+        this.city = this.event.city;
+        this.details = this.event.details;
+        this.name = this.event.name;
+        this.state = this.event.state;
+        this.zip = this.event.zip;
+        this.dateDefaultVal(this.event.date); // set bio image if present for edit mode
 
         this.image = imagePath !== "null" ? "".concat(location.origin, "/").concat(imagePath) : "";
-        this.createdDate = moment(this.staffMember.created_at).format("dddd, MMMM Do YYYY, h:mm:ss a");
-        this.modifiedDate = moment(this.staffMember.updated_at).format("dddd, MMMM Do YYYY, h:mm:ss a");
+        this.createdDate = moment(this.event.created_at).format("dddd, MMMM Do YYYY, h:mm:ss a");
+        this.modifiedDate = moment(this.event.updated_at).format("dddd, MMMM Do YYYY, h:mm:ss a");
       }
     },
     // insert featured image onto screen before loading into the database
@@ -2033,49 +2132,34 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
       $('#image').val('');
       this.image = '';
     },
+    setFormErrors: function setFormErrors() {
+      this.errors = JSON.parse(this.formErrors);
+    },
+    setSubmittedValues: function setSubmittedValues() {
+      this.oldValues = JSON.parse(this.submittedValues);
+      this.address = this.event.bio;
+      this.city = this.event.city;
+      this.details = this.event.details;
+      this.name = this.event.name;
+      this.state = this.event.state;
+      this.zip = this.event.zip;
+    },
     todaysDate: function todaysDate() {
       var today = moment().format('dddd MMM Do, YYYY');
       $('#today').text(today);
-    },
-    // install tinymce
-    tinymceInit: function tinymceInit() {
-      var editor_config = {
-        path_absolute: "/",
-        selector: '#event-details',
-        relative_urls: false,
-        plugins: ["advlist autolink lists link image charmap print preview hr anchor pagebreak", "searchreplace wordcount visualblocks visualchars code fullscreen", "insertdatetime media nonbreaking save table directionality", "emoticons template paste textpattern"],
-        toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media",
-        file_picker_callback: function file_picker_callback(callback, value, meta) {
-          var x = window.innerWidth || document.documentElement.clientWidth || document.getElementsByTagName('body')[0].clientWidth;
-          var y = window.innerHeight || document.documentElement.clientHeight || document.getElementsByTagName('body')[0].clientHeight;
-          var cmsURL = editor_config.path_absolute + 'laravel-filemanager?editor=' + meta.fieldname;
-
-          if (meta.filetype == 'image') {
-            cmsURL = cmsURL + "&type=Images";
-          } else {
-            cmsURL = cmsURL + "&type=Files";
-          }
-
-          tinyMCE.activeEditor.windowManager.openUrl({
-            url: cmsURL,
-            title: 'Filemanager',
-            width: x * 0.8,
-            height: y * 0.8,
-            resizable: "yes",
-            close_previous: "no",
-            onMessage: function onMessage(api, message) {
-              callback(message.content);
-            }
-          });
-        }
-      };
-      tinymce.init(editor_config);
     }
   },
+  created: function created() {
+    this.setFormErrors();
+  },
   mounted: function mounted() {
-    this.tinymceInit();
+    var _this$editMode;
+
+    Object(_mixins_tinymceEditor__WEBPACK_IMPORTED_MODULE_0__["tinymceInit"])();
+    this.dateDefaultVal();
     this.editEventSettings();
     this.todaysDate();
+    (_this$editMode = this.editMode) !== null && _this$editMode !== void 0 ? _this$editMode : this.setSubmittedValues();
   }
 }); // end of export default
 
@@ -2126,7 +2210,12 @@ __webpack_require__.r(__webpack_exports__);
       filterPositions: ""
     };
   },
-  props: ['direction', 'filter', 'orderBy', 'staffPositions'],
+  props: {
+    direction: String,
+    filter: String,
+    orderBy: String,
+    staffPositions: String
+  },
   methods: {
     filterTable: function filterTable(e) {
       var filterSelectVal = $(e.target).val(),
@@ -2212,6 +2301,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _mixins_tinymceEditor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../mixins/tinymceEditor */ "./resources/js/admin/mixins/tinymceEditor.js");
 //
 //
 //
@@ -2313,16 +2403,47 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
 var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+  mixins: ['tinymceInit'],
   data: function data() {
     return {
       bio: "",
       createdDate: "",
+      deleteConfirm: false,
+      deleteTeachings: false,
       editMode: false,
       errors: "",
       image: '',
+      modalBody: '',
+      modalTitle: '',
       modifiedDate: "",
       name: "",
       position: "",
@@ -2330,14 +2451,60 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
       oldValues: ""
     };
   },
-  props: ['action', 'csrf', 'imgPath', 'staffData', 'submittedValues', 'formErrors'],
+  props: {
+    action: String,
+    csrf: String,
+    imgPath: String,
+    staffData: String,
+    submittedValues: String,
+    formErrors: String,
+    teachingsCount: String
+  },
   methods: {
-    deleteStaffMember: function deleteStaffMember() {
-      var confirmed = confirm("Are you sure you want to delete staff member ".concat(this.staffMember.name));
+    // Events ===============
+    dismissModal: function dismissModal() {
+      $('#delete-staff').modal('hide');
+    },
+    cancelModalEvent: function cancelModalEvent() {
+      var _this = this;
 
-      if (confirmed) {
-        $('#form-method').val('DELETE');
+      $('#delete-staff').on('hidden.bs.modal', function () {
+        _this.deleteTeachings = false;
+        _this.deleteConfirm = false;
+      });
+    },
+    deleteSubmit: function deleteSubmit() {
+      $('#form-method').val('DELETE');
+      setTimeout(function () {
         $('#staff-form').submit();
+      }, 100);
+    },
+    // ======================== #Events
+    deleteStaffMember: function deleteStaffMember(e, deleteTeachings) {
+      if (deleteTeachings) {
+        this.deleteConfirm = true;
+        if (deleteTeachings === 'delete_staff_teachings') this.deleteTeachings = true;
+        var htmlTitle = "<span class=\"alert alert-danger\">Confirm Permanent Delete!</span>",
+            htmlBody = "Are you sure you want to permanently delete staff member ".concat(this.name);
+
+        if (this.deleteTeachings) {
+          htmlBody += " and ".concat(this.teachingsCount, " teachings associated with staff member?");
+        } else {
+          htmlBody += "?";
+        }
+
+        $(this.modalTitle).html(htmlTitle);
+        $(this.modalBody).html(htmlBody);
+      }
+
+      if (!deleteTeachings) {
+        var _htmlTitle = "Are you sure you want to delete this staff member?";
+
+        var _htmlBody = "\n                        <div class=\"w-50\">\n                        <table class=\"table table-borderless border text-center mb-0\">\n\n                            <tr>\n                                <td>Name:</td>\n                                <td>".concat(this.name, "</td>\n                            </tr>\n\n\n                            <tr>\n                                <td>Position:</td>\n                                <td>").concat(this.position, "</td>\n                            </tr>\n\n\n                            <tr>\n                                <td>Teachings:</td>\n                                <td>").concat(this.teachingsCount, "</td>\n                            </tr>\n\n                        </table>\n                        </div>\n                    ");
+
+        $(this.modalTitle).html(_htmlTitle);
+        $(this.modalBody).html(_htmlBody);
+        $('#delete-staff').modal('show');
       }
     },
     editStaffMemberSettings: function editStaffMemberSettings() {
@@ -2366,11 +2533,11 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
       this.readFile(file);
     },
     readFile: function readFile(file) {
-      var _this = this;
+      var _this2 = this;
 
       var reader = new FileReader();
       $(reader).on('load', function (e) {
-        _this.image = e.target.result;
+        _this2.image = e.target.result;
       });
       reader.readAsDataURL(file);
     },
@@ -2380,6 +2547,10 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
     },
     setFormErrors: function setFormErrors() {
       this.errors = JSON.parse(this.formErrors);
+    },
+    setModalElValues: function setModalElValues() {
+      this.modalBody = $('.modal-body');
+      this.modalTitle = $('.modal-title');
     },
     setSubmittedValues: function setSubmittedValues() {
       this.oldValues = JSON.parse(this.submittedValues);
@@ -2391,40 +2562,6 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
     todaysDate: function todaysDate() {
       var today = moment().format('dddd MMM Do, YYYY');
       $('#today').text(today);
-    },
-    // install tinymce
-    tinymceInit: function tinymceInit() {
-      var editor_config = {
-        path_absolute: "/",
-        selector: '#bio',
-        relative_urls: false,
-        plugins: ["advlist autolink lists link image charmap print preview hr anchor pagebreak", "searchreplace wordcount visualblocks visualchars code fullscreen", "insertdatetime media nonbreaking save table directionality", "emoticons template paste textpattern"],
-        toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media",
-        file_picker_callback: function file_picker_callback(callback, value, meta) {
-          var x = window.innerWidth || document.documentElement.clientWidth || document.getElementsByTagName('body')[0].clientWidth;
-          var y = window.innerHeight || document.documentElement.clientHeight || document.getElementsByTagName('body')[0].clientHeight;
-          var cmsURL = editor_config.path_absolute + 'laravel-filemanager?editor=' + meta.fieldname;
-
-          if (meta.filetype == 'image') {
-            cmsURL = cmsURL + "&type=Images";
-          } else {
-            cmsURL = cmsURL + "&type=Files";
-          }
-
-          tinyMCE.activeEditor.windowManager.openUrl({
-            url: cmsURL,
-            title: 'Filemanager',
-            width: x * 0.8,
-            height: y * 0.8,
-            resizable: "yes",
-            close_previous: "no",
-            onMessage: function onMessage(api, message) {
-              callback(message.content);
-            }
-          });
-        }
-      };
-      tinymce.init(editor_config);
     }
   },
   created: function created() {
@@ -2433,7 +2570,9 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
   mounted: function mounted() {
     var _this$editMode;
 
-    this.tinymceInit();
+    Object(_mixins_tinymceEditor__WEBPACK_IMPORTED_MODULE_0__["tinymceInit"])();
+    this.setModalElValues();
+    this.cancelModalEvent();
     this.editStaffMemberSettings();
     this.todaysDate();
     (_this$editMode = this.editMode) !== null && _this$editMode !== void 0 ? _this$editMode : this.setSubmittedValues();
@@ -2484,7 +2623,9 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
       staffMembers: []
     };
   },
-  props: ['staffData'],
+  props: {
+    staffData: String
+  },
   methods: {
     // convert table dates
     dateConvert: function dateConvert() {
@@ -2577,7 +2718,9 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
     };
   },
   //#-data
-  props: ['scriptureHtml'],
+  props: {
+    scriptureHtml: String
+  },
   methods: {
     // EVENTS =============
     // =====================
@@ -2800,7 +2943,10 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       // disables generate button when options is searching
       $("#scripture-gen").prop('disabled', true); // Stop extra request on end_verse onChange
 
-      if (e.target.name === 'end_verse') return;
+      if (e.target.name === 'end_verse') {
+        $("#scripture-gen").prop('disabled', false);
+        return;
+      }
 
       if (e.target.name === 'book') {
         $(e.target).removeClass('is-invalid');
@@ -3051,7 +3197,10 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
       teachings: []
     };
   },
-  props: ["teachingsData", "staffNamesData"],
+  props: {
+    teachingsData: String,
+    staffNamesData: String
+  },
   methods: {
     // convert table dates
     dateConvert: function dateConvert() {
@@ -3125,7 +3274,11 @@ __webpack_require__.r(__webpack_exports__);
       baseUrl: "".concat(location.origin, "/admin/teachings?")
     };
   },
-  props: ['direction', 'filter', 'orderBy'],
+  props: {
+    direction: String,
+    filter: String,
+    orderBy: String
+  },
   methods: {
     filterTable: function filterTable(e) {
       var filterSelectVal = $(e.target).val(),
@@ -3190,6 +3343,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _mixins_tinymceEditor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../mixins/tinymceEditor */ "./resources/js/admin/mixins/tinymceEditor.js");
 //
 //
 //
@@ -3330,25 +3484,73 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-var ScriptureComponent = Vue.component('scripture-component', __webpack_require__(/*! ./ScriptureComponent.vue */ "./resources/js/admin/components/teachings/ScriptureComponent.vue")["default"]);
-
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 
+
+var ScriptureComponent = Vue.component('scripture-component', __webpack_require__(/*! ./ScriptureComponent.vue */ "./resources/js/admin/components/teachings/ScriptureComponent.vue")["default"]);
 /* harmony default export */ __webpack_exports__["default"] = ({
+  mixins: ['tinymceInit'],
   data: function data() {
     return {
+      afterText: "",
       audioId: '',
       audioUrl: '',
       baseUrl: location.origin + "/api/",
+      beforeText: "",
       createdDate: "",
       description: '',
       editMode: false,
       enterSpeaker: false,
+      errors: "",
       formSubmitting: false,
       ftImg: "",
       loader: false,
       loadmore: true,
       loadMoreBtn: false,
+      oldValues: "",
       mediaSelected: false,
       mediaType: '',
       modifiedDate: "",
@@ -3369,7 +3571,15 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
   components: {
     ScriptureComponent: ScriptureComponent
   },
-  props: ['action', 'csrf', 'teachingData', 'imgPath', 'staffMembers'],
+  props: {
+    action: String,
+    csrf: String,
+    teachingData: String,
+    imgPath: String,
+    staffMembers: String,
+    formErrors: String,
+    submittedValues: String
+  },
   computed: {
     setStatusCssStyling: function setStatusCssStyling() {
       var statusClass = "admin-form__time d-inline-block alert alert-";
@@ -3388,8 +3598,12 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
         _this.insertAudio(e);
       });
     },
+    clearDescription: function clearDescription() {
+      $("#description").val("");
+    },
     // insert featured image onto screen before loading into the database
     imagePreview: function imagePreview(e) {
+      this.errors.ft_image = [];
       var file = e.target.files[0];
       this.readFile(file);
     },
@@ -3400,7 +3614,6 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
     speakerCheckbox: function speakerCheckbox() {
       var _this2 = this;
 
-      console.log('hello');
       this.enterSpeaker ? this.enterSpeaker = false : this.enterSpeaker = true;
       setTimeout(function () {
         _this2.setStaffOptions();
@@ -3417,6 +3630,74 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
           _this3.selectMedia(e);
         });
       });
+    },
+    // and event for select before after text
+    selectBeforeAfterText: function selectBeforeAfterText() {
+      var e = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      var value = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+      var selectValue = e ? $(e.target).val() : value,
+          beforeText = $("#before-text"),
+          afterText = $("#after-text"),
+          htmlContainer = $("#select-text-container");
+      var beforeHtml = "<div id=\"before-text\" class=\"form-group\">\n\n                    <label for=\"before\">Before Scripture Text</label>\n                    <textarea class=\"form-control wysiwyg\" name=\"before_text\" id=\"before\" cols=\"30\" rows=\"15\"></textarea>\n\n                </div>";
+      var afterHtml = "<div id=\"after-text\" class=\"form-group\">\n\n                    <label for=\"after\">After Scripture Text</label>\n                    <textarea class=\"form-control wysiwyg\" name=\"after_text\" id=\"after\" cols=\"30\" rows=\"15\"></textarea>\n\n                </div>";
+
+      switch (selectValue) {
+        case 'before':
+          $('#after-text').remove();
+          if (!$(beforeText).length) $(htmlContainer).prepend(beforeHtml);
+
+          if (this.beforeText) {
+            $('#before').html(this.beforeText);
+            this.beforeText = "";
+            $("[value=before]").prop('selected', true);
+          }
+
+          break;
+
+        case 'after':
+          $('#before-text').remove();
+          if (!$(afterText).length) $(htmlContainer).append(afterHtml);
+
+          if (this.afterText) {
+            $('#after').html(this.afterText);
+            this.afterText = "";
+            $("[value=after]").prop('selected', true);
+          }
+
+          break;
+
+        case 'both':
+          if ($(beforeText).length) {
+            $(htmlContainer).append(afterHtml);
+            break;
+          }
+
+          if ($(afterText).length) {
+            $(htmlContainer).prepend(beforeHtml);
+            break;
+          }
+
+          $(htmlContainer).prepend(beforeHtml);
+          $(htmlContainer).append(afterHtml);
+          $('#before').html(this.beforeText);
+          this.beforeText = "";
+          $('#after').html(this.afterText);
+          this.afterText = "";
+          $("[value=both]").prop('selected', true);
+          break;
+
+        default:
+          $(htmlContainer).html('');
+          $("[value=none]").prop('selected', true);
+          break;
+      } // Remove previous instances for re-rendering on toggle
+
+
+      tinymce.remove();
+      setTimeout(function () {
+        Object(_mixins_tinymceEditor__WEBPACK_IMPORTED_MODULE_0__["tinymceInit"])();
+      }, 100);
     },
     teachingSubmitForm: function teachingSubmitForm(e) {
       if (!this.formSubmitting) {
@@ -3494,14 +3775,15 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
         this.videoValue = videoUrl;
       }
     },
+    // WOKING HERE====================
     editTeachingSettings: function editTeachingSettings() {
       // check if we are not on teaching create
       if (this.teachingData) {
-        // get the data
-        this.teaching = JSON.parse(this.teachingData);
-        var imagePath = "".concat(this.teaching.ft_image); // switch template to edit mode
+        // switch template to edit mode
+        this.editMode = true; // get the data
 
-        this.editMode = true; // set values
+        this.teaching = JSON.parse(this.teachingData);
+        var imagePath = "".concat(this.teaching.ft_image); // set values
 
         this.setEditTeachingTitle(this.teaching);
         this.description = this.teaching.description;
@@ -3509,7 +3791,9 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
         this.insertEditVideoValues(this.teaching.video);
         this.audioUrl = this.teaching.audio;
         this.status = this.teaching.status;
-        this.setEditStaffSpeakerValues(this.teaching);
+        this.setEditStaffSpeakerValues(this.teaching); // set the before and after scripture text
+
+        this.setSelectTextValues(this.teaching);
         this.dateDefaultVal(this.teaching.publish_date); // set featured image if present for edit mode
 
         this.ftImg = imagePath !== "null" ? "".concat(location.origin, "/").concat(imagePath) : ""; // set date meta at end of sidebar
@@ -3519,8 +3803,40 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
         this.modifiedDate = moment(this.teaching.updated_at).format("dddd, MMMM Do YYYY, h:mm:ss a");
       }
     },
+    setSubmittedValues: function setSubmittedValues() {
+      if (this.submittedValues) {
+        this.oldValues = JSON.parse(this.submittedValues);
+        if (this.oldValues.title) this.setEditTeachingTitle(this.oldValues);
+        if (this.oldValues.staff_id || this.oldValues.speaker) this.setEditStaffSpeakerValues(this.oldValues);
+        if (this.oldValues.video) this.insertEditVideoValues(this.oldValues.video);
+        if (this.oldValues.audio) this.audioUrl = this.oldValues.audio;
+        if (this.oldValues.before_text || this.oldValues.after_text) this.setSelectTextValues(this.oldValues);
+        if (this.oldValues.scripture) this.scriptureHtml = this.oldValues.scripture;
+        if (this.oldValues.description) this.description = this.oldValues.description;
+        if (this.oldValues.publish_date) this.dateDefaultVal(this.oldValues.publish_date);
+      }
+    },
+    setSelectTextValues: function setSelectTextValues(teaching) {
+      // select text options
+      this.beforeText = teaching.before_text;
+      this.afterText = teaching.after_text;
+
+      if (this.beforeText && this.afterText) {
+        this.selectBeforeAfterText(null, 'both');
+        return;
+      }
+
+      if (this.beforeText) {
+        this.selectBeforeAfterText(null, 'before');
+        return;
+      }
+
+      if (this.afterText) {
+        this.selectBeforeAfterText(null, 'after');
+        return;
+      }
+    },
     setEditStaffSpeakerValues: function setEditStaffSpeakerValues(teaching) {
-      // NEED TO FIX THE STAFF ID AND SPEAKER. NOT RECOGNIZING WHEN BOTH SPEAKER AND STAFF ID ARE PRESENT WHAT TO DO!!!!!!!!!
       if (!teaching.staff_id) {
         this.speaker = teaching.speaker;
         this.enterSpeaker = true;
@@ -3605,10 +3921,18 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
     },
     insertAudio: function insertAudio(e) {
       if (e.type === 'change') {
+        var regEx = /\w{5}-\w{6}/;
         var audioValue = $(e.target).val();
-        audioValue = audioValue.replace('share', 'player');
-        audioValue = audioValue.replace('pb-', '');
-        this.audioUrl = audioValue;
+
+        if (audioValue.includes('www.podbean.com')) {
+          var audioId = audioValue.match(regEx)[0],
+              audioUrl = "https://www.podbean.com/media/player/".concat(audioId);
+          this.audioUrl = audioUrl;
+        } else {
+          this.errors.audio.push('URL must come from Podbean!');
+          this.audioUrl = "";
+          $(e.target).val("");
+        }
       }
     },
     insertMedia: function insertMedia(e) {
@@ -3633,7 +3957,16 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
           this.vidSrc = '';
           return;
         } else {
-          this.vidId = vidVal.match(regX)[0];
+          if (vidVal.match(regX)) {
+            this.vidId = vidVal.match(regX)[0];
+          } else {
+            $(e.target).val("");
+            this.videoValue = "";
+            this.vidId = "";
+            this.vidSrc = "";
+            this.errors.video.push('URL must be a share Youtube URL');
+            return;
+          }
         }
       }
 
@@ -3720,6 +4053,9 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
     setDescription: function setDescription(description) {
       this.description = description;
     },
+    setFormErrors: function setFormErrors() {
+      this.errors = JSON.parse(this.formErrors);
+    },
     setStaffOptions: function setStaffOptions() {
       var staffSelect = $('#staff-select'),
           staffData = JSON.parse(this.staffMembers);
@@ -3741,13 +4077,18 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
     }
   },
   // end of methods =========/
+  created: function created() {
+    this.setFormErrors();
+  },
   mounted: function mounted() {
+    Object(_mixins_tinymceEditor__WEBPACK_IMPORTED_MODULE_0__["tinymceInit"])();
     this.audioValueChange();
     this.dateDefaultVal();
     this.modalBackdropClickCancel();
     this.setStaffOptions();
     this.todaysDate();
-    this.vidValueChange(); // Run to set all values last
+    this.vidValueChange();
+    this.setSubmittedValues(); // Run to set all values last
 
     this.editTeachingSettings();
   }
@@ -68670,7 +69011,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "admin-form event-create" }, [
+  return _c("div", { staticClass: "admin-form staff-create" }, [
     _c(
       "form",
       {
@@ -68702,7 +69043,17 @@ var render = function() {
         _c("div", { staticClass: "admin-form__wrapper" }, [
           _c("div", { staticClass: "admin-form__main" }, [
             _c("div", { staticClass: "form-group" }, [
-              _c("label", { attrs: { for: "name" } }, [_vm._v("Enter Name")]),
+              _c("label", { attrs: { for: "name" } }, [_vm._v("Event Name")]),
+              _vm._v(" "),
+              _vm.errors.name.length
+                ? _c("div", { staticClass: "invalid-feedback d-block" }, [
+                    _vm._v(
+                      "\n                    " +
+                        _vm._s(_vm.errors.name[0]) +
+                        "\n                "
+                    )
+                  ])
+                : _vm._e(),
               _vm._v(" "),
               _c("input", {
                 directives: [
@@ -68713,8 +69064,11 @@ var render = function() {
                     expression: "name"
                   }
                 ],
-                staticClass: "form-control",
-                attrs: { id: "name", type: "text", name: "name" },
+                class: [
+                  { "is-invalid": _vm.errors.name.length },
+                  "form-control"
+                ],
+                attrs: { id: "name", type: "text", name: "name", required: "" },
                 domProps: { value: _vm.name },
                 on: {
                   input: function($event) {
@@ -68728,9 +69082,181 @@ var render = function() {
             ]),
             _vm._v(" "),
             _c("div", { staticClass: "form-group" }, [
-              _c("label", { attrs: { for: "details" } }, [
-                _vm._v("Enter Event Details")
+              _c("label", { attrs: { for: "name" } }, [
+                _vm._v("Coordinator Name/Host")
               ]),
+              _vm._v(" "),
+              _vm.errors.coordinator.length
+                ? _c("div", { staticClass: "invalid-feedback d-block" }, [
+                    _vm._v(
+                      "\n                    " +
+                        _vm._s(_vm.errors.coordinator[0]) +
+                        "\n                "
+                    )
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.coordinator,
+                    expression: "coordinator"
+                  }
+                ],
+                class: [
+                  { "is-invalid": _vm.errors.coordinator.length },
+                  "form-control"
+                ],
+                attrs: { id: "coordinator", type: "text", name: "coordinator" },
+                domProps: { value: _vm.coordinator },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.coordinator = $event.target.value
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _c("label", { attrs: { for: "phone" } }, [
+                _vm._v("Coordinator Phone")
+              ]),
+              _vm._v(" "),
+              _vm.errors.phone.length
+                ? _c("div", { staticClass: "invalid-feedback d-block" }, [
+                    _vm._v(
+                      "\n                    " +
+                        _vm._s(_vm.errors.phone[0]) +
+                        "\n                "
+                    )
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.phone,
+                    expression: "phone"
+                  }
+                ],
+                class: [
+                  { "is-invalid": _vm.errors.phone.length },
+                  "form-control"
+                ],
+                attrs: { id: "phone", type: "phone", name: "phone" },
+                domProps: { value: _vm.phone },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.phone = $event.target.value
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _c("label", { attrs: { for: "email" } }, [
+                _vm._v("Coordinator Email")
+              ]),
+              _vm._v(" "),
+              _vm.errors.email.length
+                ? _c("div", { staticClass: "invalid-feedback d-block" }, [
+                    _vm._v(
+                      "\n                    " +
+                        _vm._s(_vm.errors.email[0]) +
+                        "\n                "
+                    )
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.email,
+                    expression: "email"
+                  }
+                ],
+                class: [
+                  { "is-invalid": _vm.errors.email.length },
+                  "form-control"
+                ],
+                attrs: { id: "email", type: "email", name: "email" },
+                domProps: { value: _vm.email },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.email = $event.target.value
+                  }
+                }
+              })
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "form-group" }, [
+              _c("label", { attrs: { for: "address" } }, [
+                _vm._v("Event Address")
+              ]),
+              _vm._v(" "),
+              _vm.errors.address.length
+                ? _c("div", { staticClass: "invalid-feedback d-block" }, [
+                    _vm._v(
+                      "\n                    " +
+                        _vm._s(_vm.errors.address[0]) +
+                        "\n                "
+                    )
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.address,
+                    expression: "address"
+                  }
+                ],
+                class: [
+                  { "is-invalid": _vm.errors.address.length },
+                  "form-control"
+                ],
+                attrs: { id: "address", type: "text", name: "address" },
+                domProps: { value: _vm.address },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.address = $event.target.value
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _vm._m(0)
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "form-group" }, [
+              _c("label", { attrs: { for: "details" } }, [
+                _vm._v("Event Details")
+              ]),
+              _vm._v(" "),
+              _vm.errors.details.length
+                ? _c("div", { staticClass: "invalid-feedback" }, [
+                    _vm._v(
+                      "\n                    " +
+                        _vm._s(_vm.errors.details[0]) +
+                        "\n                "
+                    )
+                  ])
+                : _vm._e(),
               _vm._v(" "),
               _c("textarea", {
                 directives: [
@@ -68741,9 +69267,12 @@ var render = function() {
                     expression: "details"
                   }
                 ],
-                staticClass: "form-control",
+                class: [
+                  { "is-invalid": _vm.errors.details.length },
+                  "form-control wysiwyg"
+                ],
                 attrs: {
-                  id: "event-details",
+                  id: "details",
                   rows: "25",
                   type: "text",
                   name: "details"
@@ -68762,7 +69291,7 @@ var render = function() {
           ]),
           _vm._v(" "),
           _c("div", { staticClass: "admin-form__sidebar" }, [
-            _vm._m(0),
+            _vm._m(1),
             _vm._v(" "),
             _c("div", { staticClass: "form-group admin-form__btns" }, [
               _c(
@@ -68780,31 +69309,58 @@ var render = function() {
               )
             ]),
             _vm._v(" "),
+            _vm._m(2),
+            _vm._v(" "),
+            _vm._m(3),
+            _vm._v(" "),
             _c("div", { staticClass: "form-group admin-form__image" }, [
-              _c("label", { attrs: { for: "image" } }, [_vm._v("Profile Pic")]),
+              _c("label", { attrs: { for: "image" } }, [_vm._v("Event Flyer")]),
               _vm._v(" "),
-              _c("input", {
-                staticClass: "form-control-file admin-form__ft-img-input",
-                attrs: { name: "image", type: "file", id: "image" },
-                on: { change: _vm.imagePreview }
-              }),
+              _c("div", { staticClass: "custom-file" }, [
+                _c("input", {
+                  staticClass: "form-control-file admin-form__ft-img-input",
+                  attrs: { name: "image", type: "file", id: "image" },
+                  on: { change: _vm.imagePreview }
+                })
+              ]),
               _vm._v(" "),
               _c("div", { staticClass: "admin-form__image-preview" }, [
                 !_vm.image
                   ? _c("img", {
-                      staticClass: "img-fluid",
-                      attrs: { src: _vm.imgPath, alt: "select-image" }
+                      class: [
+                        { "noinput-invalid": _vm.errors.image.length },
+                        "img-fluid"
+                      ],
+                      attrs: {
+                        "aria-describedby": "image-feedback",
+                        src: _vm.imgPath,
+                        alt: "select-image"
+                      }
                     })
                   : _c("img", {
-                      staticClass: "img-fluid d-block",
+                      class: [
+                        { "is-invalid": _vm.errors.image.length },
+                        "img-fluid d-block"
+                      ],
                       attrs: { src: _vm.image }
                     }),
+                _vm._v(" "),
+                _vm.errors.image.length
+                  ? _c(
+                      "div",
+                      {
+                        staticClass: "invalid-feedback d-block",
+                        attrs: { id: "image-feedback" }
+                      },
+                      [_vm._v(_vm._s(_vm.errors.image[0]))]
+                    )
+                  : _vm._e(),
                 _vm._v(" "),
                 _vm.image
                   ? _c(
                       "button",
                       {
-                        staticClass: "btn btn-light admin-form__remove-img-btn",
+                        staticClass: "btn btn-light admin-form__sidebar-btn",
                         attrs: { id: "remove-img" },
                         on: {
                           click: function($event) {
@@ -68852,7 +69408,7 @@ var render = function() {
                         _vm._v(_vm._s(_vm.createdDate))
                       ]),
                       _vm._v(" "),
-                      _c("p", [
+                      _c("p", { staticClass: "border-bottom" }, [
                         _c("span", { staticClass: "font-weight-bold" }, [
                           _vm._v("Modified Last:")
                         ]),
@@ -68875,9 +69431,73 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-row" }, [
+      _c("div", { staticClass: "form-group col-md-6" }, [
+        _c("label", { attrs: { for: "city" } }, [_vm._v("City")]),
+        _vm._v(" "),
+        _c("input", {
+          staticClass: "form-control",
+          attrs: { type: "text", id: "city" }
+        })
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "form-group col-md-4" }, [
+        _c("label", { attrs: { for: "state" } }, [_vm._v("State")]),
+        _vm._v(" "),
+        _c("select", { staticClass: "form-control", attrs: { id: "state" } }, [
+          _c("option", { attrs: { selected: "" } }, [_vm._v("Choose...")]),
+          _vm._v(" "),
+          _c("option", [_vm._v("...")])
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "form-group col-md-2" }, [
+        _c("label", { attrs: { for: "zip" } }, [_vm._v("Zip")]),
+        _vm._v(" "),
+        _c("input", {
+          staticClass: "form-control",
+          attrs: { type: "text", id: "zip" }
+        })
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
     return _c("p", { staticClass: "admin-form__time" }, [
       _vm._v("Today's Date: "),
       _c("span", { attrs: { id: "today" } })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c("label", { staticClass: "d-block", attrs: { for: "event-date" } }, [
+        _vm._v("Event Date")
+      ]),
+      _vm._v(" "),
+      _c("input", {
+        staticClass: "form-control",
+        attrs: { name: "date", type: "date", id: "event-date" }
+      })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c("label", { staticClass: "d-block", attrs: { for: "event-time" } }, [
+        _vm._v("Event time")
+      ]),
+      _vm._v(" "),
+      _c("input", {
+        staticClass: "form-control",
+        attrs: { name: "time", type: "time", id: "event-time" }
+      })
     ])
   }
 ]
@@ -69017,6 +69637,12 @@ var render = function() {
             })
           : _vm._e(),
         _vm._v(" "),
+        _vm.deleteTeachings
+          ? _c("input", {
+              attrs: { type: "hidden", name: "delete_teachings", value: "1" }
+            })
+          : _vm._e(),
+        _vm._v(" "),
         _c("div", { staticClass: "admin-form__wrapper" }, [
           _c("div", { staticClass: "admin-form__main" }, [
             _c("div", { staticClass: "form-group" }, [
@@ -69129,7 +69755,7 @@ var render = function() {
                 ],
                 class: [
                   { "is-invalid": _vm.errors.bio.length },
-                  "form-control"
+                  "form-control wysiwyg"
                 ],
                 attrs: { id: "bio", rows: "25", type: "text", name: "bio" },
                 domProps: { value: _vm.bio },
@@ -69181,7 +69807,7 @@ var render = function() {
                 !_vm.image
                   ? _c("img", {
                       class: [
-                        { "is-invalid": _vm.errors.image.length },
+                        { "noinput-invalid": _vm.errors.image.length },
                         "img-fluid"
                       ],
                       attrs: {
@@ -69198,26 +69824,22 @@ var render = function() {
                       attrs: { src: _vm.image }
                     }),
                 _vm._v(" "),
-                _c(
-                  "div",
-                  {
-                    staticClass: "invalid-feedback",
-                    attrs: { id: "image-feedback" }
-                  },
-                  [
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(_vm.errors.image[0]) +
-                        "\n                    "
+                _vm.errors.image.length
+                  ? _c(
+                      "div",
+                      {
+                        staticClass: "invalid-feedback d-block",
+                        attrs: { id: "image-feedback" }
+                      },
+                      [_vm._v(_vm._s(_vm.errors.image[0]))]
                     )
-                  ]
-                ),
+                  : _vm._e(),
                 _vm._v(" "),
                 _vm.image
                   ? _c(
                       "button",
                       {
-                        staticClass: "btn btn-light admin-form__remove-img-btn",
+                        staticClass: "btn btn-light admin-form__sidebar-btn",
                         attrs: { id: "remove-img" },
                         on: {
                           click: function($event) {
@@ -69241,7 +69863,7 @@ var render = function() {
                       on: {
                         click: function($event) {
                           $event.preventDefault()
-                          return _vm.deleteStaffMember($event)
+                          return _vm.deleteStaffMember($event, false)
                         }
                       }
                     },
@@ -69265,13 +69887,28 @@ var render = function() {
                         _vm._v(_vm._s(_vm.createdDate))
                       ]),
                       _vm._v(" "),
-                      _c("p", [
+                      _c("p", { staticClass: "border-bottom" }, [
                         _c("span", { staticClass: "font-weight-bold" }, [
                           _vm._v("Modified Last:")
                         ]),
                         _vm._v(" "),
                         _c("br"),
                         _vm._v(_vm._s(_vm.modifiedDate))
+                      ]),
+                      _vm._v(" "),
+                      _c("p", { staticClass: "mb-0" }, [
+                        _c("span", { staticClass: "font-weight-bold" }, [
+                          _vm._v("Associated Teachings:")
+                        ]),
+                        _vm._v(" "),
+                        _c("br"),
+                        _vm._v(
+                          " " +
+                            _vm._s(_vm.name) +
+                            " has " +
+                            _vm._s(_vm.teachingsCount) +
+                            " teachings created"
+                        )
                       ])
                     ])
                   ]
@@ -69279,6 +69916,116 @@ var render = function() {
               : _vm._e()
           ])
         ])
+      ]
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal fade staff-create__delete-staff",
+        attrs: { id: "delete-staff", tabindex: "-1" }
+      },
+      [
+        _c(
+          "div",
+          {
+            staticClass: "modal-dialog",
+            staticStyle: { "max-width": "43.75rem" }
+          },
+          [
+            _c("div", { staticClass: "modal-content" }, [
+              _c(
+                "div",
+                {
+                  staticClass:
+                    "modal-header d-flex align-items-center flex-column"
+                },
+                [
+                  _c("h5", { staticClass: "modal-title my-3" }),
+                  _vm._v(" "),
+                  !_vm.deleteConfirm
+                    ? _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-light",
+                          attrs: { "data-dismiss": "modal" }
+                        },
+                        [_vm._v("Cancel")]
+                      )
+                    : _vm._e()
+                ]
+              ),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-body center-block text-center" }),
+              _vm._v(" "),
+              !_vm.deleteConfirm
+                ? _c(
+                    "div",
+                    { staticClass: "modal-footer justify-content-center" },
+                    [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-info",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              return _vm.deleteStaffMember(
+                                $event,
+                                "delete_staff"
+                              )
+                            }
+                          }
+                        },
+                        [_vm._v("Delete Staff Member Only")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-danger",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              return _vm.deleteStaffMember(
+                                $event,
+                                "delete_staff_teachings"
+                              )
+                            }
+                          }
+                        },
+                        [_vm._v("Delete Staff Member And Teachings")]
+                      )
+                    ]
+                  )
+                : _c(
+                    "div",
+                    { staticClass: "modal-footer justify-content-center" },
+                    [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-info",
+                          attrs: { type: "button" },
+                          on: { click: _vm.dismissModal }
+                        },
+                        [_vm._v("Cancel")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-danger",
+                          attrs: { type: "button" },
+                          on: { click: _vm.deleteSubmit }
+                        },
+                        [_vm._v("Yes, I am sure!")]
+                      )
+                    ]
+                  )
+            ])
+          ]
+        )
       ]
     )
   ])
@@ -69876,124 +70623,150 @@ var render = function() {
             { staticClass: "admin-form__main" },
             [
               _c("div", { staticClass: "form-group" }, [
-                _c("label", [_vm._v("Teaching Title")]),
-                _vm._v(" "),
-                _c("div", { staticClass: "custom-control custom-radio" }, [
-                  _c("input", {
-                    staticClass: "custom-control-input",
-                    attrs: {
-                      type: "radio",
-                      id: "teaching",
-                      value: "teaching",
-                      name: "type",
-                      checked: ""
-                    },
-                    on: {
-                      change: function($event) {
-                        _vm.topical = 0
-                      }
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c(
-                    "label",
-                    {
-                      staticClass: "custom-control-label",
-                      attrs: { for: "teaching" }
-                    },
-                    [
-                      _vm._v(
-                        "Use bible scripture specified below for\n                            title"
+                _c(
+                  "div",
+                  { class: { "noinput-invalid": _vm.errors.title.length } },
+                  [
+                    _c("label", [_vm._v("Teaching Title")]),
+                    _vm._v(" "),
+                    _vm.errors.title.length
+                      ? _c("div", { staticClass: "invalid-feedback d-block" }, [
+                          _vm._v(
+                            "\n                            " +
+                              _vm._s(_vm.errors.title[0]) +
+                              "\n                        "
+                          )
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "custom-control custom-radio" }, [
+                      _c("input", {
+                        staticClass: "custom-control-input",
+                        attrs: {
+                          type: "radio",
+                          id: "teaching",
+                          value: "teaching",
+                          name: "type",
+                          checked: ""
+                        },
+                        on: {
+                          change: function($event) {
+                            _vm.topical = 0
+                          }
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c(
+                        "label",
+                        {
+                          staticClass: "custom-control-label",
+                          attrs: { for: "teaching" }
+                        },
+                        [
+                          _vm._v(
+                            "Use bible scripture specified below for\n                                title"
+                          )
+                        ]
                       )
-                    ]
-                  )
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "custom-control custom-radio" }, [
-                  _c("input", {
-                    staticClass: "custom-control-input",
-                    attrs: {
-                      type: "radio",
-                      id: "topical",
-                      value: "topical",
-                      name: "type"
-                    },
-                    on: {
-                      change: function($event) {
-                        _vm.topical = 1
-                      }
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c(
-                    "label",
-                    {
-                      staticClass: "custom-control-label",
-                      attrs: { for: "topical" }
-                    },
-                    [_vm._v("Enter a title for topical teaching")]
-                  )
-                ]),
-                _vm._v(" "),
-                _vm.topical
-                  ? _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.topicalTitle,
-                          expression: "topicalTitle"
-                        }
-                      ],
-                      staticClass: "form-control mb-0 mt-2",
-                      attrs: {
-                        name: "title",
-                        type: "text",
-                        placeholder: "Enter Topical Title"
-                      },
-                      domProps: { value: _vm.topicalTitle },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "custom-control custom-radio" }, [
+                      _c("input", {
+                        staticClass: "custom-control-input",
+                        attrs: {
+                          type: "radio",
+                          id: "topical",
+                          value: "topical",
+                          name: "type"
+                        },
+                        on: {
+                          change: function($event) {
+                            _vm.topical = 1
                           }
-                          _vm.topicalTitle = $event.target.value
                         }
-                      }
-                    })
-                  : _vm._e(),
-                _vm._v(" "),
-                _vm.teachingTitle && !_vm.topical
-                  ? _c("input", {
-                      directives: [
+                      }),
+                      _vm._v(" "),
+                      _c(
+                        "label",
                         {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.teachingTitle,
-                          expression: "teachingTitle"
-                        }
-                      ],
-                      staticClass: "form-control mb-0 mt-2",
-                      attrs: {
-                        name: "title",
-                        type: "text",
-                        placeholder: "Enter Title"
-                      },
-                      domProps: { value: _vm.teachingTitle },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
+                          staticClass: "custom-control-label",
+                          attrs: { for: "topical" }
+                        },
+                        [_vm._v("Enter a title for topical teaching")]
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _vm.topical
+                      ? _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.topicalTitle,
+                              expression: "topicalTitle"
+                            }
+                          ],
+                          staticClass: "form-control mb-0 mt-2",
+                          attrs: {
+                            name: "title",
+                            type: "text",
+                            placeholder: "Enter Topical Title"
+                          },
+                          domProps: { value: _vm.topicalTitle },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.topicalTitle = $event.target.value
+                            }
                           }
-                          _vm.teachingTitle = $event.target.value
-                        }
-                      }
-                    })
-                  : _vm._e()
+                        })
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm.teachingTitle && !_vm.topical
+                      ? _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.teachingTitle,
+                              expression: "teachingTitle"
+                            }
+                          ],
+                          staticClass: "form-control mb-0 mt-2",
+                          attrs: {
+                            name: "title",
+                            type: "text",
+                            placeholder: "Enter Title"
+                          },
+                          domProps: { value: _vm.teachingTitle },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.teachingTitle = $event.target.value
+                            }
+                          }
+                        })
+                      : _vm._e()
+                  ]
+                )
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "form-group" }, [
                 _c("label", { attrs: { for: "speaker" } }, [_vm._v("Speaker")]),
+                _vm._v(" "),
+                _vm.errors.speaker.length
+                  ? _c("div", { staticClass: "invalid-feedback d-block" }, [
+                      _vm._v(
+                        "\n                            " +
+                          _vm._s(_vm.errors.speaker[0]) +
+                          "\n                        "
+                      )
+                    ])
+                  : _vm._e(),
                 _vm._v(" "),
                 _c(
                   "div",
@@ -70057,7 +70830,10 @@ var render = function() {
                       ? _c(
                           "select",
                           {
-                            staticClass: "custom-select",
+                            class: [
+                              { "is-invalid": _vm.errors.speaker.length },
+                              "custom-select"
+                            ],
                             attrs: { id: "staff-select", name: "staff_id" }
                           },
                           [
@@ -70108,8 +70884,21 @@ var render = function() {
                     )
                   : _vm._e(),
                 _vm._v(" "),
+                _vm.errors.video.length
+                  ? _c("div", { staticClass: "invalid-feedback d-block" }, [
+                      _vm._v(
+                        "\n                            " +
+                          _vm._s(_vm.errors.video[0]) +
+                          "\n                        "
+                      )
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
                 _c("input", {
-                  staticClass: "form-control",
+                  class: [
+                    { "is-invalid": _vm.errors.video.length },
+                    "form-control"
+                  ],
                   attrs: {
                     placeholder: "Enter Video Url",
                     name: "video",
@@ -70159,8 +70948,21 @@ var render = function() {
                     })
                   : _vm._e(),
                 _vm._v(" "),
+                _vm.errors.audio.length
+                  ? _c("div", { staticClass: "invalid-feedback d-block" }, [
+                      _vm._v(
+                        "\n                            " +
+                          _vm._s(_vm.errors.audio[0]) +
+                          "\n                        "
+                      )
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
                 _c("input", {
-                  staticClass: "form-control",
+                  class: [
+                    { "is-invalid": _vm.errors.audio.length },
+                    "form-control"
+                  ],
                   attrs: {
                     name: "audio",
                     type: "text",
@@ -70190,6 +70992,45 @@ var render = function() {
                 ])
               ]),
               _vm._v(" "),
+              _c("div", { staticClass: "form-group" }, [
+                _c("label", { attrs: { for: "textSelector" } }, [
+                  _vm._v("Add Text To Teaching")
+                ]),
+                _vm._v(" "),
+                _vm._m(0),
+                _vm._v(" "),
+                _c(
+                  "select",
+                  {
+                    staticClass: "custom-select",
+                    attrs: { id: "textSelector" },
+                    on: { change: _vm.selectBeforeAfterText }
+                  },
+                  [
+                    _c("option", { attrs: { value: "none", selected: "" } }, [
+                      _vm._v("No Text")
+                    ]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "before" } }, [
+                      _vm._v("Before Scripture OR Only Text")
+                    ]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "after" } }, [
+                      _vm._v("After Scripture")
+                    ]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "both" } }, [
+                      _vm._v("Before and After Scripture")
+                    ])
+                  ]
+                )
+              ]),
+              _vm._v(" "),
+              _c("div", {
+                staticClass: "admin-form__select-text-container",
+                attrs: { id: "select-text-container" }
+              }),
+              _vm._v(" "),
               _c("scripture-component", {
                 attrs: { scriptureHtml: _vm.scriptureHtml },
                 on: {
@@ -70206,7 +71047,7 @@ var render = function() {
           ),
           _vm._v(" "),
           _c("aside", { staticClass: "admin-form__sidebar" }, [
-            _vm._m(0),
+            _vm._m(1),
             _vm._v(" "),
             _vm.status && _vm.teaching
               ? _c("p", { class: _vm.setStatusCssStyling }, [
@@ -70266,12 +71107,22 @@ var render = function() {
               )
             ]),
             _vm._v(" "),
-            _vm._m(1),
+            _vm._m(2),
             _vm._v(" "),
             _c("div", { staticClass: "form-group" }, [
               _c("label", { attrs: { for: "description" } }, [
                 _vm._v("Description")
               ]),
+              _vm._v(" "),
+              _vm.errors.description.length
+                ? _c("div", { staticClass: "invalid-feedback d-block" }, [
+                    _vm._v(
+                      "\n                            " +
+                        _vm._s(_vm.errors.description[0]) +
+                        "\n                        "
+                    )
+                  ])
+                : _vm._e(),
               _vm._v(" "),
               _c("textarea", {
                 directives: [
@@ -70282,7 +71133,10 @@ var render = function() {
                     expression: "description"
                   }
                 ],
-                staticClass: "form-control",
+                class: [
+                  { "is-invalid": _vm.errors.description.length },
+                  "form-control"
+                ],
                 attrs: {
                   rows: "4",
                   name: "description",
@@ -70298,7 +71152,24 @@ var render = function() {
                     _vm.description = $event.target.value
                   }
                 }
-              })
+              }),
+              _vm._v(" "),
+              _vm.description
+                ? _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-light admin-form__sidebar-btn",
+                      attrs: { id: "clear-description" },
+                      on: {
+                        click: function($event) {
+                          $event.preventDefault()
+                          return _vm.clearDescription($event)
+                        }
+                      }
+                    },
+                    [_vm._v("× Clear Description")]
+                  )
+                : _vm._e()
             ]),
             _vm._v(" "),
             _c("div", { staticClass: "form-group admin-form__image" }, [
@@ -70314,20 +71185,44 @@ var render = function() {
               _vm._v(" "),
               _c("div", { staticClass: "admin-form__image-preview" }, [
                 !_vm.ftImg
-                  ? _c("img", {
-                      staticClass: "img-fluid",
-                      attrs: { src: _vm.imgPath, alt: "select-image" }
-                    })
+                  ? _c(
+                      "div",
+                      {
+                        class: [
+                          { "noinput-invalid": _vm.errors.ft_image.length }
+                        ]
+                      },
+                      [
+                        _c("img", {
+                          staticClass: "img-fluid",
+                          attrs: { src: _vm.imgPath, alt: "select-image" }
+                        })
+                      ]
+                    )
                   : _c("img", {
-                      staticClass: "img-fluid d-block",
+                      class: [
+                        { "noinput-invalid": _vm.errors.ft_image.length },
+                        "img-fluid",
+                        "d-block"
+                      ],
                       attrs: { src: _vm.ftImg }
                     }),
+                _vm._v(" "),
+                _vm.errors.ft_image.length
+                  ? _c("div", { staticClass: "invalid-feedback d-block" }, [
+                      _vm._v(
+                        "\n                                " +
+                          _vm._s(_vm.errors.ft_image[0]) +
+                          "\n                        "
+                      )
+                    ])
+                  : _vm._e(),
                 _vm._v(" "),
                 _vm.ftImg
                   ? _c(
                       "button",
                       {
-                        staticClass: "btn btn-light admin-form__remove-img-btn",
+                        staticClass: "btn btn-light admin-form__sidebar-btn",
                         attrs: { id: "remove-img" },
                         on: {
                           click: function($event) {
@@ -70480,6 +71375,18 @@ var render = function() {
   ])
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("p", { staticClass: "text-secondary" }, [
+      _c("em", [
+        _vm._v(
+          'Choose to add text before or after scripture. If you only want text then select "Before Scripture OR Text Only" option and simply don\'t generate any scripture!'
+        )
+      ])
+    ])
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -83281,6 +84188,52 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_TeachingsFormComponent_vue_vue_type_template_id_9a0a8df2___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
+
+/***/ }),
+
+/***/ "./resources/js/admin/mixins/tinymceEditor.js":
+/*!****************************************************!*\
+  !*** ./resources/js/admin/mixins/tinymceEditor.js ***!
+  \****************************************************/
+/*! exports provided: tinymceInit */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tinymceInit", function() { return tinymceInit; });
+var tinymceInit = function tinymceInit() {
+  var editor_config = {
+    path_absolute: "/",
+    selector: '.wysiwyg',
+    relative_urls: false,
+    plugins: ["advlist autolink lists link image charmap print preview hr anchor pagebreak", "searchreplace wordcount visualblocks visualchars code fullscreen", "insertdatetime media nonbreaking save table directionality", "emoticons template paste textpattern"],
+    toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media",
+    file_picker_callback: function file_picker_callback(callback, value, meta) {
+      var x = window.innerWidth || document.documentElement.clientWidth || document.getElementsByTagName('body')[0].clientWidth;
+      var y = window.innerHeight || document.documentElement.clientHeight || document.getElementsByTagName('body')[0].clientHeight;
+      var cmsURL = editor_config.path_absolute + 'laravel-filemanager?editor=' + meta.fieldname;
+
+      if (meta.filetype == 'image') {
+        cmsURL = cmsURL + "&type=Images";
+      } else {
+        cmsURL = cmsURL + "&type=Files";
+      }
+
+      tinyMCE.activeEditor.windowManager.openUrl({
+        url: cmsURL,
+        title: 'Filemanager',
+        width: x * 0.8,
+        height: y * 0.8,
+        resizable: "yes",
+        close_previous: "no",
+        onMessage: function onMessage(api, message) {
+          callback(message.content);
+        }
+      });
+    }
+  };
+  tinymce.init(editor_config);
+};
 
 /***/ }),
 
