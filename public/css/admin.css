@@ -11103,84 +11103,45 @@ body {
   margin-right: 0.5rem;
 }
 
-.scripture {
-  position: relative;
+.btns__icon--right {
+  margin-right: 0 !important;
+  margin-left: 0.5rem;
 }
 
-.scripture__select {
+.dynamic-btn {
+  margin: 0.5rem 3px;
+  font-family: sans-serif;
+}
+
+.dynamic-btn__btn {
+  font-size: 1.2rem;
+}
+
+.dynamic-btn__text {
+  margin-left: 0.5rem;
+}
+
+.form-create__footer-btns {
+  width: 100%;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  -webkit-animation: growFadeIn 0.2s ease-in;
-          animation: growFadeIn 0.2s ease-in;
-  margin-bottom: 1rem;
 }
 
-.scripture__select select {
-  width: calc((100% / 5) - 1rem);
+.form-create__dialog {
+  max-width: 1000px;
 }
 
-.scripture__text {
-  position: relative;
-  overflow: hidden;
+.form-create__preview {
+  min-height: 10rem;
 }
 
-.scripture__text h2 {
-  margin: 1rem auto 1rem 0;
+.form-create__options {
+  text-align: center;
 }
 
-.scripture__remove-verse {
-  display: inline-block;
-}
-
-.scripture__remove-verse .feather {
-  color: #343a40;
-  transition: all 0.2s;
-  width: 1.75rem;
-  height: 1.75rem;
-}
-
-.scripture__remove-verse .feather:hover {
-  color: #007bff;
-  cursor: pointer;
-}
-
-.scripture__remove-verse .feather:active {
-  color: #17a2b8;
-  transform: scale(0.9);
-}
-
-.scripture__add-verse {
-  display: inline-block;
-  margin-right: auto;
-}
-
-.scripture__add-verse .feather {
-  color: #343a40;
-  transition: all 0.2s;
-  width: 1.75rem;
-  height: 1.75rem;
-}
-
-.scripture__add-verse .feather:hover {
-  color: #007bff;
-  cursor: pointer;
-}
-
-.scripture__add-verse .feather:active {
-  color: #17a2b8;
-  transform: scale(0.9);
-}
-
-.scripture__fade-out {
-  -webkit-animation: growFadeOut 0.2s ease-in;
-          animation: growFadeOut 0.2s ease-in;
-  -webkit-animation-fill-mode: forwards;
-          animation-fill-mode: forwards;
-}
-
-.scripture__btn-gen {
-  margin: 1rem 0;
+.form-create__options button {
+  margin-top: 0.6rem;
+  margin-bottom: 0.6rem;
 }
 
 .media-modal {
@@ -11294,6 +11255,86 @@ body {
   align-items: center;
 }
 
+.scripture {
+  position: relative;
+}
+
+.scripture__select {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  -webkit-animation: growFadeIn 0.2s ease-in;
+          animation: growFadeIn 0.2s ease-in;
+  margin-bottom: 1rem;
+}
+
+.scripture__select select {
+  width: calc((100% / 5) - 1rem);
+}
+
+.scripture__text {
+  position: relative;
+  overflow: hidden;
+}
+
+.scripture__text h2 {
+  margin: 1rem auto 1rem 0;
+}
+
+.scripture__remove-verse {
+  display: inline-block;
+}
+
+.scripture__remove-verse .feather {
+  color: #343a40;
+  transition: all 0.2s;
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.scripture__remove-verse .feather:hover {
+  color: #007bff;
+  cursor: pointer;
+}
+
+.scripture__remove-verse .feather:active {
+  color: #17a2b8;
+  transform: scale(0.9);
+}
+
+.scripture__add-verse {
+  display: inline-block;
+  margin-right: auto;
+}
+
+.scripture__add-verse .feather {
+  color: #343a40;
+  transition: all 0.2s;
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.scripture__add-verse .feather:hover {
+  color: #007bff;
+  cursor: pointer;
+}
+
+.scripture__add-verse .feather:active {
+  color: #17a2b8;
+  transform: scale(0.9);
+}
+
+.scripture__fade-out {
+  -webkit-animation: growFadeOut 0.2s ease-in;
+          animation: growFadeOut 0.2s ease-in;
+  -webkit-animation-fill-mode: forwards;
+          animation-fill-mode: forwards;
+}
+
+.scripture__btn-gen {
+  margin: 1rem 0;
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.5s;
@@ -11319,7 +11360,8 @@ body {
   margin-bottom: 1rem;
 }
 
-.admin-form input {
+.admin-form input,
+.admin-form textarea {
   margin-bottom: 1rem;
 }
 

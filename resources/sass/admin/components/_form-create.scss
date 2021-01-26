@@ -1,0 +1,36 @@
+.form-create {
+
+
+    &__footer-btns {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+
+    }
+
+
+    &__dialog {
+        max-width: 1000px;
+    }
+
+
+    &__preview {
+        min-height: 10rem;
+    }
+
+
+
+    &__options {
+
+        text-align: center;
+
+        & button {
+            margin-top: .6rem;
+            margin-bottom: .6rem;
+        }
+
+    }
+
+
+
+}
