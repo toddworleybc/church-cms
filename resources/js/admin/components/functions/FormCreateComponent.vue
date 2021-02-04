@@ -9,7 +9,7 @@
 
                        <span v-if="step === 1">Form Details</span>
                        <span v-if="step === 2">Select Input Type</span>
-                       <span v-if="step === 3">Input Labels</span>
+                       <span v-if="step === 3">Create {{ showInputType("", true) }} input</span>
 
 
                     </h5>
@@ -20,6 +20,11 @@
                 <div class="modal-body d-flex justify-content-between">
 
                     <div class="form-create__steps col-5">
+
+                        <div class="alert alert-info border-bottom mb-0">
+                            <p class="mb-0">Send To Email: {{ formEmail }}</p>
+                        </div>
+
 
                     <!-- step one  -->
                         <div  v-if="step === 1" class="form-create__details">
@@ -50,7 +55,7 @@
                                         <button @click.prevent="selectedInput" data-type="email" class="btn btn-info">Email</button>
                                         <button @click.prevent="selectedInput" data-type="textarea" class="btn btn-info">Paragraph</button>
 
-                                        <!-- <button @click.prevent="selectedInput" data-type="select" class="btn btn-info">Select</button> -->
+                                        <button @click.prevent="selectedInput" data-type="select" class="btn btn-info">Select</button>
 
                                         <button @click.prevent="selectedInput" data-type="checkbox" class="btn btn-info">Checkbox</button>
                                         <button @click.prevent="selectedInput" data-type="radio" class="btn btn-info">Radio</button>
@@ -119,21 +124,12 @@
                                     <textarea v-model="input.description" rows="2" class="form-control" id="description"></textarea>
 
 
-                                    <label for="label">Enter Label</label>
+                                    <label for="label">Enter Label &nbsp;<span class="text-danger"><em>(required)*</em></span></label>
                                     <input v-model="input.label" type="text" class="form-control" id="label">
 
                                     <div v-if="checkboxCount > 1" class="border-bottom mb-2"></div>
 
                                 </div>
-
-
-                                <div class="custom-control custom-switch">
-
-                                    <input @click="checkboxesInline = !checkboxesInline" type="checkbox" class="custom-control-input" id="checkboxes-inline" :checked="checkboxesInline">
-                                    <label class="custom-control-label" for="checkboxes-inline">Make Checkboxes Inline</label>
-
-                                </div>
-
 
                             </div>
                             <!-- ##/ checkboxes and radios  -->
@@ -189,6 +185,34 @@
                             <!-- ##/ address features  -->
 
 
+                            <!-- select features  -->
+
+                            <div v-if="formInputType() === 'selectType'">
+
+                                <label for="heading">Enter Heading &nbsp;<span class="text-danger"><em>(required)*</em></span></label>
+                                <input id="checkboxHeading" v-model="inputHeading" type="text" class="form-control">
+
+                                <label for="placeholder">Enter Placeholder &nbsp;<span class="text-secondary"><em>(optional)</em></span></label>
+                                <input type="text" v-model="inputPlaceholder" class="form-control" id="placeholder">
+
+                                <label for="number">Enter how many <span class="text-capitalize text-bold">Options</span>'s you need</label>
+                                <p class="text-secondary"><em>Max 20</em></p>
+                                <input @change="addSelectOptions" class="form-control col-6" type="number" id="number" v-model="selectCount" min="1" max="20">
+
+                                <div :id="selectOptions.indexOf(input)" v-for="input in selectOptions" :key="selectOptions.indexOf(input)">
+
+                                    <label for="label">Enter Option</label>
+                                    <input v-model="input.option" type="text" class="form-control" id="label">
+
+                                    <div v-if="selectCount > 1" class="border-bottom mb-2"></div>
+
+                                </div>
+
+                            </div>
+
+                            <!-- ##/ select features  -->
+
+
                         <!-- make input dynamic  -->
                             <div v-if="formInputType() === 'textType'" class="dynamic-btn__form-input">
 
@@ -209,21 +233,40 @@
 
                         </div>
 
-                        <div class="alert alert-info border-bottom">
-                            <p class="mb-0">Send To Email: {{ formEmail }}</p>
-                        </div>
+
 
                     </div>
             <!-- ##/-- ============ steps ============ -->
 
 
-                <!-- FORM PREVIEW  -->
+                <!-- ===============================================================================================
+                 FORM PREVIEW ==========================================================================================  -->
+
                     <div class="form-create__info col-7 border-left">
 
-                        <h4 class="alert alert-info">
+                        <h4 class="alert alert-primary">
                             <span v-if="step !== 3"> Form Preview </span>
-                            <span v-else >Create Input</span>
+                            <span v-else >Create {{ showInputType("", true) }} Input</span>
                         </h4>
+
+                        <div class="clearfix">
+
+                            <div v-if="step === 2" class="d-flex justify-content-between align-items-end mb-2 mt-4">
+                                <button @click.prevent="editInput" class="btn btn-primary" :disabled="previewSelected !== 1">Edit Selected Input</button>
+                                <div class="form-check">
+                                    <label class="mr-2 mb-0" for="select-all">Select all</label>
+                                    <input @click="selectAll" id="select-all" type="checkbox" class="form-checkbox mb-0" :disabled="!formHtml">
+                                </div>
+
+                            </div>
+
+                            <div v-if="step === 3" class="form-check float-right">
+                                <label for="hide-form">Hide form</label>
+                                <input @click="hideForm = !hideForm" id="hide-form" type="checkbox" class="form-checkbox" :checked="hideForm">
+                            </div>
+
+                        </div>
+
 
                         <div class="border shadow-sm mb-4 p-2 form-create__preview">
 
@@ -232,10 +275,10 @@
                                 <p class="text-secondary">Your form will build here!</p>
                             </div>
 
-                            <h5>{{ formHeading }}</h5>
+                            <h4>{{ formHeading }}</h4>
 
                          <!-- main form preview -->
-                            <div v-html="formHtml"></div>
+                            <div class="form-preview" v-if="!hideForm" v-html="formHtml"></div>
 
                         <!-- CREATE INPUT PREVIEW  -->
                             <div v-if="inputType" class="form-group">
@@ -244,7 +287,7 @@
                             <!-- text type  -->
                                 <div v-if="formInputType(inputType) === 'textType'">
 
-                                    <label :class="{'text-secondary' : !inputLabel}" for="">{{ inputLabel || 'Label' }} &nbsp;<span v-if="inputRequired" class="text-danger"><em>(required)*</em></span></label>
+                                    <label>{{ inputLabel || 'Label' }} &nbsp;<span v-if="inputRequired" class="text-danger"><em>(required)*</em></span></label>
 
                                     <p class="text-secondary"><em>{{ inputDescription || 'Input Description' }}</em></p>
 
@@ -262,8 +305,8 @@
                                 <!-- checkbox type  -->
                                 <div v-if="formInputType(inputType) === 'checkboxType'">
 
-                                    <h6 v-if="inputHeading">{{ inputHeading}}</h6>
-                                    <h6 v-else class="text-secondary">Heading</h6>
+                                    <h5 v-if="inputHeading">{{ inputHeading}}</h5>
+                                    <h5 v-else class="text-secondary">Heading</h5>
 
                                     <div class="my-4" :id="checkboxInputs.indexOf(input)" v-for="input in checkboxInputs" :key="checkboxInputs.indexOf(input)">
                                         <div class="mb-4 form-create__checkbox-wrapper">
@@ -271,12 +314,12 @@
                                             <p class="text-secondary mb-0"><em>{{ input.description || 'Description' }}</em></p>
 
                                             <div v-if="inputType === 'checkbox'" class="custom-checkbox custom-control">
-                                                <input :id="'form-' + checkboxInputs.indexOf(input)" :type="inputType" class="custom-control-input">
-                                                <label class="custom-control-label" :for="'form-'+ checkboxInputs.indexOf(input)">{{ input.label }}</label>
+                                                <input :id="'form-' + checkboxInputs.indexOf(input)" :type="inputType" class="custom-control-input" :name="inputHeading">
+                                                <label class="custom-control-label" :for="'form-'+ checkboxInputs.indexOf(input)">{{ input.label || 'Label' }}</label>
                                             </div>
 
                                             <div v-if="inputType === 'radio'" class="custom-radio custom-control">
-                                                <input :id="'form-' + checkboxInputs.indexOf(input)" :type="inputType" class="custom-control-input">
+                                                <input :id="'form-' + checkboxInputs.indexOf(input)" :type="inputType" class="custom-control-input" :name="inputHeading">
                                                 <label :for="'form-' + checkboxInputs.indexOf(input)" class="custom-control-label">{{input.label || 'Label'}}</label>
                                             </div>
                                         </div>
@@ -380,6 +423,22 @@
                                 </div>
 
 
+                                <!-- select type  -->
+                                <div v-if="formInputType(inputType) === 'selectType'">
+
+                                    <h6 v-if="inputHeading">{{ inputHeading}}</h6>
+                                    <h6 v-else class="text-secondary">Heading</h6>
+
+                                    <select class="custom-select col-4">
+                                        <option class="text-secondary" :value="inputPlaceholder" selected hidden disabled>{{inputPlaceholder || 'Placeholder'}}</option>
+                                        <option v-for="input in selectOptions" :key="selectOptions.indexOf(input)" :value="input.option">{{ input.option }}</option>
+                                    </select>
+
+                                </div>
+
+                                <!-- ##/ select type  -->
+
+
                             <!-- make input dynamic  -->
                                 <div v-if="inputDynamic" class="dynamic-btn">
                                     <button class="btn btn-info dynamic-btn__btn">&plus;<small :class="{'dynamic-btn__text': inputDynamicDescription}">{{ inputDynamicDescription }}</small></button>
@@ -388,6 +447,11 @@
                             </div>
                                 <!-- ##-end of input  -->
 
+                        </div>
+
+                         <div v-if="step === 2" class="d-flex justify-content-between">
+                            <button @click.prevent="deleteSelected" class="btn btn-danger my-1" :disabled="!previewSelected">Delete Selected</button>
+                            <button @click.prevent="createGroup" class="btn btn-primary ml-2 my-1" :disabled="previewSelected < 2">Group Selected</button>
                         </div>
 
                     </div>
@@ -425,10 +489,6 @@
 
                             <button @click.prevent="createInput" class="btn btn-primary" :disabled="!enableCreateInputBtn">Create Input <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg></button>
 
-                            <!-- <button v-if="formInputType() === 'checkboxType'" @click.prevent="createInput" class="btn btn-primary" :disabled="!enableCreateInputBtn">Create Input <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg></button>
-
-                            <button v-if="formInputType() === 'numberType'" @click.prevent="createInput" class="btn btn-primary" :disabled="!enableCreateInputBtn">Create Input <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg></button> -->
-
                         </div>
 
 
@@ -465,7 +525,10 @@ export default {
                 label: "",
                 description: ""
             }, ],
-            checkboxesInline: true,
+            selectCount: 1,
+            selectOptions: [ {
+                option: ""
+            } ],
             formHtml: "",
             formInputs: [],
             formHeading: null,
@@ -480,7 +543,11 @@ export default {
             inputRequired: false,
             min: 0,
             max: 10,
+            previewSelected: 0,
             step: 2,
+            hideForm: false,
+            editMode: false,
+            editId: null,
         }
     },
 
@@ -497,9 +564,28 @@ export default {
 
     // removes disable from create input btn
         enableCreateInputBtn() {
-            return this.inputLabel || this.inputHeading ? true : false;
-        },
+            if(this.formInputType() === 'checkboxType') {
 
+            // check if input label or heading exist
+                if(this.inputLabel || this.inputHeading) {
+
+                // return labels that are filled in
+                    const labels = this.checkboxInputs.filter( input => {
+                        return input.label !== "";
+                    } );
+
+                // check to see if the length is the same
+                    return labels.length === this.checkboxInputs.length ? true : false;
+
+                } else {
+                    return false;
+                }
+
+            } else {
+                return this.inputLabel || this.inputHeading ? true : false;
+            }
+
+        },
 
 
     },
@@ -508,6 +594,70 @@ export default {
 
 
     methods: {
+
+
+        editInput() {
+
+
+            const id = parseInt($('.preview-select-input').first().attr('id')),
+                  input = this.formInputs[id];
+
+            this.editMode = true;
+            this.editId = id;
+
+            this.checkboxCount = input.checkBoxes.length;
+            this.checkboxInputs = input.checkBoxes;
+            this.selectCount = input.selectOptions.length;
+            this.selectOptions = input.selectOptions;
+            this.inputHeading = input.heading;
+            this.inputPlaceholder = input.placeholder;
+            this.inputType = input.type;
+            this.inputLabel = input.label;
+            this.inputDynamic = input.dynamic;
+            this.inputDescription = input.description;
+            this.inputDynamicDescription = input.dynamicDescription;
+            this.inputRequired = input.required;
+            this.min = input.min;
+            this.max = input.max;
+            this.hideForm = true;
+
+            this.step = 3;
+
+        },
+
+
+
+
+        // event select all
+        selectAll(e) {
+             const previewInputs = $(".preview-select-input");
+
+
+            $(previewInputs).each( (i, input) => {
+                $(input).prop('checked', $(e.target).prop('checked'));
+            } );
+
+
+            this.previewInputsSelected();
+
+        },
+
+
+
+        // event for when input is selected to enable buttons
+        formInputSelectedEvent() {
+
+            const previewInputs = $(".preview-select-input");
+
+            $(previewInputs).each( ( i, input ) => {
+
+                $(input).on('click', this.previewInputsSelected);
+
+            } );
+
+        },
+
+
 
 
         addCheckboxLabelDescriptionFields() {
@@ -533,6 +683,29 @@ export default {
         },
 
 
+        addSelectOptions() {
+
+            const inputs = {
+                name: "",
+                value: ""
+            }
+
+
+            // Add input object
+                if(this.selectOptions.length < this.selectCount ) {
+                    this.selectOptions.push(inputs);
+                }
+
+
+            // remove input object
+                if(this.selectOptions.length > this.selectCount) {
+                    this.selectOptions.pop();
+                }
+
+
+        },
+
+
 
 
     // Events ============ /
@@ -543,6 +716,88 @@ export default {
 
 
 
+        deleteSelected() {
+
+            const deleteInput = confirm( "Are you sure you want to delete the selected inputs from the form?" );
+
+
+            if(deleteInput) {
+
+                const removeIds = [];
+
+                $('.preview-select-input').each( ( i, psInput ) => {
+
+                    if( $(psInput).prop('checked') ) {
+
+                        const id = parseInt($(psInput).attr('id'));
+
+                        removeIds.push(id);
+
+                     }
+
+                } );
+                // ##/ end of loop
+
+               this.formInputs = this.formInputs.filter( (input, i) => {
+                    return removeIds.indexOf(i) == -1;
+                } );
+
+                this.createFormHtml();
+                this.previewInputsSelected(true);
+
+            }
+
+        },
+
+
+
+
+        createGroup() {
+
+            const removeIds = []; // ids to filter later
+
+            let   selectedInputs = [],
+                  setPosition = true,
+                  insertPosition = ""; // set form position
+
+            $('.preview-select-input').each( ( i, psInput ) => {
+
+                if( $(psInput).prop('checked') ) {
+
+                    const id = parseInt($(psInput).attr('id')),
+                          input = this.formInputs[id];
+
+                // set insert position
+                    if(setPosition) {
+                        insertPosition = id;
+                        setPosition = false;
+                    }  // set formInput position
+
+                    removeIds.push( id ); // add id's to remove from formInputs json
+
+                // insert selected values
+                    Array.isArray(input) ?
+                        selectedInputs = selectedInputs.concat(input) :
+                        selectedInputs.push( input );
+
+                }
+
+            } );
+            // ##/ end of loop
+
+           this.formInputs = this.formInputs.filter( (input, i) => {
+               return removeIds.indexOf(i) == -1;
+           } );
+
+
+            this.formInputs.splice(insertPosition, 0, selectedInputs);
+
+            this.createFormHtml();
+
+            this.previewInputsSelected(true);
+
+        },
+
 
     // Reset data when modal is dismissed
         resetDataModalDismiss() {
@@ -551,10 +806,13 @@ export default {
             });
         },
 
+
     // Enter selected input type
         selectedInput(e) {
 
             this.inputType = $(e.target).attr('data-type');
+
+            this.hideForm = true;
 
             this.next();
 
@@ -599,6 +857,13 @@ export default {
                     return 'addressType';
                 }
 
+            // return select type
+                if(
+                    inputType === 'select'
+                ) {
+                    return 'selectType';
+                }
+
         },
 
 // Create the main html form!
@@ -607,10 +872,58 @@ export default {
             let html = '';
 
 
-            this.formInputs.forEach( input => {
+            this.formInputs.forEach( (input, i) => {
+
+                const showInputName = Array.isArray(input) ? 'group' : this.showInputType(input);
 
 
-                const inputType = this.formInputType(input.type),
+            // adds the select to the form
+                    html += `<div class="form-check float-right form-create__preview-select preview-select">
+                                <label class="form-check-label text-secondary" for="${i}">${showInputName}</label>
+                                <input id="${i}" class="form-check-input form-create__preview-select-input preview-select-input" type="checkbox">
+                            </div>`;
+
+
+                // form group start div
+                    html += '<div class="form-group">';
+
+
+                        if(Array.isArray(input)) {
+
+                            input.forEach( input => {
+
+
+                            // remove make dynamic button if group
+                                input.dynamic = false;
+                                input.dynamicDescription = "";
+
+                               html += this.inputCreate(input);
+
+                            } );
+
+
+                        } else {
+
+                            html += this.inputCreate(input);
+
+                        }
+
+                    html += '</div>';
+
+            } );
+
+
+            this.formHtml = html;
+
+
+        },
+
+// This creates the inputs with labels and descriptions
+        inputCreate(input) {
+
+            let html = "";
+
+            const inputType = this.formInputType(input.type),
                       required = input.required ? '&nbsp;<span class="text-danger"><em>(required)*</em></span>' : '',
 
                     descriptionHtml = input.description ? `<p class="text-secondary"><em>${input.description}</em></p>` : '',
@@ -622,52 +935,50 @@ export default {
 
                     if(inputType === 'textType') {
 
-                        html += `<div class="form-group">
-                                <label for="${input.name}">${input.label} ${required}</label>
+                        html += `<label for="${input.name}">${input.label} ${required}</label>
                                 ${descriptionHtml}
                                 ${this.createInputHtml(input)}
-                                ${dynamicBtnHtml}
-                            </div>`;
+                                ${dynamicBtnHtml}`;
 
                     }
 
 
                     if(inputType === 'checkboxType') {
 
-                        html += `<div class="form-group">
-                                    <h6>${input.heading}</h6>
-                                    ${this.createCheckboxInputsHtml(input)}
-                                    ${dynamicBtnHtml}
-                                </div>`;
+                        html += `<h5>${input.heading}</h5>
+                                 ${this.createCheckboxInputsHtml(input)}`;
 
                     }
 
 
                     if(inputType === 'numberType') {
 
-                        html += `<div class="form-group"><label for="${input.name}"><span class="text-capitalize text-bold">${input.label}</span></label>
-                                    <p class="text-secondary"><em>${input.description}</em></p>
-                                    ${this.createInputHtml(input)}</div>`;
+                        html += `<label for="${input.name}">${input.label}</label>
+                                    <p class="text-secondary"><em>${descriptionHtml}</em></p>
+                                    ${this.createInputHtml(input)}`;
 
                     }
 
 
                     if(inputType === 'addressType') {
 
-                        html += `<div class="form-group">
-                                    <label><h6 class="d-inline">${input.heading}</h6> &nbsp;<span class="text-danger"><em>(required)*</em></span></label>
-                                    <p class="text-secondary"><em>${input.description}</em></p>
-                                    ${this.createInputHtml(input)}
-                                </div>`;
+                        html += `<h5>${input.heading} ${required}</h5>
+                                    <p class="text-secondary"><em>${descriptionHtml}</em></p>
+                                    ${this.createInputHtml(input)}`;
 
                     }
 
-            } );
 
+                    if(inputType === 'selectType') {
+                            html += `<h5>${input.heading}</h5>
+                                ${this.createInputHtml(input)}`;
 
-            this.formHtml = html;
+                    }
+
+                    return html;
 
         },
+
 
         createCheckboxInputsHtml(input) {
 
@@ -677,9 +988,9 @@ export default {
 
                const uid = muid();
 
-                html += `<div class="mb-4"><p class="text-secondary mb-0"><em>${checkbox.description}</em></p>
+                html += `<div class="my-4"><p class="text-secondary mb-0"><em>${checkbox.description}</em></p>
                         <div class="custom-control custom-${input.type}">
-                            ${this.createInputHtml(input, uid)}
+                            ${this.createInputHtml(input, uid, checkbox.label)}
                             <label class="custom-control-label" for="${uid}">${checkbox.label}</label>
                         </div></div>`;
 
@@ -690,8 +1001,8 @@ export default {
         },
 
 
-// Create the input html from created inputs in the form inputs array
-        createInputHtml(input, uid = muid()) {
+// Create the input html from created inputs in the formInputs array
+        createInputHtml(input, uid = muid(), checkboxLabel = "") {
 
             const required = input.required ? 'required' : '';
 
@@ -700,32 +1011,32 @@ export default {
             if( input.type === 'text'  ||
                 input.type === 'email'  ) {
 
-                inputHtml = `<input id="${input.name}" type="${input.type}" name="${input.name}" placeholder="${input.placeholder}" class="form-control" ${required}>`;
+                inputHtml = `<input id="${input.name}" type="${input.type}" name="${input.name}" placeholder="${input.placeholder}" class="form-control mb-4" ${required}>`;
 
             }
 
             if (input.type === 'textarea') {
 
-                inputHtml = `<textarea id="${input.name}" rows="5" name="${input.name}" class="form-control" placeholder="${input.placeholder}" ${required}></textarea>`;
+                inputHtml = `<textarea id="${input.name}" rows="5" name="${input.name}" class="form-control mb-4" placeholder="${input.placeholder}" ${required}></textarea>`;
 
             }
 
 
             if( input.type === 'number' ) {
-                inputHtml = `<input id="${input.name}" type="${input.type}" class="form-control col-6" value="${input.min}" name="${input.name}" min="${input.min}" max="${input.max}" ${required}>`;
+                inputHtml = `<input id="${input.name}" type="${input.type}" class="form-control col-6 mb-4" value="${input.min}" name="${input.name}" min="${input.min}" max="${input.max}" ${required}>`;
 
             }
 
 
             if( input.type === 'tel' ) {
-                inputHtml = `<input id="${input.name}" type="${input.type}" name="${input.name}" class="form-control" ${required}>`;
+                inputHtml = `<input id="${input.name}" type="${input.type}" name="${input.name}" class="form-control mb-4" ${required}>`;
             }
 
 
 
             if( input.type === 'radio' || input.type === 'checkbox' ) {
 
-                inputHtml = `<input id="${input.name}" type="${input.type}" name="${input.name}" class="custom-control-input" id="${uid}" ${required}>`;
+                inputHtml = `<input id="${uid}" type="${input.type}" value="${checkboxLabel.toLowerCase()}" name="${this.getInputName(false, input)}" class="custom-control-input mb-4" id="${uid}" ${required}>`;
 
             }
 
@@ -737,7 +1048,7 @@ export default {
                 inputHtml = `<label for="${input.name}_address">Address</label>
                             <input type="text" name="${input.name}_address" class="form-control" id="${input.name}_address" ${required}>
 
-                            <div class="form-row">
+                            <div class="form-row mb-4">
                                 <div class="form-group col-md-6">
                                 <label for="${input.name}_city">City</label>
                                 <input type="text" name="${input.name}_city" class="form-control" id="${input.name}_city" ${required}>
@@ -808,8 +1119,33 @@ export default {
 
 
 
+            if(input.type === 'select') {
+
+                const placeHolder = input.placeholder ? `<option class="text-secondary" selected hidden disabled>${input.placeholder}</option>` : "";
+
+                inputHtml = `<select name="${this.getInputName(true, input)}" class="mb-4 custom-select col-4 d-block">
+                                    ${placeHolder}
+                                    ${this.createOptionsHtml(input)}
+                                </select>`;
+
+            }
+
+
             return inputHtml;
 
+        },
+
+        createOptionsHtml(input) {
+
+            let options = "";
+
+            input.selectOptions.forEach( input => {
+
+                options += `<option value="${input.option}">${input.option}</option>`;
+
+            } );
+
+            return options;
 
         },
 
@@ -829,17 +1165,21 @@ export default {
             input.required = this.inputRequired;
             input.max = this.max;
             input.min = this.min;
+            input.selectOptions = this.selectOptions;
 
 
-            input.name = this.inputLabel ?
-                                this.inputLabel.toLowerCase().replace(" ", "_") :
-                                this.inputHeading.toLowerCase().replace(" ", "_");
+            input.name = this.getInputName(true);
 
-        // make input name unique
-            input.name = `${input.name}_${muid()}`;
+            if (this.editMode) {
 
+                this.formInputs[this.editId] = input;
 
-            this.formInputs.push(input);
+            } else {
+
+                this.formInputs.push(input);
+
+            }
+
 
             this.reset();
 
@@ -849,6 +1189,53 @@ export default {
 
 
 
+        getInputName(uniqueId = false, input = "") {
+
+                let name = "";
+
+                if(!input) {
+
+                    name = this.inputLabel ?
+                                this.inputLabel.toLowerCase().replaceAll(" ", "_") :
+                                this.inputHeading.toLowerCase().replaceAll(" ", "_");
+
+                } else {
+
+                    name = input.label ?
+                                input.label.toLowerCase().replaceAll(" ", "_") :
+                                input.heading.toLowerCase().replaceAll(" ", "_");
+
+                }
+
+
+                if (uniqueId) name += `_${muid()}`;
+
+                return name;
+
+        },
+
+// increases count to access delete/group/selectall btns
+        previewInputsSelected(reset = false) {
+
+            if(reset && typeof reset !== 'object') {
+                this.previewSelected = 0;
+                $('#select-all').prop('checked', false);
+                return;
+            }
+
+            const previewInputs = $(".preview-select-input");
+
+            let count = 0;
+
+            $(previewInputs).each( (i, select) => {
+                if($(select).prop('checked')) {
+                    count++;
+                }
+            } );
+
+            this.previewSelected = count;
+
+        },
 
 
 
@@ -869,6 +1256,10 @@ export default {
                 label: "",
                 description: ""
             },];
+            this.selectCount = 1;
+            this.selectOptions = [{
+                    option: ""
+                }, ];
             this.inputHeading = "";
             this.inputPlaceholder = "";
             this.inputType = null;
@@ -879,8 +1270,47 @@ export default {
             this.inputRequired = false;
             this.min = 0;
             this.max = 10;
+            this.hideForm = false;
+            this.editMode = false;
+            this.editId = null;
 
             this.step = all ? 1 : 2;
+
+            this.previewInputsSelected(true);
+        },
+
+        showInputType(input = '', capitalize = false) {
+
+            const inputName = input ? input.type : this.inputType;
+
+            let name = "";
+
+            if(inputName === 'text') name = 'single line';
+
+            if(inputName === 'email') name = 'email';
+
+            if(inputName === 'textarea') name = 'paragraph';
+
+            if(inputName === 'select') name = 'select';
+
+            if(inputName === 'checkbox') name = 'checkbox';
+
+            if(inputName === 'radio') name = 'radio';
+
+            if(inputName === 'number') name = 'number';
+
+
+            if(inputName === 'tel') name = 'phone';
+
+
+            if(inputName === 'address') name = 'address';
+
+
+            if(capitalize) name = name.charAt(0).toUpperCase() + name.slice(1);;
+
+
+            return name;
+
         },
 
 
@@ -891,7 +1321,7 @@ export default {
 
 
     updated() {
-
+        this.formInputSelectedEvent();
     }, // ##-UPDATED
 
 

@@ -11144,6 +11144,15 @@ body {
   margin-bottom: 0.6rem;
 }
 
+.form-create__preview-select {
+  padding-left: 0;
+}
+
+.form-create__preview-select-input {
+  position: relative;
+  margin-left: 0.25rem;
+}
+
 .media-modal {
   padding-right: 0 !important;
 }

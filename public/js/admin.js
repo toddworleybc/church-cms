@@ -2243,6 +2243,68 @@ var FormCreatorComponent = Vue.component('form-create-component', __webpack_requ
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _mixins_muid__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../mixins/muid */ "./resources/js/admin/mixins/muid.js");
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2706,7 +2768,10 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
         label: "",
         description: ""
       }],
-      checkboxesInline: true,
+      selectCount: 1,
+      selectOptions: [{
+        option: ""
+      }],
       formHtml: "",
       formInputs: [],
       formHeading: null,
@@ -2721,7 +2786,11 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       inputRequired: false,
       min: 0,
       max: 10,
-      step: 2
+      previewSelected: 0,
+      step: 2,
+      hideForm: false,
+      editMode: false,
+      editId: null
     };
   },
   computed: {
@@ -2731,10 +2800,63 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
     },
     // removes disable from create input btn
     enableCreateInputBtn: function enableCreateInputBtn() {
-      return this.inputLabel || this.inputHeading ? true : false;
+      if (this.formInputType() === 'checkboxType') {
+        // check if input label or heading exist
+        if (this.inputLabel || this.inputHeading) {
+          // return labels that are filled in
+          var labels = this.checkboxInputs.filter(function (input) {
+            return input.label !== "";
+          }); // check to see if the length is the same
+
+          return labels.length === this.checkboxInputs.length ? true : false;
+        } else {
+          return false;
+        }
+      } else {
+        return this.inputLabel || this.inputHeading ? true : false;
+      }
     }
   },
   methods: {
+    editInput: function editInput() {
+      var id = parseInt($('.preview-select-input').first().attr('id')),
+          input = this.formInputs[id];
+      this.editMode = true;
+      this.editId = id;
+      this.checkboxCount = input.checkBoxes.length;
+      this.checkboxInputs = input.checkBoxes;
+      this.selectCount = input.selectOptions.length;
+      this.selectOptions = input.selectOptions;
+      this.inputHeading = input.heading;
+      this.inputPlaceholder = input.placeholder;
+      this.inputType = input.type;
+      this.inputLabel = input.label;
+      this.inputDynamic = input.dynamic;
+      this.inputDescription = input.description;
+      this.inputDynamicDescription = input.dynamicDescription;
+      this.inputRequired = input.required;
+      this.min = input.min;
+      this.max = input.max;
+      this.hideForm = true;
+      this.step = 3;
+    },
+    // event select all
+    selectAll: function selectAll(e) {
+      var previewInputs = $(".preview-select-input");
+      $(previewInputs).each(function (i, input) {
+        $(input).prop('checked', $(e.target).prop('checked'));
+      });
+      this.previewInputsSelected();
+    },
+    // event for when input is selected to enable buttons
+    formInputSelectedEvent: function formInputSelectedEvent() {
+      var _this = this;
+
+      var previewInputs = $(".preview-select-input");
+      $(previewInputs).each(function (i, input) {
+        $(input).on('click', _this.previewInputsSelected);
+      });
+    },
     addCheckboxLabelDescriptionFields: function addCheckboxLabelDescriptionFields() {
       var inputs = {
         label: "",
@@ -2750,6 +2872,21 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
         this.checkboxInputs.pop();
       }
     },
+    addSelectOptions: function addSelectOptions() {
+      var inputs = {
+        name: "",
+        value: ""
+      }; // Add input object
+
+      if (this.selectOptions.length < this.selectCount) {
+        this.selectOptions.push(inputs);
+      } // remove input object
+
+
+      if (this.selectOptions.length > this.selectCount) {
+        this.selectOptions.pop();
+      }
+    },
     // Events ============ /
     // Step Events
     back: function back() {
@@ -2759,17 +2896,71 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
     next: function next() {
       this.step++;
     },
+    deleteSelected: function deleteSelected() {
+      var deleteInput = confirm("Are you sure you want to delete the selected inputs from the form?");
+
+      if (deleteInput) {
+        var removeIds = [];
+        $('.preview-select-input').each(function (i, psInput) {
+          if ($(psInput).prop('checked')) {
+            var id = parseInt($(psInput).attr('id'));
+            removeIds.push(id);
+          }
+        }); // ##/ end of loop
+
+        this.formInputs = this.formInputs.filter(function (input, i) {
+          return removeIds.indexOf(i) == -1;
+        });
+        this.createFormHtml();
+        this.previewInputsSelected(true);
+      }
+    },
+    createGroup: function createGroup() {
+      var _this2 = this;
+
+      var removeIds = []; // ids to filter later
+
+      var selectedInputs = [],
+          setPosition = true,
+          insertPosition = ""; // set form position
+
+      $('.preview-select-input').each(function (i, psInput) {
+        if ($(psInput).prop('checked')) {
+          var id = parseInt($(psInput).attr('id')),
+              input = _this2.formInputs[id]; // set insert position
+
+          if (setPosition) {
+            insertPosition = id;
+            setPosition = false;
+          } // set formInput position
+
+
+          removeIds.push(id); // add id's to remove from formInputs json
+          // insert selected values
+
+          Array.isArray(input) ? selectedInputs = selectedInputs.concat(input) : selectedInputs.push(input);
+        }
+      }); // ##/ end of loop
+
+      this.formInputs = this.formInputs.filter(function (input, i) {
+        return removeIds.indexOf(i) == -1;
+      });
+      this.formInputs.splice(insertPosition, 0, selectedInputs);
+      this.createFormHtml();
+      this.previewInputsSelected(true);
+    },
     // Reset data when modal is dismissed
     resetDataModalDismiss: function resetDataModalDismiss() {
-      var _this = this;
+      var _this3 = this;
 
       $('#create-form').on('hidden.bs.modal', function () {
-        _this.reset(true);
+        _this3.reset(true);
       });
     },
     // Enter selected input type
     selectedInput: function selectedInput(e) {
       this.inputType = $(e.target).attr('data-type');
+      this.hideForm = true;
       this.next();
     },
     // Funcitons ============= /
@@ -2795,78 +2986,124 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
 
       if (inputType === 'address') {
         return 'addressType';
+      } // return select type
+
+
+      if (inputType === 'select') {
+        return 'selectType';
       }
     },
     // Create the main html form!
     createFormHtml: function createFormHtml() {
-      var _this2 = this;
+      var _this4 = this;
 
       var html = '';
-      this.formInputs.forEach(function (input) {
-        var inputType = _this2.formInputType(input.type),
-            required = input.required ? '&nbsp;<span class="text-danger"><em>(required)*</em></span>' : '',
-            descriptionHtml = input.description ? "<p class=\"text-secondary\"><em>".concat(input.description, "</em></p>") : '',
-            dynamicBtnHtml = input.dynamicDescription ? "<div class=\"dynamic-btn\">\n                                        <button class=\"btn btn-info dynamic-btn__btn\">&plus;<small class=\"dynamic-btn__text\">".concat(input.dynamicDescription, "</small></button>\n                                    </div>") : "";
+      this.formInputs.forEach(function (input, i) {
+        var showInputName = Array.isArray(input) ? 'group' : _this4.showInputType(input); // adds the select to the form
 
-        if (inputType === 'textType') {
-          html += "<div class=\"form-group\">\n                                <label for=\"".concat(input.name, "\">").concat(input.label, " ").concat(required, "</label>\n                                ").concat(descriptionHtml, "\n                                ").concat(_this2.createInputHtml(input), "\n                                ").concat(dynamicBtnHtml, "\n                            </div>");
+        html += "<div class=\"form-check float-right form-create__preview-select preview-select\">\n                                <label class=\"form-check-label text-secondary\" for=\"".concat(i, "\">").concat(showInputName, "</label>\n                                <input id=\"").concat(i, "\" class=\"form-check-input form-create__preview-select-input preview-select-input\" type=\"checkbox\">\n                            </div>"); // form group start div
+
+        html += '<div class="form-group">';
+
+        if (Array.isArray(input)) {
+          input.forEach(function (input) {
+            // remove make dynamic button if group
+            input.dynamic = false;
+            input.dynamicDescription = "";
+            html += _this4.inputCreate(input);
+          });
+        } else {
+          html += _this4.inputCreate(input);
         }
 
-        if (inputType === 'checkboxType') {
-          html += "<div class=\"form-group\">\n                                    <h6>".concat(input.heading, "</h6>\n                                    ").concat(_this2.createCheckboxInputsHtml(input), "\n                                    ").concat(dynamicBtnHtml, "\n                                </div>");
-        }
-
-        if (inputType === 'numberType') {
-          html += "<div class=\"form-group\"><label for=\"".concat(input.name, "\"><span class=\"text-capitalize text-bold\">").concat(input.label, "</span></label>\n                                    <p class=\"text-secondary\"><em>").concat(input.description, "</em></p>\n                                    ").concat(_this2.createInputHtml(input), "</div>");
-        }
-
-        if (inputType === 'addressType') {
-          html += "<div class=\"form-group\">\n                                    <label><h6 class=\"d-inline\">".concat(input.heading, "</h6> &nbsp;<span class=\"text-danger\"><em>(required)*</em></span></label>\n                                    <p class=\"text-secondary\"><em>").concat(input.description, "</em></p>\n                                    ").concat(_this2.createInputHtml(input), "\n                                </div>");
-        }
+        html += '</div>';
       });
       this.formHtml = html;
     },
+    // This creates the inputs with labels and descriptions
+    inputCreate: function inputCreate(input) {
+      var html = "";
+      var inputType = this.formInputType(input.type),
+          required = input.required ? '&nbsp;<span class="text-danger"><em>(required)*</em></span>' : '',
+          descriptionHtml = input.description ? "<p class=\"text-secondary\"><em>".concat(input.description, "</em></p>") : '',
+          dynamicBtnHtml = input.dynamicDescription ? "<div class=\"dynamic-btn\">\n                                        <button class=\"btn btn-info dynamic-btn__btn\">&plus;<small class=\"dynamic-btn__text\">".concat(input.dynamicDescription, "</small></button>\n                                    </div>") : "";
+
+      if (inputType === 'textType') {
+        html += "<label for=\"".concat(input.name, "\">").concat(input.label, " ").concat(required, "</label>\n                                ").concat(descriptionHtml, "\n                                ").concat(this.createInputHtml(input), "\n                                ").concat(dynamicBtnHtml);
+      }
+
+      if (inputType === 'checkboxType') {
+        html += "<h5>".concat(input.heading, "</h5>\n                                 ").concat(this.createCheckboxInputsHtml(input));
+      }
+
+      if (inputType === 'numberType') {
+        html += "<label for=\"".concat(input.name, "\">").concat(input.label, "</label>\n                                    <p class=\"text-secondary\"><em>").concat(descriptionHtml, "</em></p>\n                                    ").concat(this.createInputHtml(input));
+      }
+
+      if (inputType === 'addressType') {
+        html += "<h5>".concat(input.heading, " ").concat(required, "</h5>\n                                    <p class=\"text-secondary\"><em>").concat(descriptionHtml, "</em></p>\n                                    ").concat(this.createInputHtml(input));
+      }
+
+      if (inputType === 'selectType') {
+        html += "<h5>".concat(input.heading, "</h5>\n                                ").concat(this.createInputHtml(input));
+      }
+
+      return html;
+    },
     createCheckboxInputsHtml: function createCheckboxInputsHtml(input) {
-      var _this3 = this;
+      var _this5 = this;
 
       var html = "";
       input.checkBoxes.forEach(function (checkbox) {
         var uid = Object(_mixins_muid__WEBPACK_IMPORTED_MODULE_0__["muid"])();
-        html += "<div class=\"mb-4\"><p class=\"text-secondary mb-0\"><em>".concat(checkbox.description, "</em></p>\n                        <div class=\"custom-control custom-").concat(input.type, "\">\n                            ").concat(_this3.createInputHtml(input, uid), "\n                            <label class=\"custom-control-label\" for=\"").concat(uid, "\">").concat(checkbox.label, "</label>\n                        </div></div>");
+        html += "<div class=\"my-4\"><p class=\"text-secondary mb-0\"><em>".concat(checkbox.description, "</em></p>\n                        <div class=\"custom-control custom-").concat(input.type, "\">\n                            ").concat(_this5.createInputHtml(input, uid, checkbox.label), "\n                            <label class=\"custom-control-label\" for=\"").concat(uid, "\">").concat(checkbox.label, "</label>\n                        </div></div>");
       });
       return html;
     },
-    // Create the input html from created inputs in the form inputs array
+    // Create the input html from created inputs in the formInputs array
     createInputHtml: function createInputHtml(input) {
       var uid = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Object(_mixins_muid__WEBPACK_IMPORTED_MODULE_0__["muid"])();
+      var checkboxLabel = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "";
       var required = input.required ? 'required' : '';
       var inputHtml = '';
 
       if (input.type === 'text' || input.type === 'email') {
-        inputHtml = "<input id=\"".concat(input.name, "\" type=\"").concat(input.type, "\" name=\"").concat(input.name, "\" placeholder=\"").concat(input.placeholder, "\" class=\"form-control\" ").concat(required, ">");
+        inputHtml = "<input id=\"".concat(input.name, "\" type=\"").concat(input.type, "\" name=\"").concat(input.name, "\" placeholder=\"").concat(input.placeholder, "\" class=\"form-control mb-4\" ").concat(required, ">");
       }
 
       if (input.type === 'textarea') {
-        inputHtml = "<textarea id=\"".concat(input.name, "\" rows=\"5\" name=\"").concat(input.name, "\" class=\"form-control\" placeholder=\"").concat(input.placeholder, "\" ").concat(required, "></textarea>");
+        inputHtml = "<textarea id=\"".concat(input.name, "\" rows=\"5\" name=\"").concat(input.name, "\" class=\"form-control mb-4\" placeholder=\"").concat(input.placeholder, "\" ").concat(required, "></textarea>");
       }
 
       if (input.type === 'number') {
-        inputHtml = "<input id=\"".concat(input.name, "\" type=\"").concat(input.type, "\" class=\"form-control col-6\" value=\"").concat(input.min, "\" name=\"").concat(input.name, "\" min=\"").concat(input.min, "\" max=\"").concat(input.max, "\" ").concat(required, ">");
+        inputHtml = "<input id=\"".concat(input.name, "\" type=\"").concat(input.type, "\" class=\"form-control col-6 mb-4\" value=\"").concat(input.min, "\" name=\"").concat(input.name, "\" min=\"").concat(input.min, "\" max=\"").concat(input.max, "\" ").concat(required, ">");
       }
 
       if (input.type === 'tel') {
-        inputHtml = "<input id=\"".concat(input.name, "\" type=\"").concat(input.type, "\" name=\"").concat(input.name, "\" class=\"form-control\" ").concat(required, ">");
+        inputHtml = "<input id=\"".concat(input.name, "\" type=\"").concat(input.type, "\" name=\"").concat(input.name, "\" class=\"form-control mb-4\" ").concat(required, ">");
       }
 
       if (input.type === 'radio' || input.type === 'checkbox') {
-        inputHtml = "<input id=\"".concat(input.name, "\" type=\"").concat(input.type, "\" name=\"").concat(input.name, "\" class=\"custom-control-input\" id=\"").concat(uid, "\" ").concat(required, ">");
+        inputHtml = "<input id=\"".concat(uid, "\" type=\"").concat(input.type, "\" value=\"").concat(checkboxLabel.toLowerCase(), "\" name=\"").concat(this.getInputName(false, input), "\" class=\"custom-control-input mb-4\" id=\"").concat(uid, "\" ").concat(required, ">");
       }
 
       if (input.type === "address") {
-        inputHtml = "<label for=\"".concat(input.name, "_address\">Address</label>\n                            <input type=\"text\" name=\"").concat(input.name, "_address\" class=\"form-control\" id=\"").concat(input.name, "_address\" ").concat(required, ">\n\n                            <div class=\"form-row\">\n                                <div class=\"form-group col-md-6\">\n                                <label for=\"").concat(input.name, "_city\">City</label>\n                                <input type=\"text\" name=\"").concat(input.name, "_city\" class=\"form-control\" id=\"").concat(input.name, "_city\" ").concat(required, ">\n                                </div>\n                                <div class=\"form-group col-md-4\">\n                                <label for=\"").concat(input.name, "_state\">State</label>\n                                 <select name=\"").concat(input.name, "_state\" id=\"").concat(input.name, "_state\" class=\"form-control\" ").concat(required, ">\n                                    <option selected hidden>Choose State</option>\n                                    <option value=\"AL\">Alabama</option>\n                                    <option value=\"AK\">Alaska</option>\n                                    <option value=\"AZ\">Arizona</option>\n                                    <option value=\"AR\">Arkansas</option>\n                                    <option value=\"CA\">California</option>\n                                    <option value=\"CO\">Colorado</option>\n                                    <option value=\"CT\">Connecticut</option>\n                                    <option value=\"DE\">Delaware</option>\n                                    <option value=\"DC\">District Of Columbia</option>\n                                    <option value=\"FL\">Florida</option>\n                                    <option value=\"GA\">Georgia</option>\n                                    <option value=\"HI\">Hawaii</option>\n                                    <option value=\"ID\">Idaho</option>\n                                    <option value=\"IL\">Illinois</option>\n                                    <option value=\"IN\">Indiana</option>\n                                    <option value=\"IA\">Iowa</option>\n                                    <option value=\"KS\">Kansas</option>\n                                    <option value=\"KY\">Kentucky</option>\n                                    <option value=\"LA\">Louisiana</option>\n                                    <option value=\"ME\">Maine</option>\n                                    <option value=\"MD\">Maryland</option>\n                                    <option value=\"MA\">Massachusetts</option>\n                                    <option value=\"MI\">Michigan</option>\n                                    <option value=\"MN\">Minnesota</option>\n                                    <option value=\"MS\">Mississippi</option>\n                                    <option value=\"MO\">Missouri</option>\n                                    <option value=\"MT\">Montana</option>\n                                    <option value=\"NE\">Nebraska</option>\n                                    <option value=\"NV\">Nevada</option>\n                                    <option value=\"NH\">New Hampshire</option>\n                                    <option value=\"NJ\">New Jersey</option>\n                                    <option value=\"NM\">New Mexico</option>\n                                    <option value=\"NY\">New York</option>\n                                    <option value=\"NC\">North Carolina</option>\n                                    <option value=\"ND\">North Dakota</option>\n                                    <option value=\"OH\">Ohio</option>\n                                    <option value=\"OK\">Oklahoma</option>\n                                    <option value=\"OR\">Oregon</option>\n                                    <option value=\"PA\">Pennsylvania</option>\n                                    <option value=\"RI\">Rhode Island</option>\n                                    <option value=\"SC\">South Carolina</option>\n                                    <option value=\"SD\">South Dakota</option>\n                                    <option value=\"TN\">Tennessee</option>\n                                    <option value=\"TX\">Texas</option>\n                                    <option value=\"UT\">Utah</option>\n                                    <option value=\"VT\">Vermont</option>\n                                    <option value=\"VA\">Virginia</option>\n                                    <option value=\"WA\">Washington</option>\n                                    <option value=\"WV\">West Virginia</option>\n                                    <option value=\"WI\">Wisconsin</option>\n                                    <option value=\"WY\">Wyoming</option>\n                                </select>\n                                </div>\n                                <div class=\"form-group col-md-2\">\n                                <label for=\"").concat(input.name, "_zip\">Zip</label>\n                                <input type=\"text\" name=\"").concat(input.name, "_zip\" class=\"form-control\" id=\"").concat(input.name, "_zip\" ").concat(required, ">\n                                </div>\n                            </div>");
+        inputHtml = "<label for=\"".concat(input.name, "_address\">Address</label>\n                            <input type=\"text\" name=\"").concat(input.name, "_address\" class=\"form-control\" id=\"").concat(input.name, "_address\" ").concat(required, ">\n\n                            <div class=\"form-row mb-4\">\n                                <div class=\"form-group col-md-6\">\n                                <label for=\"").concat(input.name, "_city\">City</label>\n                                <input type=\"text\" name=\"").concat(input.name, "_city\" class=\"form-control\" id=\"").concat(input.name, "_city\" ").concat(required, ">\n                                </div>\n                                <div class=\"form-group col-md-4\">\n                                <label for=\"").concat(input.name, "_state\">State</label>\n                                 <select name=\"").concat(input.name, "_state\" id=\"").concat(input.name, "_state\" class=\"form-control\" ").concat(required, ">\n                                    <option selected hidden>Choose State</option>\n                                    <option value=\"AL\">Alabama</option>\n                                    <option value=\"AK\">Alaska</option>\n                                    <option value=\"AZ\">Arizona</option>\n                                    <option value=\"AR\">Arkansas</option>\n                                    <option value=\"CA\">California</option>\n                                    <option value=\"CO\">Colorado</option>\n                                    <option value=\"CT\">Connecticut</option>\n                                    <option value=\"DE\">Delaware</option>\n                                    <option value=\"DC\">District Of Columbia</option>\n                                    <option value=\"FL\">Florida</option>\n                                    <option value=\"GA\">Georgia</option>\n                                    <option value=\"HI\">Hawaii</option>\n                                    <option value=\"ID\">Idaho</option>\n                                    <option value=\"IL\">Illinois</option>\n                                    <option value=\"IN\">Indiana</option>\n                                    <option value=\"IA\">Iowa</option>\n                                    <option value=\"KS\">Kansas</option>\n                                    <option value=\"KY\">Kentucky</option>\n                                    <option value=\"LA\">Louisiana</option>\n                                    <option value=\"ME\">Maine</option>\n                                    <option value=\"MD\">Maryland</option>\n                                    <option value=\"MA\">Massachusetts</option>\n                                    <option value=\"MI\">Michigan</option>\n                                    <option value=\"MN\">Minnesota</option>\n                                    <option value=\"MS\">Mississippi</option>\n                                    <option value=\"MO\">Missouri</option>\n                                    <option value=\"MT\">Montana</option>\n                                    <option value=\"NE\">Nebraska</option>\n                                    <option value=\"NV\">Nevada</option>\n                                    <option value=\"NH\">New Hampshire</option>\n                                    <option value=\"NJ\">New Jersey</option>\n                                    <option value=\"NM\">New Mexico</option>\n                                    <option value=\"NY\">New York</option>\n                                    <option value=\"NC\">North Carolina</option>\n                                    <option value=\"ND\">North Dakota</option>\n                                    <option value=\"OH\">Ohio</option>\n                                    <option value=\"OK\">Oklahoma</option>\n                                    <option value=\"OR\">Oregon</option>\n                                    <option value=\"PA\">Pennsylvania</option>\n                                    <option value=\"RI\">Rhode Island</option>\n                                    <option value=\"SC\">South Carolina</option>\n                                    <option value=\"SD\">South Dakota</option>\n                                    <option value=\"TN\">Tennessee</option>\n                                    <option value=\"TX\">Texas</option>\n                                    <option value=\"UT\">Utah</option>\n                                    <option value=\"VT\">Vermont</option>\n                                    <option value=\"VA\">Virginia</option>\n                                    <option value=\"WA\">Washington</option>\n                                    <option value=\"WV\">West Virginia</option>\n                                    <option value=\"WI\">Wisconsin</option>\n                                    <option value=\"WY\">Wyoming</option>\n                                </select>\n                                </div>\n                                <div class=\"form-group col-md-2\">\n                                <label for=\"").concat(input.name, "_zip\">Zip</label>\n                                <input type=\"text\" name=\"").concat(input.name, "_zip\" class=\"form-control\" id=\"").concat(input.name, "_zip\" ").concat(required, ">\n                                </div>\n                            </div>");
+      }
+
+      if (input.type === 'select') {
+        var placeHolder = input.placeholder ? "<option class=\"text-secondary\" selected hidden disabled>".concat(input.placeholder, "</option>") : "";
+        inputHtml = "<select name=\"".concat(this.getInputName(true, input), "\" class=\"mb-4 custom-select col-4 d-block\">\n                                    ").concat(placeHolder, "\n                                    ").concat(this.createOptionsHtml(input), "\n                                </select>");
       }
 
       return inputHtml;
+    },
+    createOptionsHtml: function createOptionsHtml(input) {
+      var options = "";
+      input.selectOptions.forEach(function (input) {
+        options += "<option value=\"".concat(input.option, "\">").concat(input.option, "</option>");
+      });
+      return options;
     },
     // Creates or rather adds the input properties into an object and pushes the data into the form inputs array.
     createInput: function createInput() {
@@ -2882,12 +3119,50 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       input.required = this.inputRequired;
       input.max = this.max;
       input.min = this.min;
-      input.name = this.inputLabel ? this.inputLabel.toLowerCase().replace(" ", "_") : this.inputHeading.toLowerCase().replace(" ", "_"); // make input name unique
+      input.selectOptions = this.selectOptions;
+      input.name = this.getInputName(true);
 
-      input.name = "".concat(input.name, "_").concat(Object(_mixins_muid__WEBPACK_IMPORTED_MODULE_0__["muid"])());
-      this.formInputs.push(input);
+      if (this.editMode) {
+        this.formInputs[this.editId] = input;
+      } else {
+        this.formInputs.push(input);
+      }
+
       this.reset();
       this.createFormHtml();
+    },
+    getInputName: function getInputName() {
+      var uniqueId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      var input = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+      var name = "";
+
+      if (!input) {
+        name = this.inputLabel ? this.inputLabel.toLowerCase().replaceAll(" ", "_") : this.inputHeading.toLowerCase().replaceAll(" ", "_");
+      } else {
+        name = input.label ? input.label.toLowerCase().replaceAll(" ", "_") : input.heading.toLowerCase().replaceAll(" ", "_");
+      }
+
+      if (uniqueId) name += "_".concat(Object(_mixins_muid__WEBPACK_IMPORTED_MODULE_0__["muid"])());
+      return name;
+    },
+    // increases count to access delete/group/selectall btns
+    previewInputsSelected: function previewInputsSelected() {
+      var reset = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+      if (reset && _typeof(reset) !== 'object') {
+        this.previewSelected = 0;
+        $('#select-all').prop('checked', false);
+        return;
+      }
+
+      var previewInputs = $(".preview-select-input");
+      var count = 0;
+      $(previewInputs).each(function (i, select) {
+        if ($(select).prop('checked')) {
+          count++;
+        }
+      });
+      this.previewSelected = count;
     },
     // Reset the inputs properties. if ALL is true reset the entire form!
     reset: function reset() {
@@ -2906,6 +3181,10 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
         label: "",
         description: ""
       }];
+      this.selectCount = 1;
+      this.selectOptions = [{
+        option: ""
+      }];
       this.inputHeading = "";
       this.inputPlaceholder = "";
       this.inputType = null;
@@ -2916,11 +3195,35 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       this.inputRequired = false;
       this.min = 0;
       this.max = 10;
+      this.hideForm = false;
+      this.editMode = false;
+      this.editId = null;
       this.step = all ? 1 : 2;
+      this.previewInputsSelected(true);
+    },
+    showInputType: function showInputType() {
+      var input = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+      var capitalize = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      var inputName = input ? input.type : this.inputType;
+      var name = "";
+      if (inputName === 'text') name = 'single line';
+      if (inputName === 'email') name = 'email';
+      if (inputName === 'textarea') name = 'paragraph';
+      if (inputName === 'select') name = 'select';
+      if (inputName === 'checkbox') name = 'checkbox';
+      if (inputName === 'radio') name = 'radio';
+      if (inputName === 'number') name = 'number';
+      if (inputName === 'tel') name = 'phone';
+      if (inputName === 'address') name = 'address';
+      if (capitalize) name = name.charAt(0).toUpperCase() + name.slice(1);
+      ;
+      return name;
     }
   },
   // ##-METHODS ---/
-  updated: function updated() {},
+  updated: function updated() {
+    this.formInputSelectedEvent();
+  },
   // ##-UPDATED
   mounted: function mounted() {
     this.resetDataModalDismiss(); // add the reset method to the cancel modal event
@@ -70421,7 +70724,13 @@ var render = function() {
                     : _vm._e(),
                   _vm._v(" "),
                   _vm.step === 3
-                    ? _c("span", [_vm._v("Input Labels")])
+                    ? _c("span", [
+                        _vm._v(
+                          "Create " +
+                            _vm._s(_vm.showInputType("", true)) +
+                            " input"
+                        )
+                      ])
                     : _vm._e()
                 ]),
                 _vm._v(" "),
@@ -70433,6 +70742,16 @@ var render = function() {
                 { staticClass: "modal-body d-flex justify-content-between" },
                 [
                   _c("div", { staticClass: "form-create__steps col-5" }, [
+                    _c(
+                      "div",
+                      { staticClass: "alert alert-info border-bottom mb-0" },
+                      [
+                        _c("p", { staticClass: "mb-0" }, [
+                          _vm._v("Send To Email: " + _vm._s(_vm.formEmail))
+                        ])
+                      ]
+                    ),
+                    _vm._v(" "),
                     _vm.step === 1
                       ? _c("div", { staticClass: "form-create__details" }, [
                           _c("p", [
@@ -70569,6 +70888,21 @@ var render = function() {
                                         }
                                       },
                                       [_vm._v("Paragraph")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "button",
+                                      {
+                                        staticClass: "btn btn-info",
+                                        attrs: { "data-type": "select" },
+                                        on: {
+                                          click: function($event) {
+                                            $event.preventDefault()
+                                            return _vm.selectedInput($event)
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("Select")]
                                     ),
                                     _vm._v(" "),
                                     _c(
@@ -70893,11 +71227,7 @@ var render = function() {
                                           }
                                         }),
                                         _vm._v(" "),
-                                        _c(
-                                          "label",
-                                          { attrs: { for: "label" } },
-                                          [_vm._v("Enter Label")]
-                                        ),
+                                        _vm._m(7, true),
                                         _vm._v(" "),
                                         _c("input", {
                                           directives: [
@@ -70932,41 +71262,7 @@ var render = function() {
                                           : _vm._e()
                                       ]
                                     )
-                                  }),
-                                  _vm._v(" "),
-                                  _c(
-                                    "div",
-                                    {
-                                      staticClass:
-                                        "custom-control custom-switch"
-                                    },
-                                    [
-                                      _c("input", {
-                                        staticClass: "custom-control-input",
-                                        attrs: {
-                                          type: "checkbox",
-                                          id: "checkboxes-inline"
-                                        },
-                                        domProps: {
-                                          checked: _vm.checkboxesInline
-                                        },
-                                        on: {
-                                          click: function($event) {
-                                            _vm.checkboxesInline = !_vm.checkboxesInline
-                                          }
-                                        }
-                                      }),
-                                      _vm._v(" "),
-                                      _c(
-                                        "label",
-                                        {
-                                          staticClass: "custom-control-label",
-                                          attrs: { for: "checkboxes-inline" }
-                                        },
-                                        [_vm._v("Make Checkboxes Inline")]
-                                      )
-                                    ]
-                                  )
+                                  })
                                 ],
                                 2
                               )
@@ -70974,7 +71270,7 @@ var render = function() {
                           _vm._v(" "),
                           _vm.formInputType() === "numberType"
                             ? _c("div", [
-                                _vm._m(7),
+                                _vm._m(8),
                                 _vm._v(" "),
                                 _c("input", {
                                   directives: [
@@ -70998,7 +71294,7 @@ var render = function() {
                                   }
                                 }),
                                 _vm._v(" "),
-                                _vm._m(8),
+                                _vm._m(9),
                                 _vm._v(" "),
                                 _c("textarea", {
                                   directives: [
@@ -71026,7 +71322,7 @@ var render = function() {
                                   _vm._v("Enter Minimum Value")
                                 ]),
                                 _vm._v(" "),
-                                _vm._m(9),
+                                _vm._m(10),
                                 _vm._v(" "),
                                 _c("input", {
                                   directives: [
@@ -71054,7 +71350,7 @@ var render = function() {
                                   _vm._v("Enter Maximum Value")
                                 ]),
                                 _vm._v(" "),
-                                _vm._m(10),
+                                _vm._m(11),
                                 _vm._v(" "),
                                 _c("input", {
                                   directives: [
@@ -71121,7 +71417,7 @@ var render = function() {
                                   ]
                                 ),
                                 _vm._v(" "),
-                                _vm._m(11),
+                                _vm._m(12),
                                 _vm._v(" "),
                                 _c("input", {
                                   directives: [
@@ -71145,7 +71441,7 @@ var render = function() {
                                   }
                                 }),
                                 _vm._v(" "),
-                                _vm._m(12),
+                                _vm._m(13),
                                 _vm._v(" "),
                                 _c("textarea", {
                                   directives: [
@@ -71169,6 +71465,149 @@ var render = function() {
                                   }
                                 })
                               ])
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _vm.formInputType() === "selectType"
+                            ? _c(
+                                "div",
+                                [
+                                  _vm._m(14),
+                                  _vm._v(" "),
+                                  _c("input", {
+                                    directives: [
+                                      {
+                                        name: "model",
+                                        rawName: "v-model",
+                                        value: _vm.inputHeading,
+                                        expression: "inputHeading"
+                                      }
+                                    ],
+                                    staticClass: "form-control",
+                                    attrs: {
+                                      id: "checkboxHeading",
+                                      type: "text"
+                                    },
+                                    domProps: { value: _vm.inputHeading },
+                                    on: {
+                                      input: function($event) {
+                                        if ($event.target.composing) {
+                                          return
+                                        }
+                                        _vm.inputHeading = $event.target.value
+                                      }
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _vm._m(15),
+                                  _vm._v(" "),
+                                  _c("input", {
+                                    directives: [
+                                      {
+                                        name: "model",
+                                        rawName: "v-model",
+                                        value: _vm.inputPlaceholder,
+                                        expression: "inputPlaceholder"
+                                      }
+                                    ],
+                                    staticClass: "form-control",
+                                    attrs: { type: "text", id: "placeholder" },
+                                    domProps: { value: _vm.inputPlaceholder },
+                                    on: {
+                                      input: function($event) {
+                                        if ($event.target.composing) {
+                                          return
+                                        }
+                                        _vm.inputPlaceholder =
+                                          $event.target.value
+                                      }
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _vm._m(16),
+                                  _vm._v(" "),
+                                  _vm._m(17),
+                                  _vm._v(" "),
+                                  _c("input", {
+                                    directives: [
+                                      {
+                                        name: "model",
+                                        rawName: "v-model",
+                                        value: _vm.selectCount,
+                                        expression: "selectCount"
+                                      }
+                                    ],
+                                    staticClass: "form-control col-6",
+                                    attrs: {
+                                      type: "number",
+                                      id: "number",
+                                      min: "1",
+                                      max: "20"
+                                    },
+                                    domProps: { value: _vm.selectCount },
+                                    on: {
+                                      change: _vm.addSelectOptions,
+                                      input: function($event) {
+                                        if ($event.target.composing) {
+                                          return
+                                        }
+                                        _vm.selectCount = $event.target.value
+                                      }
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _vm._l(_vm.selectOptions, function(input) {
+                                    return _c(
+                                      "div",
+                                      {
+                                        key: _vm.selectOptions.indexOf(input),
+                                        attrs: {
+                                          id: _vm.selectOptions.indexOf(input)
+                                        }
+                                      },
+                                      [
+                                        _c(
+                                          "label",
+                                          { attrs: { for: "label" } },
+                                          [_vm._v("Enter Option")]
+                                        ),
+                                        _vm._v(" "),
+                                        _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value: input.option,
+                                              expression: "input.option"
+                                            }
+                                          ],
+                                          staticClass: "form-control",
+                                          attrs: { type: "text", id: "label" },
+                                          domProps: { value: input.option },
+                                          on: {
+                                            input: function($event) {
+                                              if ($event.target.composing) {
+                                                return
+                                              }
+                                              _vm.$set(
+                                                input,
+                                                "option",
+                                                $event.target.value
+                                              )
+                                            }
+                                          }
+                                        }),
+                                        _vm._v(" "),
+                                        _vm.selectCount > 1
+                                          ? _c("div", {
+                                              staticClass: "border-bottom mb-2"
+                                            })
+                                          : _vm._e()
+                                      ]
+                                    )
+                                  })
+                                ],
+                                2
+                              )
                             : _vm._e(),
                           _vm._v(" "),
                           _vm.formInputType() === "textType"
@@ -71244,27 +71683,97 @@ var render = function() {
                               )
                             : _vm._e()
                         ])
-                      : _vm._e(),
-                    _vm._v(" "),
-                    _c(
-                      "div",
-                      { staticClass: "alert alert-info border-bottom" },
-                      [
-                        _c("p", { staticClass: "mb-0" }, [
-                          _vm._v("Send To Email: " + _vm._s(_vm.formEmail))
-                        ])
-                      ]
-                    )
+                      : _vm._e()
                   ]),
                   _vm._v(" "),
                   _c(
                     "div",
                     { staticClass: "form-create__info col-7 border-left" },
                     [
-                      _c("h4", { staticClass: "alert alert-info" }, [
+                      _c("h4", { staticClass: "alert alert-primary" }, [
                         _vm.step !== 3
                           ? _c("span", [_vm._v(" Form Preview ")])
-                          : _c("span", [_vm._v("Create Input")])
+                          : _c("span", [
+                              _vm._v(
+                                "Create " +
+                                  _vm._s(_vm.showInputType("", true)) +
+                                  " Input"
+                              )
+                            ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "clearfix" }, [
+                        _vm.step === 2
+                          ? _c(
+                              "div",
+                              {
+                                staticClass:
+                                  "d-flex justify-content-between align-items-end mb-2 mt-4"
+                              },
+                              [
+                                _c(
+                                  "button",
+                                  {
+                                    staticClass: "btn btn-primary",
+                                    attrs: {
+                                      disabled: _vm.previewSelected !== 1
+                                    },
+                                    on: {
+                                      click: function($event) {
+                                        $event.preventDefault()
+                                        return _vm.editInput($event)
+                                      }
+                                    }
+                                  },
+                                  [_vm._v("Edit Selected Input")]
+                                ),
+                                _vm._v(" "),
+                                _c("div", { staticClass: "form-check" }, [
+                                  _c(
+                                    "label",
+                                    {
+                                      staticClass: "mr-2 mb-0",
+                                      attrs: { for: "select-all" }
+                                    },
+                                    [_vm._v("Select all")]
+                                  ),
+                                  _vm._v(" "),
+                                  _c("input", {
+                                    staticClass: "form-checkbox mb-0",
+                                    attrs: {
+                                      id: "select-all",
+                                      type: "checkbox",
+                                      disabled: !_vm.formHtml
+                                    },
+                                    on: { click: _vm.selectAll }
+                                  })
+                                ])
+                              ]
+                            )
+                          : _vm._e(),
+                        _vm._v(" "),
+                        _vm.step === 3
+                          ? _c(
+                              "div",
+                              { staticClass: "form-check float-right" },
+                              [
+                                _c("label", { attrs: { for: "hide-form" } }, [
+                                  _vm._v("Hide form")
+                                ]),
+                                _vm._v(" "),
+                                _c("input", {
+                                  staticClass: "form-checkbox",
+                                  attrs: { id: "hide-form", type: "checkbox" },
+                                  domProps: { checked: _vm.hideForm },
+                                  on: {
+                                    click: function($event) {
+                                      _vm.hideForm = !_vm.hideForm
+                                    }
+                                  }
+                                })
+                              ]
+                            )
+                          : _vm._e()
                       ]),
                       _vm._v(" "),
                       _c(
@@ -71282,42 +71791,36 @@ var render = function() {
                               ])
                             : _vm._e(),
                           _vm._v(" "),
-                          _c("h5", [_vm._v(_vm._s(_vm.formHeading))]),
+                          _c("h4", [_vm._v(_vm._s(_vm.formHeading))]),
                           _vm._v(" "),
-                          _c("div", {
-                            domProps: { innerHTML: _vm._s(_vm.formHtml) }
-                          }),
+                          !_vm.hideForm
+                            ? _c("div", {
+                                staticClass: "form-preview",
+                                domProps: { innerHTML: _vm._s(_vm.formHtml) }
+                              })
+                            : _vm._e(),
                           _vm._v(" "),
                           _vm.inputType
                             ? _c("div", { staticClass: "form-group" }, [
                                 _vm.formInputType(_vm.inputType) === "textType"
                                   ? _c("div", [
-                                      _c(
-                                        "label",
-                                        {
-                                          class: {
-                                            "text-secondary": !_vm.inputLabel
-                                          },
-                                          attrs: { for: "" }
-                                        },
-                                        [
-                                          _vm._v(
-                                            _vm._s(_vm.inputLabel || "Label") +
-                                              "  "
-                                          ),
-                                          _vm.inputRequired
-                                            ? _c(
-                                                "span",
-                                                { staticClass: "text-danger" },
-                                                [
-                                                  _c("em", [
-                                                    _vm._v("(required)*")
-                                                  ])
-                                                ]
-                                              )
-                                            : _vm._e()
-                                        ]
-                                      ),
+                                      _c("label", [
+                                        _vm._v(
+                                          _vm._s(_vm.inputLabel || "Label") +
+                                            "  "
+                                        ),
+                                        _vm.inputRequired
+                                          ? _c(
+                                              "span",
+                                              { staticClass: "text-danger" },
+                                              [
+                                                _c("em", [
+                                                  _vm._v("(required)*")
+                                                ])
+                                              ]
+                                            )
+                                          : _vm._e()
+                                      ]),
                                       _vm._v(" "),
                                       _c(
                                         "p",
@@ -71392,11 +71895,11 @@ var render = function() {
                                       "div",
                                       [
                                         _vm.inputHeading
-                                          ? _c("h6", [
+                                          ? _c("h5", [
                                               _vm._v(_vm._s(_vm.inputHeading))
                                             ])
                                           : _c(
-                                              "h6",
+                                              "h5",
                                               { staticClass: "text-secondary" },
                                               [_vm._v("Heading")]
                                             ),
@@ -71461,7 +71964,9 @@ var render = function() {
                                                                   input
                                                                 ),
                                                               type:
-                                                                _vm.inputType
+                                                                _vm.inputType,
+                                                              name:
+                                                                _vm.inputHeading
                                                             }
                                                           }),
                                                           _vm._v(" "),
@@ -71481,7 +71986,8 @@ var render = function() {
                                                             [
                                                               _vm._v(
                                                                 _vm._s(
-                                                                  input.label
+                                                                  input.label ||
+                                                                    "Label"
                                                                 )
                                                               )
                                                             ]
@@ -71508,7 +72014,9 @@ var render = function() {
                                                                   input
                                                                 ),
                                                               type:
-                                                                _vm.inputType
+                                                                _vm.inputType,
+                                                              name:
+                                                                _vm.inputHeading
                                                             }
                                                           }),
                                                           _vm._v(" "),
@@ -71684,7 +72192,69 @@ var render = function() {
                                         }
                                       }),
                                       _vm._v(" "),
-                                      _vm._m(13)
+                                      _vm._m(18)
+                                    ])
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                _vm.formInputType(_vm.inputType) ===
+                                "selectType"
+                                  ? _c("div", [
+                                      _vm.inputHeading
+                                        ? _c("h6", [
+                                            _vm._v(_vm._s(_vm.inputHeading))
+                                          ])
+                                        : _c(
+                                            "h6",
+                                            { staticClass: "text-secondary" },
+                                            [_vm._v("Heading")]
+                                          ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "select",
+                                        { staticClass: "custom-select col-4" },
+                                        [
+                                          _c(
+                                            "option",
+                                            {
+                                              staticClass: "text-secondary",
+                                              attrs: {
+                                                selected: "",
+                                                hidden: "",
+                                                disabled: ""
+                                              },
+                                              domProps: {
+                                                value: _vm.inputPlaceholder
+                                              }
+                                            },
+                                            [
+                                              _vm._v(
+                                                _vm._s(
+                                                  _vm.inputPlaceholder ||
+                                                    "Placeholder"
+                                                )
+                                              )
+                                            ]
+                                          ),
+                                          _vm._v(" "),
+                                          _vm._l(_vm.selectOptions, function(
+                                            input
+                                          ) {
+                                            return _c(
+                                              "option",
+                                              {
+                                                key: _vm.selectOptions.indexOf(
+                                                  input
+                                                ),
+                                                domProps: {
+                                                  value: input.option
+                                                }
+                                              },
+                                              [_vm._v(_vm._s(input.option))]
+                                            )
+                                          })
+                                        ],
+                                        2
+                                      )
                                     ])
                                   : _vm._e(),
                                 _vm._v(" "),
@@ -71721,7 +72291,45 @@ var render = function() {
                               ])
                             : _vm._e()
                         ]
-                      )
+                      ),
+                      _vm._v(" "),
+                      _vm.step === 2
+                        ? _c(
+                            "div",
+                            { staticClass: "d-flex justify-content-between" },
+                            [
+                              _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-danger my-1",
+                                  attrs: { disabled: !_vm.previewSelected },
+                                  on: {
+                                    click: function($event) {
+                                      $event.preventDefault()
+                                      return _vm.deleteSelected($event)
+                                    }
+                                  }
+                                },
+                                [_vm._v("Delete Selected")]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-primary ml-2 my-1",
+                                  attrs: { disabled: _vm.previewSelected < 2 },
+                                  on: {
+                                    click: function($event) {
+                                      $event.preventDefault()
+                                      return _vm.createGroup($event)
+                                    }
+                                  }
+                                },
+                                [_vm._v("Group Selected")]
+                              )
+                            ]
+                          )
+                        : _vm._e()
                     ]
                   )
                 ]
@@ -72255,6 +72863,17 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
+    return _c("label", { attrs: { for: "label" } }, [
+      _vm._v("Enter Label  "),
+      _c("span", { staticClass: "text-danger" }, [
+        _c("em", [_vm._v("(required)*")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
     return _c("label", { attrs: { for: "description" } }, [
       _vm._v("Enter Description  "),
       _c("span", { staticClass: "text-secondary" }, [
@@ -72298,6 +72917,48 @@ var staticRenderFns = [
       _c("span", { staticClass: "text-secondary" }, [
         _c("em", [_vm._v("(optional)")])
       ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("label", { attrs: { for: "heading" } }, [
+      _vm._v("Enter Heading  "),
+      _c("span", { staticClass: "text-danger" }, [
+        _c("em", [_vm._v("(required)*")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("label", { attrs: { for: "placeholder" } }, [
+      _vm._v("Enter Placeholder  "),
+      _c("span", { staticClass: "text-secondary" }, [
+        _c("em", [_vm._v("(optional)")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("label", { attrs: { for: "number" } }, [
+      _vm._v("Enter how many "),
+      _c("span", { staticClass: "text-capitalize text-bold" }, [
+        _vm._v("Options")
+      ]),
+      _vm._v("'s you need")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("p", { staticClass: "text-secondary" }, [
+      _c("em", [_vm._v("Max 20")])
     ])
   },
   function() {
