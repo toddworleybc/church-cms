@@ -2819,8 +2819,15 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
   },
   methods: {
     editInput: function editInput() {
-      var id = parseInt($('.preview-select-input').first().attr('id')),
-          input = this.formInputs[id];
+      var previewSelects = $('.preview-select-input');
+      var id = "";
+      $(previewSelects).each(function (i, input) {
+        if ($(input).prop('checked')) {
+          id = parseInt($(input).attr('id'));
+          return;
+        }
+      });
+      var input = this.formInputs[id];
       this.editMode = true;
       this.editId = id;
       this.checkboxCount = input.checkBoxes.length;

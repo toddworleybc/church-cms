@@ -598,9 +598,26 @@ export default {
 
         editInput() {
 
+            const previewSelects = $('.preview-select-input');
 
-            const id = parseInt($('.preview-select-input').first().attr('id')),
-                  input = this.formInputs[id];
+            let id = "";
+
+
+
+            $(previewSelects).each( ( i, input ) => {
+
+                if($(input).prop('checked')) {
+
+                    id = parseInt($(input).attr('id'));
+
+                    return;
+
+                }
+
+            } );
+
+            const input = this.formInputs[id];
+
 
             this.editMode = true;
             this.editId = id;
