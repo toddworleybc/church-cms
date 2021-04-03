@@ -13,8 +13,37 @@
         max-width: 1000px;
     }
 
+    &__disable-inputs {
+
+        position: relative;
+
+
+        &--white::before {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            background-color: #ffffffc7;
+        }
+
+        &--transparent::before {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            background-color: transparent;
+        }
+
+
+    }
+
 
     &__preview {
+        padding: 2rem;
         min-height: 10rem;
     }
 
@@ -34,6 +63,11 @@
 
     &__preview-select {
         padding-left: 0;
+
+    }
+
+    &__pointer {
+        cursor: pointer;
     }
 
     &__preview-select-input {

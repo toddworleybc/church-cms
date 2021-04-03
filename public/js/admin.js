@@ -2101,8 +2101,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
 
 
 var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
@@ -2125,6 +2123,7 @@ var FormCreatorComponent = Vue.component('form-create-component', __webpack_requ
       email: "",
       errors: "",
       event: "",
+      eventFormJson: {},
       image: '',
       modifiedDate: "",
       name: "",
@@ -2212,6 +2211,9 @@ var FormCreatorComponent = Vue.component('form-create-component', __webpack_requ
       this.state = this.event.state;
       this.zip = this.event.zip;
     },
+    storeEventFormJson: function storeEventFormJson(formJson) {
+      this.eventFormJson = formJson;
+    },
     todaysDate: function todaysDate() {
       var today = moment().format('dddd MMM Do, YYYY');
       $('#today').text(today);
@@ -2245,6 +2247,231 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _mixins_muid__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../mixins/muid */ "./resources/js/admin/mixins/muid.js");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2763,34 +2990,58 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
   mixins: ['muid'],
   data: function data() {
     return {
+      addQuantity: false,
+      createdFormHtml: "",
+      createdFormJson: {},
       checkboxCount: 1,
       checkboxInputs: [{
         label: "",
         description: ""
       }],
+      setCheckboxDelay: false,
       selectCount: 1,
       selectOptions: [{
         option: ""
       }],
+      groupDetails: {
+        id: Object(_mixins_muid__WEBPACK_IMPORTED_MODULE_0__["muid"])(),
+        heading: "",
+        description: "",
+        groupDynamic: false,
+        groupDynamicDescription: ""
+      },
+      groupInputsHtml: "",
       formHtml: "",
+      showHiddenForm: false,
+      showFormHtml: "",
+      showFormInputs: [],
       formInputs: [],
       formHeading: null,
       formEmail: null,
       inputHeading: "",
       inputPlaceholder: "",
       inputType: null,
-      inputLabel: null,
+      inputLabel: "",
       inputDescription: null,
       inputDynamic: false,
       inputDynamicDescription: "",
       inputRequired: false,
+      inputInfoMode: false,
+      inputPbText: "Purchase",
+      quanityInputLabel: 'Quantity',
+      inputTotal: "0.00",
+      showPrice: "0.00",
+      infoHtml: "",
       min: 0,
       max: 10,
+      paymentAdded: false,
       previewSelected: 0,
-      step: 2,
-      hideForm: false,
+      paymentSelected: false,
+      step: 1,
+      formHidden: false,
       editMode: false,
-      editId: null
+      editId: null,
+      quantityNum: 0
     };
   },
   computed: {
@@ -2800,6 +3051,14 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
     },
     // removes disable from create input btn
     enableCreateInputBtn: function enableCreateInputBtn() {
+      if (this.showHiddenForm) return false;
+
+      if (this.formInputType() === 'paymentType') {
+        if (this.inputTotal !== "0.00") return true;
+      }
+
+      if (this.formInputType() === 'groupType') return true;
+
       if (this.formInputType() === 'checkboxType') {
         // check if input label or heading exist
         if (this.inputLabel || this.inputHeading) {
@@ -2813,72 +3072,70 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
           return false;
         }
       } else {
-        return this.inputLabel || this.inputHeading ? true : false;
+        if (this.formInputType() !== 'paymentType') {
+          return this.inputLabel || this.inputHeading ? true : false;
+        }
+      }
+    },
+    dynamicControl: function dynamicControl() {
+      if (this.formInputType() === 'textType' || this.formInputType() === 'groupType') {
+        return true;
+      } else {
+        return false;
       }
     }
   },
   methods: {
-    editInput: function editInput() {
-      var previewSelects = $('.preview-select-input');
-      var id = "";
-      $(previewSelects).each(function (i, input) {
-        if ($(input).prop('checked')) {
-          id = parseInt($(input).attr('id'));
-          return;
-        }
-      });
-      var input = this.formInputs[id];
-      this.editMode = true;
-      this.editId = id;
-      this.checkboxCount = input.checkBoxes.length;
-      this.checkboxInputs = input.checkBoxes;
-      this.selectCount = input.selectOptions.length;
-      this.selectOptions = input.selectOptions;
-      this.inputHeading = input.heading;
-      this.inputPlaceholder = input.placeholder;
-      this.inputType = input.type;
-      this.inputLabel = input.label;
-      this.inputDynamic = input.dynamic;
-      this.inputDescription = input.description;
-      this.inputDynamicDescription = input.dynamicDescription;
-      this.inputRequired = input.required;
-      this.min = input.min;
-      this.max = input.max;
-      this.hideForm = true;
-      this.step = 3;
-    },
-    // event select all
-    selectAll: function selectAll(e) {
-      var previewInputs = $(".preview-select-input");
-      $(previewInputs).each(function (i, input) {
-        $(input).prop('checked', $(e.target).prop('checked'));
-      });
-      this.previewInputsSelected();
-    },
-    // event for when input is selected to enable buttons
-    formInputSelectedEvent: function formInputSelectedEvent() {
-      var _this = this;
-
-      var previewInputs = $(".preview-select-input");
-      $(previewInputs).each(function (i, input) {
-        $(input).on('click', _this.previewInputsSelected);
-      });
-    },
-    addCheckboxLabelDescriptionFields: function addCheckboxLabelDescriptionFields() {
-      var inputs = {
-        label: "",
-        description: ""
-      }; // Add input object
+    //============ EVENTS ================================================/
+    addCheckboxLabelDescriptionFields: function addCheckboxLabelDescriptionFields(e) {
+      $(e.target).prop('disabled', true); // Add input object
 
       if (this.checkboxInputs.length < this.checkboxCount) {
-        this.checkboxInputs.push(inputs);
+        var diff = parseInt(this.checkboxCount) - this.checkboxInputs.length;
+
+        for (var i = 1; i <= diff; i++) {
+          var inputs = {
+            label: "",
+            description: ""
+          };
+          this.checkboxInputs.push(inputs);
+        }
       } // remove input object
 
 
       if (this.checkboxInputs.length > this.checkboxCount) {
-        this.checkboxInputs.pop();
-      }
+        var _diff = this.checkboxInputs.length - parseInt(this.checkboxCount);
+
+        for (var _i = 1; _i <= _diff; _i++) {
+          this.checkboxInputs.pop();
+        }
+      } // Set delay to prevent button mashing
+
+
+      setTimeout(function () {
+        $(e.target).prop("disabled", false);
+      }, 300);
     },
+    // adds dynamic btn event after the button has been created
+    addDynamicBtnEvent: function addDynamicBtnEvent() {
+      var _this = this;
+
+      var dyBtns = $(".dynamic-btn");
+      $(dyBtns).each(function (i, btn) {
+        $(btn).on('click', _this.dynamicAddDup);
+      });
+    },
+    // enable quantity input
+    addQuantityInput: function addQuantityInput() {
+      this.addQuantity = this.addQuantity ? false : true;
+      this.showPrice = this.inputTotal;
+    },
+    // add quantity input html event
+    addHtmlQuantityEvent: function addHtmlQuantityEvent() {
+      var quantityInput = $('#html-quantity-input');
+      $(quantityInput).on('change', this.calPrice);
+    },
+    // add options for select element
     addSelectOptions: function addSelectOptions() {
       var inputs = {
         name: "",
@@ -2894,33 +3151,58 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
         this.selectOptions.pop();
       }
     },
-    // Events ============ /
-    // Step Events
-    back: function back() {
+    // Back Event
+    backStep: function backStep() {
       this.step--;
       this.reset();
+      this.checkPaymentExists();
     },
-    next: function next() {
-      this.step++;
-    },
-    deleteSelected: function deleteSelected() {
-      var deleteInput = confirm("Are you sure you want to delete the selected inputs from the form?");
+    // calculate the total price
+    calPrice: function calPrice(e) {
+      var priceType = $(e.target).attr('data-price-type'); // user input to calculate price
 
-      if (deleteInput) {
-        var removeIds = [];
-        $('.preview-select-input').each(function (i, psInput) {
-          if ($(psInput).prop('checked')) {
-            var id = parseInt($(psInput).attr('id'));
-            removeIds.push(id);
-          }
-        }); // ##/ end of loop
+      if (priceType === 'user-input') {
+        $('#addQuantity').val("1");
+        var total = $(e.target).val();
+        total = this.calPriceConvertTotal(total); // change user value to format value
 
-        this.formInputs = this.formInputs.filter(function (input, i) {
-          return removeIds.indexOf(i) == -1;
-        });
-        this.createFormHtml();
-        this.previewInputsSelected(true);
+        $(e.target).val(total); // insert value into input total
+
+        this.inputTotal = total;
+        this.showPrice = total;
+      } // quantity input to calculate price
+
+
+      if (priceType === 'quantity-input' || priceType === 'html-quantity-input') {
+        var quantityVal = $(e.target).val();
+        var price = '';
+
+        if (priceType !== 'html-quantity-input') {
+          price = this.inputTotal * quantityVal;
+          this.showPrice = this.calPriceConvertTotal(price.toString());
+        } else {
+          var currentTotal = parseFloat($(e.target).attr('data-total'));
+          price = currentTotal * quantityVal;
+          price = this.calPriceConvertTotal(price.toString()); // set values in html
+
+          $('#input-total').text(price);
+        }
       }
+    },
+    createEventForm: function createEventForm() {
+      var formProperties = {
+        info: {
+          heading: this.formHeading,
+          email: this.formEmail
+        },
+        inputs: this.formInputs
+      };
+      this.createFormHtml(false, true);
+      this.createdFormHtml = this.formHtml;
+      this.createdFormJson = formProperties;
+      this.$emit('eventFormJson', formProperties);
+      $('#create-form').modal('hide');
+      this.reset(true);
     },
     createGroup: function createGroup() {
       var _this2 = this;
@@ -2951,26 +3233,467 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
 
       this.formInputs = this.formInputs.filter(function (input, i) {
         return removeIds.indexOf(i) == -1;
-      });
+      }); //add group details
+
+      if (selectedInputs[0].id === undefined) selectedInputs.unshift(this.groupDetails);
       this.formInputs.splice(insertPosition, 0, selectedInputs);
       this.createFormHtml();
       this.previewInputsSelected(true);
     },
-    // Reset data when modal is dismissed
-    resetDataModalDismiss: function resetDataModalDismiss() {
+    deleteSelected: function deleteSelected() {
       var _this3 = this;
 
-      $('#create-form').on('hidden.bs.modal', function () {
-        _this3.reset(true);
+      var deleteInput = confirm("Are you sure you want to delete the selected inputs from the form?");
+
+      if (deleteInput) {
+        var removeIds = [];
+        $('.preview-select-input').each(function (i, psInput) {
+          if ($(psInput).prop('checked')) {
+            var id = parseInt($(psInput).attr('id'));
+            removeIds.push(id);
+          }
+        }); // ##/ end of loop
+        // remove  payment button.
+
+        removeIds.forEach(function (id) {
+          if (_this3.formInputs[id].type === 'payment') {
+            _this3.paymentAdded = false;
+          }
+        });
+        this.formInputs = this.formInputs.filter(function (input, i) {
+          return removeIds.indexOf(i) == -1;
+        });
+        this.createFormHtml();
+        this.previewInputsSelected(true);
+      }
+    },
+    // add duplicate of input
+    dynamicAddDup: function dynamicAddDup(e) {
+      var _this4 = this;
+
+      e.preventDefault();
+      var btn = $(e.target).closest(".dynamic-btn"),
+          id = parseInt($(btn).attr("data-id")),
+          input = this.formInputs[id],
+          uid = Object(_mixins_muid__WEBPACK_IMPORTED_MODULE_0__["muid"])(),
+          removeBtn = "<div class=\"d-flex justify-content-end\"><button class=\"btn btn-danger btn-sm remove-btn\" data-id=\"".concat(uid, "\">Remove</button></div>");
+      var inputHtml = "<div data-remove=\"".concat(uid, "\">");
+
+      if (Array.isArray(input)) {
+        input.forEach(function (item, i) {
+          if (i) inputHtml += _this4.inputCreate(item, true);
+          if (input.length === i + 1) inputHtml += removeBtn;
+        });
+      } else {
+        inputHtml += this.inputCreate(input, true);
+        inputHtml += removeBtn;
+      }
+
+      inputHtml += "</div>";
+      $(btn).before(inputHtml);
+      setTimeout(function () {
+        _this4.removeDupEvent();
+      }, 500);
+    },
+    editInput: function editInput() {
+      var _this5 = this;
+
+      var previewSelects = $('.preview-select-input');
+      var id = "",
+          group = false;
+      $(previewSelects).each(function (i, input) {
+        if ($(input).prop('checked')) {
+          id = parseInt($(input).attr('id'));
+          if ($(input).attr('data-type') === 'group') group = true;
+          return;
+        }
       });
+      var input = this.formInputs[id];
+      this.editMode = true;
+      this.editId = id;
+
+      if (group) {
+        var groupDetails = input[0];
+        this.groupDetails.id = groupDetails.id;
+        this.groupDetails.heading = groupDetails.heading;
+        this.groupDetails.description = groupDetails.description;
+        this.groupDetails.groupDynamic = groupDetails.groupDynamic;
+        this.groupDetails.groupDynamicDescription = groupDetails.groupDynamicDescription;
+        this.inputType = 'group';
+        input.forEach(function (groupInput, i) {
+          if (i) _this5.groupInputsHtml += _this5.inputCreate(groupInput);
+        });
+      } else {
+        this.checkboxCount = input.checkBoxes.length;
+        this.checkboxInputs = input.checkBoxes;
+        this.selectCount = input.selectOptions.length;
+        this.selectOptions = input.selectOptions;
+        this.inputHeading = input.heading;
+        this.inputPlaceholder = input.placeholder;
+        this.inputTotal = input.inputTotal;
+        this.addQuantity = input.addQuantity;
+        this.quanityInputLabel = input.quanityInputLabel;
+        this.showPrice = input.inputTotal;
+        this.inputType = input.type;
+        this.inputLabel = input.label;
+        this.inputDynamic = input.dynamic;
+        this.inputDescription = input.description;
+        this.inputDynamicDescription = input.dynamicDescription;
+        this.inputRequired = input.required;
+        this.min = input.min;
+        this.max = input.max;
+      }
+
+      this.formHidden = true;
+      this.step = 3;
+    },
+    // event for when input is selected to enable buttons
+    formInputSelectedEvent: function formInputSelectedEvent() {
+      var _this6 = this;
+
+      var previewInputs = $(".preview-select-input");
+      $(previewInputs).each(function (i, input) {
+        $(input).on('click', function (e) {
+          _this6.previewInputsSelected(false, e);
+        });
+      });
+    },
+    initEditForm: function initEditForm() {
+      if (!Object.keys(this.createdFormJson).length) return;
+      this.formHeading = this.createdFormJson.info.heading;
+      this.formEmail = this.createdFormJson.info.email;
+      this.formInputs = this.createdFormJson.inputs;
+      this.createFormHtml();
+    },
+    // display info text for each button element
+    inputInfo: function inputInfo() {
+      this.inputInfoMode = true;
+      var textInfo = "<h6>Input Required</h6><p>You may toggle this option to make this input required. A required input won't allow the form to be submitted until this input is filled.</p><h6>Enter Label</h6><p>This option is used to add a label to your input. This option is REQUIRED for seo, assistive technologies, and general functionality of your form. The label will be used as the input name that you will get back in the email when a user has submitted the form.</p><h6>Enter Description</h6><p>This option allows you to give more details about what information you want from the user. This option is optional!</p><h6>Enter Placeholder</h6><p>This option is used for give examples of how you want the user to fill in the input. This option is optional!</p><h6>Make Dynamic</h6><p>This option allows you to give users the ability to add/(duplicate) this input. Example of a good use for this is family registrations where families have different amounts of kids. You can create an input to capture a child's name and make it dynamic so the parent can add their other children as well. Button label is optional!</p>";
+      var html = "";
+
+      switch (this.inputType) {
+        case 'text':
+          html += "<h6>Input Details</h6><p>The <strong>Single Line</strong> input is used to capture just one line of information from a user like their name!</p>".concat(textInfo);
+          break;
+
+        case 'email':
+          html += "<h6>Input Details</h6><p>The <strong>Email</strong> input is used to capture the email of a user. While this input looks identical to the single line input, the email input will validate if the information enter into the input is indeed an email!</p>".concat(textInfo);
+          break;
+
+        case 'textarea':
+          html += "<h6>Input Details</h6><p>The <strong>Paragraph</strong> input allows the user to write multple lines of text. This is quite useful for messages or long details.</p>".concat(textInfo);
+          break;
+
+        case 'tel':
+          html += "<h6>Input Details</h6><p>The <strong>Phone</strong> input is used to capture a users phone number. While this input looks identical to the single line input, the phone input will validate if the information entered into the input is indeed a phone number!</p>".concat(textInfo);
+          break;
+
+        case 'number':
+          html += "<h6>Input Details</h6><p>The <strong>Number</strong> input allows a user to set a specific number.</p><h6>Enter Label</h6><p>This option is used to add a label to your input. This option is REQUIRED for seo, assistive technologies, and general functionality of your form. The label will be used as the input name that you will get back in the email when a user has submitted the form.</p><h6>Enter Description</h6><p>This option allows you to give more details about what information you want from the user. This option is optional!</p><h6>Enter Minimum Value</h6><p>This options allows you to set the MINIMUM value a user can enter.</p><h6>Enter Maximum Value</h6><p>This option allows you to set the MAXIMUM value a user can enter.</p>";
+          break;
+
+        case 'checkbox':
+          html += "<h6>Input Details</h6><p>The <strong>Checkbox</strong> input allows the user to select MULTIPLE options via checkboxes. If you only want to allow the user to select one option use Radio or Select inputs.</p><h6>Enter Heading</h6><p>This option is used to add a label to your input. This option is REQUIRED for seo, assistive technologies, and general functionality of your form. The heading will be used as the input name that you will get back in the email when a user has submitted the form.</p><h6>Enter how many Checkboxes you need</h6><p>This option allows you to increase or decrease the amount of checkboxes for this input. Each checkbox has a description and label field. Label field is REQUIRED for each checkbox.</p><h6>Enter Description</h6><p>This option allows you to write a description for this particular checkbox. This option is optional!</p><h6>Enter Label</h6><p>This option allows you to write a label for this particular checkbox. This option is optional!</p>";
+          break;
+
+        case 'radio':
+          html += "<h6>Input Details</h6><p>The <strong>Radio</strong> input allows the user to select a SINGLE option via checkboxes. If you want a user to be able to select multiple options use checkbox.</p><h6>Enter Heading</h6><p>This option is used to add a label to your input. This option is REQUIRED for seo, assistive technologies, and general functionality of your form. The heading will be used as the input name that you will get back in the email when a user has submitted the form.</p><h6>Enter how many Radio's you need</h6><p>This option allows you to increase or decrease the amount of radio's for this input. Each radio has a description and label field. Label field is REQUIRED for each radio.</p><h6>Enter Description</h6><p>This option allows you to write a description for this particular radio. This option is optional!</p><h6>Enter Label</h6><p>This option allows you to write a label for this particular radio. This option is optional!</p>";
+          break;
+
+        case 'select':
+          html += "<h6>Input Details</h6><p>The <strong>Select</strong> input allows the user to select a SINGLE option. If you want a user to be able to select multiple options use checkbox.</p><h6>Enter Heading</h6><p>This option is used to add a label to your input. This option is REQUIRED for seo, assistive technologies, and general functionality of your form. The heading will be used as the input name that you will get back in the email when a user has submitted the form.</p><h6>Enter Placeholder</h6><p>You may use this option to give direction to the user on what to do. example: \"Choose...\" or \"Select One...\" This option is optional!</p><h6>Enter how many options you need</h6><p>This option allows you to increase or decrease the amount of options for the select input.</p><h6>Enter Option</h6><p>Enter the option that you would like to be availble to select.</p>";
+          break;
+
+        case 'address':
+          html += "<h6>Input Details</h6><p>The <strong>Address</strong> input allows the user to enter their address.</p><h6>Input Required</h6><p>You may toggle this option to make this input required. A required input won't allow the form to be submitted until this input is filled.</p><h6>Enter Label</h6><p>This option is used to add a label to your input. This option is REQUIRED for seo, assistive technologies, and general functionality of your form. The label will be used as the input name that you will get back in the email when a user has submitted the form.</p><h6>Enter Description</h6><p>This option allows you to give more details about what information you want from the user. This option is optional!</p>";
+          break;
+
+        default:
+          break;
+      }
+
+      this.infoHtml = html;
+    },
+    // next step
+    next: function next() {
+      this.step++;
+    },
+    removeDupEvent: function removeDupEvent() {
+      var _this7 = this;
+
+      var removeBtns = $(".remove-btn");
+      $(removeBtns).each(function (i, btn) {
+        $(btn).on('click', _this7.removeDup);
+      });
+    },
+    // Reset data when modal is dismissed
+    resetDataModalDismiss: function resetDataModalDismiss() {
+      var _this8 = this;
+
+      $('#create-form').on('hidden.bs.modal', function () {
+        _this8.reset(true);
+      });
+    },
+    // event select all
+    selectAll: function selectAll(e) {
+      var previewInputs = $(".preview-select-input");
+      $(previewInputs).each(function (i, input) {
+        $(input).prop('checked', $(e.target).prop('checked'));
+      });
+      this.previewInputsSelected();
     },
     // Enter selected input type
     selectedInput: function selectedInput(e) {
       this.inputType = $(e.target).attr('data-type');
-      this.hideForm = true;
+      this.formHidden = true;
       this.next();
+      if (this.inputType === 'payment') this.paymentAdded = true;
     },
-    // Funcitons ============= /
+    // show html form when creating input
+    showForm: function showForm(e) {
+      if ($(e.target).prop('checked')) {
+        this.createInput(true);
+        this.showHiddenForm = true;
+      } else {
+        this.showHiddenForm = false;
+        this.showFormHtml = "";
+        this.showFormInputs = [];
+      }
+    },
+    switchSelected: function switchSelected() {
+      var previewSelects = $('.preview-select-input'),
+          formInputs = _toConsumableArray(this.formInputs);
+
+      var ids = []; // get the ids
+
+      $(previewSelects).each(function (i, selected) {
+        if ($(selected).prop('checked')) {
+          var id = parseInt($(selected).attr('id'));
+          ids.push(id);
+        }
+      });
+      var inputOne = formInputs[ids[0]],
+          inputTwo = formInputs[ids[1]];
+      formInputs[ids[0]] = inputTwo;
+      formInputs[ids[1]] = inputOne;
+      this.formInputs = formInputs;
+      this.createFormHtml();
+      this.reset();
+    },
+    //============ /## EVENTS ================================================/
+    //============ FUNCTIONS ================================================/
+    // convert number into money format.
+    calPriceConvertTotal: function calPriceConvertTotal(total) {
+      // add decimal if not present
+      if (!total.includes('.')) total += '.00'; // corrects if decimal goes into thousandths or more ex. 12.123
+
+      if (total.match(/(?<=\.\d{2})\d+$/)) {
+        var regExMatch = total.match(/(?<=\.\d{2})\d+$/)[0];
+        total = total.replace(regExMatch, "");
+      } // adds zero if missing hundredths
+
+
+      if (total.match(/(?<=\.)\d{1}$/)) total += '0';
+      return total;
+    },
+    // check
+    checkPaymentExists: function checkPaymentExists() {
+      var _this9 = this;
+
+      var payment = false;
+
+      if (this.inputType === 'payment') {
+        this.paymentAdded = true;
+        return;
+      }
+
+      this.formInputs.forEach(function (input) {
+        if (input.type === 'payment') {
+          _this9.paymentAdded = true;
+          payment = true;
+        }
+      });
+      if (!payment) this.paymentAdded = false;
+    },
+    createCheckboxInputsHtml: function createCheckboxInputsHtml(input) {
+      var _this10 = this;
+
+      var html = "";
+      input.checkBoxes.forEach(function (checkbox) {
+        var uid = Object(_mixins_muid__WEBPACK_IMPORTED_MODULE_0__["muid"])();
+        html += "<div class=\"my-4\"><p class=\"text-secondary mb-0\"><em>".concat(checkbox.description, "</em></p>\n                        <div class=\"custom-control custom-").concat(input.type, "\">\n                            ").concat(_this10.createInputHtml(input, uid, checkbox.label), "\n                            <label class=\"custom-control-label\" for=\"").concat(uid, "\">").concat(checkbox.label, "</label>\n                        </div></div>");
+      });
+      return html;
+    },
+    // Create the main html form!
+    createFormHtml: function createFormHtml() {
+      var _this11 = this;
+
+      var showForm = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      var createForm = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      var formInputsArray = !showForm ? this.formInputs : this.showFormInputs;
+      var html = '',
+          paymentHtml = '';
+      html += createForm ? "<h4>".concat(this.formHeading, "</h4>") : '';
+      formInputsArray.forEach(function (input, i) {
+        var showInputName = Array.isArray(input) ? 'group' : _this11.showInputType(input); // adds the select to the form
+
+        var selectBoxHtml = !createForm ? "<div class=\"form-check float-right form-create__preview-select preview-select\">\n                                <label class=\"form-check-label text-secondary form-create__pointer\" for=\"".concat(i, "\">").concat(showInputName, "</label>\n                                <input id=\"").concat(i, "\" class=\"form-check-input form-create__preview-select-input preview-select-input form-create__pointer\" data-type=\"").concat(showInputName, "\" type=\"checkbox\"  ").concat(showForm ? 'disabled' : '', ">\n                            </div>") : '';
+
+        if (input.type !== 'payment') {
+          // form group start div
+          html += "".concat(selectBoxHtml, "<div class=\"form-group\">");
+
+          if (Array.isArray(input)) {
+            input.type = 'group'; // set input type to group
+
+            html += _this11.inputCreate(input);
+          } else {
+            html += _this11.inputCreate(input);
+          }
+
+          html += '</div>';
+        } else {
+          paymentHtml = "".concat(selectBoxHtml, "<div class=\"form-group\">").concat(_this11.inputCreate(input), "</div>");
+        }
+      });
+
+      if (paymentHtml) {
+        html += paymentHtml;
+      }
+
+      if (createForm) {
+        html += "<div class=\"clearfix\">\n                            <div class=\"float-right\">\n                                <button href=\"#\" class=\"btn btn-light\">Reset</button>\n                                <button href=\"#\" class=\"btn btn-primary\">".concat(paymentHtml ? this.inputPbText : 'Submit', "</button>\n                            </div>\n                        </div>");
+      }
+
+      !showForm ? this.formHtml = html : this.showFormHtml = html;
+    },
+    createGroupInputs: function createGroupInputs(groupInputs) {
+      var _this12 = this;
+
+      var html = "";
+      groupInputs.forEach(function (input, i) {
+        if (i) {
+          input.dynamic = false;
+          input.dynamicDescription = "";
+          html += _this12.inputCreate(input);
+        }
+
+        ;
+      });
+      return html;
+    },
+    // Creates or rather adds the input properties into an object and pushes the data into the form inputs array.
+    createInput: function createInput() {
+      var showForm = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      var input = {};
+
+      if (this.inputType === 'group') {
+        input = this.groupDetails;
+      } else {
+        input.addQuantity = this.addQuantity;
+        input.quanityInputLabel = this.quanityInputLabel;
+        input.inputTotal = this.inputTotal;
+        input.inputPbText = this.inputPbText;
+        input.checkBoxes = this.checkboxInputs;
+        input.label = this.inputLabel;
+        input.heading = this.inputHeading;
+        input.placeholder = this.inputPlaceholder;
+        input.type = this.inputType;
+        input.dynamic = this.inputDynamic;
+        input.dynamicDescription = this.inputDynamicDescription;
+        input.dupCount = 0;
+        input.description = this.inputDescription;
+        input.required = this.inputRequired;
+        input.max = this.max;
+        input.min = this.min;
+        input.selectOptions = this.selectOptions;
+        input.name = this.getInputName(true);
+      }
+
+      if (showForm) {
+        this.showFormInputs = _toConsumableArray(this.formInputs); // if edit mode add input in correct position else just add to the end
+
+        this.editMode ? this.showFormInputs.splice(this.editId, 1, input) : this.showFormInputs.push(input);
+        this.createFormHtml(true);
+        return;
+      }
+
+      if (this.editMode) {
+        this.inputType === 'group' ? this.formInputs[this.editId][0] = input : this.formInputs[this.editId] = input;
+      } else {
+        this.formInputs.push(input);
+      }
+
+      this.reset();
+      this.createFormHtml();
+    },
+    // Create the input html from created inputs in the formInputs array
+    createInputHtml: function createInputHtml(input) {
+      var uid = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Object(_mixins_muid__WEBPACK_IMPORTED_MODULE_0__["muid"])();
+      var checkboxLabel = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "";
+      var required = input.required ? 'required' : '';
+      var inputHtml = '';
+
+      if (input.type === 'text' || input.type === 'email') {
+        inputHtml = "<input id=\"".concat(input.name, "\" type=\"").concat(input.type, "\" name=\"").concat(input.name, "\" placeholder=\"").concat(input.placeholder, "\" class=\"form-control mb-4\" ").concat(required, ">");
+      }
+
+      if (input.type === 'textarea') {
+        inputHtml = "<textarea id=\"".concat(input.name, "\" rows=\"5\" name=\"").concat(input.name, "\" class=\"form-control mb-4\" placeholder=\"").concat(input.placeholder, "\" ").concat(required, "></textarea>");
+      }
+
+      if (input.type === 'number') {
+        inputHtml = "<input id=\"".concat(input.name, "\" type=\"").concat(input.type, "\" class=\"form-control col-6 mb-4\" value=\"").concat(input.min, "\" name=\"").concat(input.name, "\" min=\"").concat(input.min, "\" max=\"").concat(input.max, "\" ").concat(required, ">");
+      }
+
+      if (input.type === 'tel') {
+        inputHtml = "<input id=\"".concat(input.name, "\" type=\"").concat(input.type, "\" name=\"").concat(input.name, "\" class=\"form-control mb-4\" placeholder=\"").concat(input.placeholder, "\" ").concat(required, ">");
+      }
+
+      if (input.type === 'radio' || input.type === 'checkbox') {
+        inputHtml = "<input id=\"".concat(uid, "\" type=\"").concat(input.type, "\" value=\"").concat(checkboxLabel.toLowerCase(), "\" name=\"").concat(this.getInputName(false, input), "\" class=\"custom-control-input mb-4\" id=\"").concat(uid, "\" ").concat(required, ">");
+      }
+
+      if (input.type === "address") {
+        inputHtml = "<label for=\"".concat(input.name, "_address\">Address</label>\n                            <input type=\"text\" name=\"").concat(input.name, "_address\" class=\"form-control\" id=\"").concat(input.name, "_address\" ").concat(required, ">\n\n                            <div class=\"form-row mb-4\">\n                                <div class=\"form-group col-md-6\">\n                                <label for=\"").concat(input.name, "_city\">City</label>\n                                <input type=\"text\" name=\"").concat(input.name, "_city\" class=\"form-control\" id=\"").concat(input.name, "_city\" ").concat(required, ">\n                                </div>\n                                <div class=\"form-group col-md-4\">\n                                <label for=\"").concat(input.name, "_state\">State</label>\n                                 <select name=\"").concat(input.name, "_state\" id=\"").concat(input.name, "_state\" class=\"form-control\" ").concat(required, ">\n                                    <option selected hidden>Choose State</option>\n                                    <option value=\"AL\">Alabama</option>\n                                    <option value=\"AK\">Alaska</option>\n                                    <option value=\"AZ\">Arizona</option>\n                                    <option value=\"AR\">Arkansas</option>\n                                    <option value=\"CA\">California</option>\n                                    <option value=\"CO\">Colorado</option>\n                                    <option value=\"CT\">Connecticut</option>\n                                    <option value=\"DE\">Delaware</option>\n                                    <option value=\"DC\">District Of Columbia</option>\n                                    <option value=\"FL\">Florida</option>\n                                    <option value=\"GA\">Georgia</option>\n                                    <option value=\"HI\">Hawaii</option>\n                                    <option value=\"ID\">Idaho</option>\n                                    <option value=\"IL\">Illinois</option>\n                                    <option value=\"IN\">Indiana</option>\n                                    <option value=\"IA\">Iowa</option>\n                                    <option value=\"KS\">Kansas</option>\n                                    <option value=\"KY\">Kentucky</option>\n                                    <option value=\"LA\">Louisiana</option>\n                                    <option value=\"ME\">Maine</option>\n                                    <option value=\"MD\">Maryland</option>\n                                    <option value=\"MA\">Massachusetts</option>\n                                    <option value=\"MI\">Michigan</option>\n                                    <option value=\"MN\">Minnesota</option>\n                                    <option value=\"MS\">Mississippi</option>\n                                    <option value=\"MO\">Missouri</option>\n                                    <option value=\"MT\">Montana</option>\n                                    <option value=\"NE\">Nebraska</option>\n                                    <option value=\"NV\">Nevada</option>\n                                    <option value=\"NH\">New Hampshire</option>\n                                    <option value=\"NJ\">New Jersey</option>\n                                    <option value=\"NM\">New Mexico</option>\n                                    <option value=\"NY\">New York</option>\n                                    <option value=\"NC\">North Carolina</option>\n                                    <option value=\"ND\">North Dakota</option>\n                                    <option value=\"OH\">Ohio</option>\n                                    <option value=\"OK\">Oklahoma</option>\n                                    <option value=\"OR\">Oregon</option>\n                                    <option value=\"PA\">Pennsylvania</option>\n                                    <option value=\"RI\">Rhode Island</option>\n                                    <option value=\"SC\">South Carolina</option>\n                                    <option value=\"SD\">South Dakota</option>\n                                    <option value=\"TN\">Tennessee</option>\n                                    <option value=\"TX\">Texas</option>\n                                    <option value=\"UT\">Utah</option>\n                                    <option value=\"VT\">Vermont</option>\n                                    <option value=\"VA\">Virginia</option>\n                                    <option value=\"WA\">Washington</option>\n                                    <option value=\"WV\">West Virginia</option>\n                                    <option value=\"WI\">Wisconsin</option>\n                                    <option value=\"WY\">Wyoming</option>\n                                </select>\n                                </div>\n                                <div class=\"form-group col-md-2\">\n                                <label for=\"").concat(input.name, "_zip\">Zip</label>\n                                <input type=\"text\" name=\"").concat(input.name, "_zip\" class=\"form-control\" id=\"").concat(input.name, "_zip\" ").concat(required, ">\n                                </div>\n                            </div>");
+      }
+
+      if (input.type === 'select') {
+        var placeHolder = input.placeholder ? "<option class=\"text-secondary\" selected hidden disabled>".concat(input.placeholder, "</option>") : "";
+        inputHtml = "<select name=\"".concat(this.getInputName(true, input), "\" class=\"mb-4 custom-select col-4 d-block\">\n                                    ").concat(placeHolder, "\n                                    ").concat(this.createOptionsHtml(input), "\n                                </select>");
+      }
+
+      if (input.type === 'payment') {
+        // dont forget to fix event listener for add quantity button
+        var addQuantity = input.addQuantity ? "<div class=\"mb-2\">\n                                    <label for=\"addQuantity\">".concat(input.quanityInputLabel, "</label>\n                                    <input id=\"html-quantity-input\" data-price-type=\"html-quantity-input\" data-total=\"").concat(input.inputTotal, "\" name=\"addQuantity\" class=\"form-control col-6\" type=\"number\" min=\"1\" max=\"50\" value=\"1\" id=\"addQuantity\">\n                                </div>") : "";
+        inputHtml = "<div class=\"my-3\">\n                                    <div class=\"form-check\">\n                                        <input id=\"credit\" name=\"paymentMethod\" value=\"credit\" type=\"radio\" class=\"form-check-input\" checked required>\n                                        <label class=\"form-check-label\" for=\"credit\">Credit card</label>\n                                    </div>\n                                    <div class=\"form-check\">\n                                        <input id=\"debit\" name=\"paymentMethod\" type=\"radio\" class=\"form-check-input\" value=\"debit\" required>\n                                        <label class=\"form-check-label\" for=\"debit\">Debit card</label>\n                                    </div>\n                                </div>\n\n\n                                ".concat(input.required ? '<p class="text-danger"><em> All payment fields are (required)*</em></p>' : '', "\n\n\n                                <div class=\"row gy-3\">\n\n                                    <div class=\"col-md-6\">\n                                        <label for=\"cc-name\" class=\"form-label\">Name on card</label>\n\n                                        <input type=\"text\" class=\"form-control\" id=\"cc-name\" placeholder=\"\" required>\n\n                                        <div class=\"invalid-feedback\">\n                                            Name on card is required\n                                        </div>\n                                    </div>\n\n                                    <div class=\"col-md-6\">\n                                        <label for=\"cc-number\" class=\"form-label\">Credit card number</label>\n                                        <input type=\"text\" class=\"form-control\" id=\"cc-number\" placeholder=\"\" required>\n                                        <div class=\"invalid-feedback\">\n                                            Credit card number is required\n                                        </div>\n                                    </div>\n\n                                    <div class=\"col-md-3\">\n                                        <label for=\"cc-expiration\" class=\"form-label\">Expiration</label>\n                                        <input type=\"text\" class=\"form-control\" id=\"cc-expiration\" placeholder=\"\" required>\n                                        <div class=\"invalid-feedback\">\n                                            Expiration date required\n                                        </div>\n                                    </div>\n\n                                    <div class=\"col-md-3\">\n                                        <label for=\"cc-cvv\" class=\"form-label\">CVV</label>\n                                        <input type=\"text\" class=\"form-control\" id=\"cc-cvv\" placeholder=\"\" required>\n                                        <div class=\"invalid-feedback\">\n                                            Security code required\n                                        </div>\n                                    </div>\n                                </div>\n\n                                ").concat(addQuantity, "\n\n                                <div class=\"clearfix mb-2\">\n                                    <div class=\"float-right\"><p><strong>Total: </strong><span id=\"input-total\">").concat(input.inputTotal, "</span></p></div>\n                                </div>");
+      }
+
+      return inputHtml;
+    },
+    createOptionsHtml: function createOptionsHtml(input) {
+      var options = "";
+      input.selectOptions.forEach(function (input) {
+        options += "<option value=\"".concat(input.option, "\">").concat(input.option, "</option>");
+      });
+      return options;
+    },
+    getInputName: function getInputName() {
+      var uniqueId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      var input = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+      var name = "";
+
+      if (!input) {
+        name = this.inputLabel ? this.inputLabel.toLowerCase().replaceAll(" ", "_") : this.inputHeading.toLowerCase().replaceAll(" ", "_");
+      } else {
+        name = input.label ? input.label.toLowerCase().replaceAll(" ", "_") : input.heading.toLowerCase().replaceAll(" ", "_");
+      }
+
+      if (uniqueId) name += "_".concat(Object(_mixins_muid__WEBPACK_IMPORTED_MODULE_0__["muid"])());
+      if (input.dupCount) name += "_".concat(input.dupCount);
+      return name;
+    },
     // this will set options for the form input
     formInputType: function formInputType() {
       var inputType = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.inputType;
@@ -2998,49 +3721,35 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
 
       if (inputType === 'select') {
         return 'selectType';
+      } // return group type
+
+
+      if (inputType === 'group') {
+        return 'groupType';
+      } // return payment type
+
+
+      if (inputType === 'payment') {
+        return 'paymentType';
       }
-    },
-    // Create the main html form!
-    createFormHtml: function createFormHtml() {
-      var _this4 = this;
-
-      var html = '';
-      this.formInputs.forEach(function (input, i) {
-        var showInputName = Array.isArray(input) ? 'group' : _this4.showInputType(input); // adds the select to the form
-
-        html += "<div class=\"form-check float-right form-create__preview-select preview-select\">\n                                <label class=\"form-check-label text-secondary\" for=\"".concat(i, "\">").concat(showInputName, "</label>\n                                <input id=\"").concat(i, "\" class=\"form-check-input form-create__preview-select-input preview-select-input\" type=\"checkbox\">\n                            </div>"); // form group start div
-
-        html += '<div class="form-group">';
-
-        if (Array.isArray(input)) {
-          input.forEach(function (input) {
-            // remove make dynamic button if group
-            input.dynamic = false;
-            input.dynamicDescription = "";
-            html += _this4.inputCreate(input);
-          });
-        } else {
-          html += _this4.inputCreate(input);
-        }
-
-        html += '</div>';
-      });
-      this.formHtml = html;
     },
     // This creates the inputs with labels and descriptions
     inputCreate: function inputCreate(input) {
+      var dup = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      if (dup) input.dupCount += 1;
       var html = "";
       var inputType = this.formInputType(input.type),
           required = input.required ? '&nbsp;<span class="text-danger"><em>(required)*</em></span>' : '',
           descriptionHtml = input.description ? "<p class=\"text-secondary\"><em>".concat(input.description, "</em></p>") : '',
-          dynamicBtnHtml = input.dynamicDescription ? "<div class=\"dynamic-btn\">\n                                        <button class=\"btn btn-info dynamic-btn__btn\">&plus;<small class=\"dynamic-btn__text\">".concat(input.dynamicDescription, "</small></button>\n                                    </div>") : "";
+          dynamicDescription = input.dynamicDescription ? "<small class=\"dynamic-btn__text\">".concat(input.dynamicDescription, "</small>") : "",
+          dynamicBtnHtml = input.dynamic && !dup ? "<div data-id=\"".concat(this.formInputs.indexOf(input), "\" class=\"dynamic-btn\">\n                                        <button class=\"btn btn-info dynamic-btn__btn\">&plus;").concat(dynamicDescription, "</button>\n                                    </div>") : "";
 
       if (inputType === 'textType') {
         html += "<label for=\"".concat(input.name, "\">").concat(input.label, " ").concat(required, "</label>\n                                ").concat(descriptionHtml, "\n                                ").concat(this.createInputHtml(input), "\n                                ").concat(dynamicBtnHtml);
       }
 
       if (inputType === 'checkboxType') {
-        html += "<h5>".concat(input.heading, "</h5>\n                                 ").concat(this.createCheckboxInputsHtml(input));
+        html += "<label>".concat(input.heading, "</label>\n                                 ").concat(this.createCheckboxInputsHtml(input));
       }
 
       if (inputType === 'numberType') {
@@ -3048,113 +3757,40 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       }
 
       if (inputType === 'addressType') {
-        html += "<h5>".concat(input.heading, " ").concat(required, "</h5>\n                                    <p class=\"text-secondary\"><em>").concat(descriptionHtml, "</em></p>\n                                    ").concat(this.createInputHtml(input));
+        html += "<label>".concat(input.heading, " ").concat(required, "</label>\n                                    <p class=\"text-secondary\"><em>").concat(descriptionHtml, "</em></p>\n                                    ").concat(this.createInputHtml(input));
       }
 
       if (inputType === 'selectType') {
-        html += "<h5>".concat(input.heading, "</h5>\n                                ").concat(this.createInputHtml(input));
+        html += "<label>".concat(input.heading, "</label>\n                                ").concat(this.createInputHtml(input));
+      }
+
+      if (inputType === 'groupType') {
+        var groupDetails = input[0],
+            groupHeading = groupDetails.heading && !dup ? "<label>".concat(groupDetails.heading, "</label>") : "",
+            groupDescription = groupDetails.description && !dup ? "<p class=\"text-secondary\"><em>".concat(groupDetails.description, "</em></p>") : '',
+            groupDynamicDescription = groupDetails.groupDynamicDescription ? "<small class=\"dynamic-btn__text\">".concat(groupDetails.groupDynamicDescription, "</small>") : "",
+            groupDynamic = groupDetails.groupDynamic && !dup ? "<div data-id=\"".concat(this.formInputs.indexOf(input), "\" class=\"dynamic-btn\">\n                                        <button class=\"btn btn-info dynamic-btn__btn\">&plus;").concat(groupDynamicDescription, "</button>\n                                    </div>") : "";
+        html += "".concat(groupHeading, "\n                                 ").concat(groupDescription, "\n                                 ").concat(this.createGroupInputs(input), "\n                                 ").concat(groupDynamic);
+      }
+
+      if (inputType === 'paymentType') {
+        html += "<label>".concat(input.label, "</label>\n                                    ").concat(descriptionHtml, "\n                                    ").concat(this.createInputHtml(input));
       }
 
       return html;
-    },
-    createCheckboxInputsHtml: function createCheckboxInputsHtml(input) {
-      var _this5 = this;
-
-      var html = "";
-      input.checkBoxes.forEach(function (checkbox) {
-        var uid = Object(_mixins_muid__WEBPACK_IMPORTED_MODULE_0__["muid"])();
-        html += "<div class=\"my-4\"><p class=\"text-secondary mb-0\"><em>".concat(checkbox.description, "</em></p>\n                        <div class=\"custom-control custom-").concat(input.type, "\">\n                            ").concat(_this5.createInputHtml(input, uid, checkbox.label), "\n                            <label class=\"custom-control-label\" for=\"").concat(uid, "\">").concat(checkbox.label, "</label>\n                        </div></div>");
-      });
-      return html;
-    },
-    // Create the input html from created inputs in the formInputs array
-    createInputHtml: function createInputHtml(input) {
-      var uid = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Object(_mixins_muid__WEBPACK_IMPORTED_MODULE_0__["muid"])();
-      var checkboxLabel = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "";
-      var required = input.required ? 'required' : '';
-      var inputHtml = '';
-
-      if (input.type === 'text' || input.type === 'email') {
-        inputHtml = "<input id=\"".concat(input.name, "\" type=\"").concat(input.type, "\" name=\"").concat(input.name, "\" placeholder=\"").concat(input.placeholder, "\" class=\"form-control mb-4\" ").concat(required, ">");
-      }
-
-      if (input.type === 'textarea') {
-        inputHtml = "<textarea id=\"".concat(input.name, "\" rows=\"5\" name=\"").concat(input.name, "\" class=\"form-control mb-4\" placeholder=\"").concat(input.placeholder, "\" ").concat(required, "></textarea>");
-      }
-
-      if (input.type === 'number') {
-        inputHtml = "<input id=\"".concat(input.name, "\" type=\"").concat(input.type, "\" class=\"form-control col-6 mb-4\" value=\"").concat(input.min, "\" name=\"").concat(input.name, "\" min=\"").concat(input.min, "\" max=\"").concat(input.max, "\" ").concat(required, ">");
-      }
-
-      if (input.type === 'tel') {
-        inputHtml = "<input id=\"".concat(input.name, "\" type=\"").concat(input.type, "\" name=\"").concat(input.name, "\" class=\"form-control mb-4\" ").concat(required, ">");
-      }
-
-      if (input.type === 'radio' || input.type === 'checkbox') {
-        inputHtml = "<input id=\"".concat(uid, "\" type=\"").concat(input.type, "\" value=\"").concat(checkboxLabel.toLowerCase(), "\" name=\"").concat(this.getInputName(false, input), "\" class=\"custom-control-input mb-4\" id=\"").concat(uid, "\" ").concat(required, ">");
-      }
-
-      if (input.type === "address") {
-        inputHtml = "<label for=\"".concat(input.name, "_address\">Address</label>\n                            <input type=\"text\" name=\"").concat(input.name, "_address\" class=\"form-control\" id=\"").concat(input.name, "_address\" ").concat(required, ">\n\n                            <div class=\"form-row mb-4\">\n                                <div class=\"form-group col-md-6\">\n                                <label for=\"").concat(input.name, "_city\">City</label>\n                                <input type=\"text\" name=\"").concat(input.name, "_city\" class=\"form-control\" id=\"").concat(input.name, "_city\" ").concat(required, ">\n                                </div>\n                                <div class=\"form-group col-md-4\">\n                                <label for=\"").concat(input.name, "_state\">State</label>\n                                 <select name=\"").concat(input.name, "_state\" id=\"").concat(input.name, "_state\" class=\"form-control\" ").concat(required, ">\n                                    <option selected hidden>Choose State</option>\n                                    <option value=\"AL\">Alabama</option>\n                                    <option value=\"AK\">Alaska</option>\n                                    <option value=\"AZ\">Arizona</option>\n                                    <option value=\"AR\">Arkansas</option>\n                                    <option value=\"CA\">California</option>\n                                    <option value=\"CO\">Colorado</option>\n                                    <option value=\"CT\">Connecticut</option>\n                                    <option value=\"DE\">Delaware</option>\n                                    <option value=\"DC\">District Of Columbia</option>\n                                    <option value=\"FL\">Florida</option>\n                                    <option value=\"GA\">Georgia</option>\n                                    <option value=\"HI\">Hawaii</option>\n                                    <option value=\"ID\">Idaho</option>\n                                    <option value=\"IL\">Illinois</option>\n                                    <option value=\"IN\">Indiana</option>\n                                    <option value=\"IA\">Iowa</option>\n                                    <option value=\"KS\">Kansas</option>\n                                    <option value=\"KY\">Kentucky</option>\n                                    <option value=\"LA\">Louisiana</option>\n                                    <option value=\"ME\">Maine</option>\n                                    <option value=\"MD\">Maryland</option>\n                                    <option value=\"MA\">Massachusetts</option>\n                                    <option value=\"MI\">Michigan</option>\n                                    <option value=\"MN\">Minnesota</option>\n                                    <option value=\"MS\">Mississippi</option>\n                                    <option value=\"MO\">Missouri</option>\n                                    <option value=\"MT\">Montana</option>\n                                    <option value=\"NE\">Nebraska</option>\n                                    <option value=\"NV\">Nevada</option>\n                                    <option value=\"NH\">New Hampshire</option>\n                                    <option value=\"NJ\">New Jersey</option>\n                                    <option value=\"NM\">New Mexico</option>\n                                    <option value=\"NY\">New York</option>\n                                    <option value=\"NC\">North Carolina</option>\n                                    <option value=\"ND\">North Dakota</option>\n                                    <option value=\"OH\">Ohio</option>\n                                    <option value=\"OK\">Oklahoma</option>\n                                    <option value=\"OR\">Oregon</option>\n                                    <option value=\"PA\">Pennsylvania</option>\n                                    <option value=\"RI\">Rhode Island</option>\n                                    <option value=\"SC\">South Carolina</option>\n                                    <option value=\"SD\">South Dakota</option>\n                                    <option value=\"TN\">Tennessee</option>\n                                    <option value=\"TX\">Texas</option>\n                                    <option value=\"UT\">Utah</option>\n                                    <option value=\"VT\">Vermont</option>\n                                    <option value=\"VA\">Virginia</option>\n                                    <option value=\"WA\">Washington</option>\n                                    <option value=\"WV\">West Virginia</option>\n                                    <option value=\"WI\">Wisconsin</option>\n                                    <option value=\"WY\">Wyoming</option>\n                                </select>\n                                </div>\n                                <div class=\"form-group col-md-2\">\n                                <label for=\"").concat(input.name, "_zip\">Zip</label>\n                                <input type=\"text\" name=\"").concat(input.name, "_zip\" class=\"form-control\" id=\"").concat(input.name, "_zip\" ").concat(required, ">\n                                </div>\n                            </div>");
-      }
-
-      if (input.type === 'select') {
-        var placeHolder = input.placeholder ? "<option class=\"text-secondary\" selected hidden disabled>".concat(input.placeholder, "</option>") : "";
-        inputHtml = "<select name=\"".concat(this.getInputName(true, input), "\" class=\"mb-4 custom-select col-4 d-block\">\n                                    ").concat(placeHolder, "\n                                    ").concat(this.createOptionsHtml(input), "\n                                </select>");
-      }
-
-      return inputHtml;
-    },
-    createOptionsHtml: function createOptionsHtml(input) {
-      var options = "";
-      input.selectOptions.forEach(function (input) {
-        options += "<option value=\"".concat(input.option, "\">").concat(input.option, "</option>");
-      });
-      return options;
-    },
-    // Creates or rather adds the input properties into an object and pushes the data into the form inputs array.
-    createInput: function createInput() {
-      var input = {};
-      input.checkBoxes = this.checkboxInputs;
-      input.label = this.inputLabel;
-      input.heading = this.inputHeading;
-      input.placeholder = this.inputPlaceholder;
-      input.type = this.inputType;
-      input.dynamic = this.inputDynamic;
-      input.dynamicDescription = this.inputDynamicDescription;
-      input.description = this.inputDescription;
-      input.required = this.inputRequired;
-      input.max = this.max;
-      input.min = this.min;
-      input.selectOptions = this.selectOptions;
-      input.name = this.getInputName(true);
-
-      if (this.editMode) {
-        this.formInputs[this.editId] = input;
-      } else {
-        this.formInputs.push(input);
-      }
-
-      this.reset();
-      this.createFormHtml();
-    },
-    getInputName: function getInputName() {
-      var uniqueId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-      var input = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
-      var name = "";
-
-      if (!input) {
-        name = this.inputLabel ? this.inputLabel.toLowerCase().replaceAll(" ", "_") : this.inputHeading.toLowerCase().replaceAll(" ", "_");
-      } else {
-        name = input.label ? input.label.toLowerCase().replaceAll(" ", "_") : input.heading.toLowerCase().replaceAll(" ", "_");
-      }
-
-      if (uniqueId) name += "_".concat(Object(_mixins_muid__WEBPACK_IMPORTED_MODULE_0__["muid"])());
-      return name;
     },
     // increases count to access delete/group/selectall btns
     previewInputsSelected: function previewInputsSelected() {
       var reset = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      var e = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+      if (e) {
+        var selected = e.target;
+
+        if (selected.getAttribute('data-type') === 'payment') {
+          this.paymentSelected = selected.checked ? true : false;
+        }
+      }
 
       if (reset && _typeof(reset) !== 'object') {
         this.previewSelected = 0;
@@ -3170,6 +3806,12 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
         }
       });
       this.previewSelected = count;
+    },
+    // remove dup element
+    removeDup: function removeDup(e) {
+      e.preventDefault();
+      var id = $(e.target).attr('data-id');
+      $("[data-remove=\"".concat(id, "\"]")).remove();
     },
     // Reset the inputs properties. if ALL is true reset the entire form!
     reset: function reset() {
@@ -3192,19 +3834,36 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       this.selectOptions = [{
         option: ""
       }];
+      this.groupDetails = {
+        id: Object(_mixins_muid__WEBPACK_IMPORTED_MODULE_0__["muid"])(),
+        heading: "",
+        description: "",
+        groupDynamic: false,
+        groupDynamicDescription: ""
+      };
+      this.groupInputsHtml = "";
       this.inputHeading = "";
       this.inputPlaceholder = "";
       this.inputType = null;
-      this.inputLabel = null;
+      this.inputLabel = "";
+      this.inputTotal = "0.00";
+      this.showPrice = "0.00";
+      this.inputPbText = "Purchase";
+      this.quanityInputLabel = 'Quantity';
+      this.addQuantity = false;
       this.inputDynamic = false;
       this.inputDescription = null;
       this.inputDynamicDescription = "";
+      this.inputInfoMode = false;
       this.inputRequired = false;
       this.min = 0;
       this.max = 10;
-      this.hideForm = false;
+      this.formHidden = false;
       this.editMode = false;
       this.editId = null;
+      this.showHiddenForm = false;
+      this.showFormHtml = "";
+      this.showFormInputs = [];
       this.step = all ? 1 : 2;
       this.previewInputsSelected(true);
     },
@@ -3222,14 +3881,20 @@ var feather = __webpack_require__(/*! feather-icons */ "./node_modules/feather-i
       if (inputName === 'number') name = 'number';
       if (inputName === 'tel') name = 'phone';
       if (inputName === 'address') name = 'address';
+      if (inputName === 'group') name = 'group';
+      if (inputName === 'payment') name = 'payment';
       if (capitalize) name = name.charAt(0).toUpperCase() + name.slice(1);
       ;
       return name;
-    }
+    } //============ /## FUNCTIONS ================================================/
+
   },
   // ##-METHODS ---/
   updated: function updated() {
     this.formInputSelectedEvent();
+    this.addDynamicBtnEvent();
+    this.addHtmlQuantityEvent();
+    feather.replace();
   },
   // ##-UPDATED
   mounted: function mounted() {
@@ -70366,7 +71031,36 @@ var render = function() {
             _c(
               "div",
               { staticClass: "form-group" },
-              [_c("form-create-component")],
+              [
+                _c("form-create-component", {
+                  on: { eventFormJson: _vm.storeEventFormJson }
+                }),
+                _vm._v(" "),
+                _c("textarea", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.eventFormJson,
+                      expression: "eventFormJson"
+                    }
+                  ],
+                  attrs: {
+                    "aria-hidden": "true",
+                    name: "eventFormJson",
+                    hidden: ""
+                  },
+                  domProps: { value: _vm.eventFormJson },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.eventFormJson = $event.target.value
+                    }
+                  }
+                })
+              ],
               1
             )
           ]),
@@ -70733,7 +71427,8 @@ var render = function() {
                   _vm.step === 3
                     ? _c("span", [
                         _vm._v(
-                          "Create " +
+                          _vm._s(_vm.editMode ? "Edit" : "Create") +
+                            " " +
                             _vm._s(_vm.showInputType("", true)) +
                             " input"
                         )
@@ -70749,23 +71444,9 @@ var render = function() {
                 { staticClass: "modal-body d-flex justify-content-between" },
                 [
                   _c("div", { staticClass: "form-create__steps col-5" }, [
-                    _c(
-                      "div",
-                      { staticClass: "alert alert-info border-bottom mb-0" },
-                      [
-                        _c("p", { staticClass: "mb-0" }, [
-                          _vm._v("Send To Email: " + _vm._s(_vm.formEmail))
-                        ])
-                      ]
-                    ),
-                    _vm._v(" "),
                     _vm.step === 1
                       ? _c("div", { staticClass: "form-create__details" }, [
-                          _c("p", [
-                            _vm._v(
-                              "Lets start by entering the heading of the form and the email you want the form submission to be sent to."
-                            )
-                          ]),
+                          _vm._m(1),
                           _vm._v(" "),
                           _c("div", { staticClass: "form-group" }, [
                             _c("label", { attrs: { for: "form-email" } }, [
@@ -70796,7 +71477,25 @@ var render = function() {
                                   _vm.formEmail = $event.target.value
                                 }
                               }
-                            })
+                            }),
+                            _vm._v(" "),
+                            _vm.step === 1
+                              ? _c(
+                                  "div",
+                                  {
+                                    staticClass:
+                                      "alert alert-info border-bottom mb-0"
+                                  },
+                                  [
+                                    _c("p", { staticClass: "mb-0" }, [
+                                      _vm._v(
+                                        "Send To Email: " +
+                                          _vm._s(_vm.formEmail)
+                                      )
+                                    ])
+                                  ]
+                                )
+                              : _vm._e()
                           ]),
                           _vm._v(" "),
                           _c("div", { staticClass: "form-group" }, [
@@ -70836,17 +71535,15 @@ var render = function() {
                     _vm.step === 2
                       ? _c(
                           "div",
-                          { staticClass: "form-create__creator form-group" },
+                          { staticClass: "form-create__creator pt-3" },
                           [
-                            _c("p", [
-                              _vm._v(
-                                "Select the input that you want to add to this form group."
-                              )
-                            ]),
+                            _vm._m(2),
                             _vm._v(" "),
                             _c(
                               "div",
-                              { staticClass: "form-create__container" },
+                              {
+                                staticClass: "form-create__container border-tb"
+                              },
                               [
                                 _c(
                                   "div",
@@ -70985,711 +71682,1260 @@ var render = function() {
                                         }
                                       },
                                       [_vm._v("Address")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "button",
+                                      {
+                                        staticClass: "btn btn-info",
+                                        attrs: {
+                                          "data-type": "payment",
+                                          disabled: _vm.paymentAdded
+                                        },
+                                        on: {
+                                          click: function($event) {
+                                            $event.preventDefault()
+                                            return _vm.selectedInput($event)
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("Payment")]
                                     )
                                   ]
                                 )
                               ]
-                            )
+                            ),
+                            _vm._v(" "),
+                            _vm.step > 1
+                              ? _c(
+                                  "div",
+                                  { staticClass: "alert alert-info mt-3" },
+                                  [
+                                    _c("p", { staticClass: "mb-0" }, [
+                                      _vm._v(
+                                        "Send To Email: " +
+                                          _vm._s(_vm.formEmail)
+                                      )
+                                    ])
+                                  ]
+                                )
+                              : _vm._e()
                           ]
                         )
                       : _vm._e(),
                     _vm._v(" "),
-                    _vm.step === 3
-                      ? _c("div", { staticClass: "form-group pb-4 pt-0" }, [
+                    _vm.inputInfoMode && _vm.step === 3
+                      ? _c("div", {
+                          staticClass: "form-group pb-4",
+                          attrs: { id: "inputInfoInsert" },
+                          domProps: { innerHTML: _vm._s(_vm.infoHtml) }
+                        })
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm.step === 3 && !_vm.inputInfoMode
+                      ? _c("div", { staticClass: "form-group pb-4" }, [
                           _c("p", [
-                            _vm._v(
-                              "Enter the label that you would like for this input. Labels appear above input."
+                            _vm._v("Enter the options for the input type "),
+                            _c(
+                              "span",
+                              {
+                                staticClass: "font-weight-bold text-capitalize"
+                              },
+                              [_vm._v(_vm._s(_vm.showInputType()))]
                             )
                           ]),
                           _vm._v(" "),
-                          _vm.formInputType() === "textType"
-                            ? _c("div", { staticClass: "mb-4" }, [
-                                _c(
-                                  "div",
-                                  {
-                                    staticClass: "dynamic-btn__form-input my-4"
-                                  },
-                                  [
+                          _c(
+                            "div",
+                            {
+                              class: {
+                                "form-create__disable-inputs form-create__disable-inputs--white":
+                                  _vm.showHiddenForm
+                              }
+                            },
+                            [
+                              _vm.formInputType() === "groupType"
+                                ? _c("div", { staticClass: "mb-4" }, [
+                                    _vm._m(3),
+                                    _vm._v(" "),
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.groupDetails.heading,
+                                          expression: "groupDetails.heading"
+                                        }
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: {
+                                        id: "checkboxHeading",
+                                        type: "text"
+                                      },
+                                      domProps: {
+                                        value: _vm.groupDetails.heading
+                                      },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.$set(
+                                            _vm.groupDetails,
+                                            "heading",
+                                            $event.target.value
+                                          )
+                                        }
+                                      }
+                                    }),
+                                    _vm._v(" "),
+                                    _vm._m(4),
+                                    _vm._v(" "),
+                                    _c("textarea", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.groupDetails.description,
+                                          expression: "groupDetails.description"
+                                        }
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: { rows: "2", id: "description" },
+                                      domProps: {
+                                        value: _vm.groupDetails.description
+                                      },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.$set(
+                                            _vm.groupDetails,
+                                            "description",
+                                            $event.target.value
+                                          )
+                                        }
+                                      }
+                                    })
+                                  ])
+                                : _vm._e(),
+                              _vm._v(" "),
+                              _vm.formInputType() === "paymentType"
+                                ? _c("div", { staticClass: "mb-4" }, [
                                     _c(
                                       "div",
                                       {
                                         staticClass:
-                                          "custom-control custom-switch"
+                                          "dynamic-btn__form-input my-4"
+                                      },
+                                      [
+                                        _c(
+                                          "div",
+                                          {
+                                            staticClass:
+                                              "custom-control custom-switch"
+                                          },
+                                          [
+                                            _c("input", {
+                                              staticClass:
+                                                "custom-control-input",
+                                              attrs: {
+                                                type: "checkbox",
+                                                id: "required"
+                                              },
+                                              on: {
+                                                click: function($event) {
+                                                  _vm.inputRequired = !_vm.inputRequired
+                                                }
+                                              }
+                                            }),
+                                            _vm._v(" "),
+                                            _c(
+                                              "label",
+                                              {
+                                                staticClass:
+                                                  "custom-control-label",
+                                                attrs: { for: "required" }
+                                              },
+                                              [_vm._v("Input Required")]
+                                            )
+                                          ]
+                                        )
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    _vm._m(5),
+                                    _vm._v(" "),
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.inputLabel,
+                                          expression: "inputLabel"
+                                        }
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: { type: "text", id: "label" },
+                                      domProps: { value: _vm.inputLabel },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.inputLabel = $event.target.value
+                                        }
+                                      }
+                                    }),
+                                    _vm._v(" "),
+                                    _vm._m(6),
+                                    _vm._v(" "),
+                                    _c("textarea", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.inputDescription,
+                                          expression: "inputDescription"
+                                        }
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: { rows: "2", id: "description" },
+                                      domProps: { value: _vm.inputDescription },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.inputDescription =
+                                            $event.target.value
+                                        }
+                                      }
+                                    }),
+                                    _vm._v(" "),
+                                    _vm._m(7),
+                                    _vm._v(" "),
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.inputTotal,
+                                          expression: "inputTotal"
+                                        }
+                                      ],
+                                      staticClass: "form-control col-4",
+                                      attrs: {
+                                        "data-price-type": "user-input",
+                                        id: "total",
+                                        type: "number",
+                                        name: "total"
+                                      },
+                                      domProps: { value: _vm.inputTotal },
+                                      on: {
+                                        change: _vm.calPrice,
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.inputTotal = $event.target.value
+                                        }
+                                      }
+                                    }),
+                                    _vm._v(" "),
+                                    _c(
+                                      "div",
+                                      {
+                                        staticClass:
+                                          "custom-control custom-switch mb-4"
                                       },
                                       [
                                         _c("input", {
                                           staticClass: "custom-control-input",
                                           attrs: {
                                             type: "checkbox",
-                                            id: "required"
-                                          },
-                                          on: {
-                                            click: function($event) {
-                                              _vm.inputRequired = !_vm.inputRequired
-                                            }
-                                          }
-                                        }),
-                                        _vm._v(" "),
-                                        _c(
-                                          "label",
-                                          {
-                                            staticClass: "custom-control-label",
-                                            attrs: { for: "required" }
-                                          },
-                                          [_vm._v("Input Required")]
-                                        )
-                                      ]
-                                    )
-                                  ]
-                                ),
-                                _vm._v(" "),
-                                _vm._m(1),
-                                _vm._v(" "),
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.inputLabel,
-                                      expression: "inputLabel"
-                                    }
-                                  ],
-                                  staticClass: "form-control",
-                                  attrs: { type: "text", id: "label" },
-                                  domProps: { value: _vm.inputLabel },
-                                  on: {
-                                    input: function($event) {
-                                      if ($event.target.composing) {
-                                        return
-                                      }
-                                      _vm.inputLabel = $event.target.value
-                                    }
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _vm._m(2),
-                                _vm._v(" "),
-                                _c("textarea", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.inputDescription,
-                                      expression: "inputDescription"
-                                    }
-                                  ],
-                                  staticClass: "form-control",
-                                  attrs: { rows: "2", id: "description" },
-                                  domProps: { value: _vm.inputDescription },
-                                  on: {
-                                    input: function($event) {
-                                      if ($event.target.composing) {
-                                        return
-                                      }
-                                      _vm.inputDescription = $event.target.value
-                                    }
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _vm._m(3),
-                                _vm._v(" "),
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.inputPlaceholder,
-                                      expression: "inputPlaceholder"
-                                    }
-                                  ],
-                                  staticClass: "form-control",
-                                  attrs: { type: "text", id: "placeholder" },
-                                  domProps: { value: _vm.inputPlaceholder },
-                                  on: {
-                                    input: function($event) {
-                                      if ($event.target.composing) {
-                                        return
-                                      }
-                                      _vm.inputPlaceholder = $event.target.value
-                                    }
-                                  }
-                                })
-                              ])
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _vm.formInputType() === "checkboxType"
-                            ? _c(
-                                "div",
-                                [
-                                  _vm._m(4),
-                                  _vm._v(" "),
-                                  _c("input", {
-                                    directives: [
-                                      {
-                                        name: "model",
-                                        rawName: "v-model",
-                                        value: _vm.inputHeading,
-                                        expression: "inputHeading"
-                                      }
-                                    ],
-                                    staticClass: "form-control",
-                                    attrs: {
-                                      id: "checkboxHeading",
-                                      type: "text"
-                                    },
-                                    domProps: { value: _vm.inputHeading },
-                                    on: {
-                                      input: function($event) {
-                                        if ($event.target.composing) {
-                                          return
-                                        }
-                                        _vm.inputHeading = $event.target.value
-                                      }
-                                    }
-                                  }),
-                                  _vm._v(" "),
-                                  _c("label", { attrs: { for: "number" } }, [
-                                    _vm._v("Enter how many "),
-                                    _c(
-                                      "span",
-                                      {
-                                        staticClass: "text-capitalize text-bold"
-                                      },
-                                      [_vm._v(_vm._s(_vm.inputType))]
-                                    ),
-                                    _vm._v("'s you need")
-                                  ]),
-                                  _vm._v(" "),
-                                  _vm._m(5),
-                                  _vm._v(" "),
-                                  _c("input", {
-                                    directives: [
-                                      {
-                                        name: "model",
-                                        rawName: "v-model",
-                                        value: _vm.checkboxCount,
-                                        expression: "checkboxCount"
-                                      }
-                                    ],
-                                    staticClass: "form-control col-6",
-                                    attrs: {
-                                      type: "number",
-                                      id: "number",
-                                      min: "1",
-                                      max: "20"
-                                    },
-                                    domProps: { value: _vm.checkboxCount },
-                                    on: {
-                                      change:
-                                        _vm.addCheckboxLabelDescriptionFields,
-                                      input: function($event) {
-                                        if ($event.target.composing) {
-                                          return
-                                        }
-                                        _vm.checkboxCount = $event.target.value
-                                      }
-                                    }
-                                  }),
-                                  _vm._v(" "),
-                                  _vm._l(_vm.checkboxInputs, function(input) {
-                                    return _c(
-                                      "div",
-                                      {
-                                        key: _vm.checkboxInputs.indexOf(input),
-                                        attrs: {
-                                          id: _vm.checkboxInputs.indexOf(input)
-                                        }
-                                      },
-                                      [
-                                        _vm._m(6, true),
-                                        _vm._v(" "),
-                                        _c("textarea", {
-                                          directives: [
-                                            {
-                                              name: "model",
-                                              rawName: "v-model",
-                                              value: input.description,
-                                              expression: "input.description"
-                                            }
-                                          ],
-                                          staticClass: "form-control",
-                                          attrs: {
-                                            rows: "2",
-                                            id: "description"
+                                            id: "quanityInput"
                                           },
                                           domProps: {
-                                            value: input.description
+                                            checked: _vm.addQuantity
                                           },
-                                          on: {
-                                            input: function($event) {
-                                              if ($event.target.composing) {
-                                                return
-                                              }
-                                              _vm.$set(
-                                                input,
-                                                "description",
-                                                $event.target.value
-                                              )
-                                            }
-                                          }
-                                        }),
-                                        _vm._v(" "),
-                                        _vm._m(7, true),
-                                        _vm._v(" "),
-                                        _c("input", {
-                                          directives: [
-                                            {
-                                              name: "model",
-                                              rawName: "v-model",
-                                              value: input.label,
-                                              expression: "input.label"
-                                            }
-                                          ],
-                                          staticClass: "form-control",
-                                          attrs: { type: "text", id: "label" },
-                                          domProps: { value: input.label },
-                                          on: {
-                                            input: function($event) {
-                                              if ($event.target.composing) {
-                                                return
-                                              }
-                                              _vm.$set(
-                                                input,
-                                                "label",
-                                                $event.target.value
-                                              )
-                                            }
-                                          }
-                                        }),
-                                        _vm._v(" "),
-                                        _vm.checkboxCount > 1
-                                          ? _c("div", {
-                                              staticClass: "border-bottom mb-2"
-                                            })
-                                          : _vm._e()
-                                      ]
-                                    )
-                                  })
-                                ],
-                                2
-                              )
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _vm.formInputType() === "numberType"
-                            ? _c("div", [
-                                _vm._m(8),
-                                _vm._v(" "),
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.inputLabel,
-                                      expression: "inputLabel"
-                                    }
-                                  ],
-                                  staticClass: "form-control",
-                                  attrs: { type: "text", id: "label" },
-                                  domProps: { value: _vm.inputLabel },
-                                  on: {
-                                    input: function($event) {
-                                      if ($event.target.composing) {
-                                        return
-                                      }
-                                      _vm.inputLabel = $event.target.value
-                                    }
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _vm._m(9),
-                                _vm._v(" "),
-                                _c("textarea", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.inputDescription,
-                                      expression: "inputDescription"
-                                    }
-                                  ],
-                                  staticClass: "form-control",
-                                  attrs: { rows: "2", id: "description" },
-                                  domProps: { value: _vm.inputDescription },
-                                  on: {
-                                    input: function($event) {
-                                      if ($event.target.composing) {
-                                        return
-                                      }
-                                      _vm.inputDescription = $event.target.value
-                                    }
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("label", { attrs: { for: "minimum" } }, [
-                                  _vm._v("Enter Minimum Value")
-                                ]),
-                                _vm._v(" "),
-                                _vm._m(10),
-                                _vm._v(" "),
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.min,
-                                      expression: "min"
-                                    }
-                                  ],
-                                  staticClass: "form-control col-6",
-                                  attrs: { type: "number", id: "minimum" },
-                                  domProps: { value: _vm.min },
-                                  on: {
-                                    input: function($event) {
-                                      if ($event.target.composing) {
-                                        return
-                                      }
-                                      _vm.min = $event.target.value
-                                    }
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("label", { attrs: { for: "maximum" } }, [
-                                  _vm._v("Enter Maximum Value")
-                                ]),
-                                _vm._v(" "),
-                                _vm._m(11),
-                                _vm._v(" "),
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.max,
-                                      expression: "max"
-                                    }
-                                  ],
-                                  staticClass: "form-control col-6",
-                                  attrs: { type: "number", id: "maximum" },
-                                  domProps: { value: _vm.max },
-                                  on: {
-                                    input: function($event) {
-                                      if ($event.target.composing) {
-                                        return
-                                      }
-                                      _vm.max = $event.target.value
-                                    }
-                                  }
-                                })
-                              ])
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _vm.formInputType() === "addressType"
-                            ? _c("div", [
-                                _c(
-                                  "div",
-                                  {
-                                    staticClass: "dynamic-btn__form-input my-4"
-                                  },
-                                  [
-                                    _c(
-                                      "div",
-                                      {
-                                        staticClass:
-                                          "custom-control custom-switch"
-                                      },
-                                      [
-                                        _c("input", {
-                                          staticClass: "custom-control-input",
-                                          attrs: {
-                                            type: "checkbox",
-                                            id: "required"
-                                          },
-                                          on: {
-                                            click: function($event) {
-                                              _vm.inputRequired = !_vm.inputRequired
-                                            }
-                                          }
+                                          on: { click: _vm.addQuantityInput }
                                         }),
                                         _vm._v(" "),
                                         _c(
                                           "label",
                                           {
                                             staticClass: "custom-control-label",
-                                            attrs: { for: "required" }
+                                            attrs: { for: "quanityInput" }
                                           },
-                                          [_vm._v("Input Required")]
+                                          [_vm._v("Add Quanity")]
                                         )
                                       ]
-                                    )
-                                  ]
-                                ),
-                                _vm._v(" "),
-                                _vm._m(12),
-                                _vm._v(" "),
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.inputHeading,
-                                      expression: "inputHeading"
-                                    }
-                                  ],
-                                  staticClass: "form-control",
-                                  attrs: { type: "text", id: "label" },
-                                  domProps: { value: _vm.inputHeading },
-                                  on: {
-                                    input: function($event) {
-                                      if ($event.target.composing) {
-                                        return
-                                      }
-                                      _vm.inputHeading = $event.target.value
-                                    }
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _vm._m(13),
-                                _vm._v(" "),
-                                _c("textarea", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.inputDescription,
-                                      expression: "inputDescription"
-                                    }
-                                  ],
-                                  staticClass: "form-control",
-                                  attrs: { rows: "2", id: "description" },
-                                  domProps: { value: _vm.inputDescription },
-                                  on: {
-                                    input: function($event) {
-                                      if ($event.target.composing) {
-                                        return
-                                      }
-                                      _vm.inputDescription = $event.target.value
-                                    }
-                                  }
-                                })
-                              ])
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _vm.formInputType() === "selectType"
-                            ? _c(
-                                "div",
-                                [
-                                  _vm._m(14),
-                                  _vm._v(" "),
-                                  _c("input", {
-                                    directives: [
-                                      {
-                                        name: "model",
-                                        rawName: "v-model",
-                                        value: _vm.inputHeading,
-                                        expression: "inputHeading"
-                                      }
-                                    ],
-                                    staticClass: "form-control",
-                                    attrs: {
-                                      id: "checkboxHeading",
-                                      type: "text"
-                                    },
-                                    domProps: { value: _vm.inputHeading },
-                                    on: {
-                                      input: function($event) {
-                                        if ($event.target.composing) {
-                                          return
+                                    ),
+                                    _vm._v(" "),
+                                    _vm.addQuantity
+                                      ? _c("div", { staticClass: "mt-3" }, [
+                                          _c("input", {
+                                            directives: [
+                                              {
+                                                name: "model",
+                                                rawName: "v-model",
+                                                value: _vm.quanityInputLabel,
+                                                expression: "quanityInputLabel"
+                                              }
+                                            ],
+                                            staticClass: "form form-control",
+                                            attrs: { type: "text" },
+                                            domProps: {
+                                              value: _vm.quanityInputLabel
+                                            },
+                                            on: {
+                                              input: function($event) {
+                                                if ($event.target.composing) {
+                                                  return
+                                                }
+                                                _vm.quanityInputLabel =
+                                                  $event.target.value
+                                              }
+                                            }
+                                          })
+                                        ])
+                                      : _vm._e(),
+                                    _vm._v(" "),
+                                    _vm._m(8),
+                                    _vm._v(" "),
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.inputPbText,
+                                          expression: "inputPbText"
                                         }
-                                        _vm.inputHeading = $event.target.value
-                                      }
-                                    }
-                                  }),
-                                  _vm._v(" "),
-                                  _vm._m(15),
-                                  _vm._v(" "),
-                                  _c("input", {
-                                    directives: [
-                                      {
-                                        name: "model",
-                                        rawName: "v-model",
-                                        value: _vm.inputPlaceholder,
-                                        expression: "inputPlaceholder"
-                                      }
-                                    ],
-                                    staticClass: "form-control",
-                                    attrs: { type: "text", id: "placeholder" },
-                                    domProps: { value: _vm.inputPlaceholder },
-                                    on: {
-                                      input: function($event) {
-                                        if ($event.target.composing) {
-                                          return
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: { id: "pb-text", type: "text" },
+                                      domProps: { value: _vm.inputPbText },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.inputPbText = $event.target.value
                                         }
-                                        _vm.inputPlaceholder =
-                                          $event.target.value
                                       }
-                                    }
-                                  }),
-                                  _vm._v(" "),
-                                  _vm._m(16),
-                                  _vm._v(" "),
-                                  _vm._m(17),
-                                  _vm._v(" "),
-                                  _c("input", {
-                                    directives: [
-                                      {
-                                        name: "model",
-                                        rawName: "v-model",
-                                        value: _vm.selectCount,
-                                        expression: "selectCount"
-                                      }
-                                    ],
-                                    staticClass: "form-control col-6",
-                                    attrs: {
-                                      type: "number",
-                                      id: "number",
-                                      min: "1",
-                                      max: "20"
-                                    },
-                                    domProps: { value: _vm.selectCount },
-                                    on: {
-                                      change: _vm.addSelectOptions,
-                                      input: function($event) {
-                                        if ($event.target.composing) {
-                                          return
-                                        }
-                                        _vm.selectCount = $event.target.value
-                                      }
-                                    }
-                                  }),
-                                  _vm._v(" "),
-                                  _vm._l(_vm.selectOptions, function(input) {
-                                    return _c(
+                                    })
+                                  ])
+                                : _vm._e(),
+                              _vm._v(" "),
+                              _vm.formInputType() === "textType"
+                                ? _c("div", { staticClass: "mb-4" }, [
+                                    _c(
                                       "div",
                                       {
-                                        key: _vm.selectOptions.indexOf(input),
-                                        attrs: {
-                                          id: _vm.selectOptions.indexOf(input)
-                                        }
+                                        staticClass:
+                                          "dynamic-btn__form-input my-4"
                                       },
                                       [
                                         _c(
-                                          "label",
-                                          { attrs: { for: "label" } },
-                                          [_vm._v("Enter Option")]
-                                        ),
-                                        _vm._v(" "),
-                                        _c("input", {
-                                          directives: [
-                                            {
-                                              name: "model",
-                                              rawName: "v-model",
-                                              value: input.option,
-                                              expression: "input.option"
-                                            }
-                                          ],
-                                          staticClass: "form-control",
-                                          attrs: { type: "text", id: "label" },
-                                          domProps: { value: input.option },
-                                          on: {
-                                            input: function($event) {
-                                              if ($event.target.composing) {
-                                                return
+                                          "div",
+                                          {
+                                            staticClass:
+                                              "custom-control custom-switch"
+                                          },
+                                          [
+                                            _c("input", {
+                                              staticClass:
+                                                "custom-control-input",
+                                              attrs: {
+                                                type: "checkbox",
+                                                id: "required"
+                                              },
+                                              on: {
+                                                click: function($event) {
+                                                  _vm.inputRequired = !_vm.inputRequired
+                                                }
                                               }
-                                              _vm.$set(
-                                                input,
-                                                "option",
-                                                $event.target.value
-                                              )
-                                            }
-                                          }
-                                        }),
-                                        _vm._v(" "),
-                                        _vm.selectCount > 1
-                                          ? _c("div", {
-                                              staticClass: "border-bottom mb-2"
-                                            })
-                                          : _vm._e()
+                                            }),
+                                            _vm._v(" "),
+                                            _c(
+                                              "label",
+                                              {
+                                                staticClass:
+                                                  "custom-control-label",
+                                                attrs: { for: "required" }
+                                              },
+                                              [_vm._v("Input Required")]
+                                            )
+                                          ]
+                                        )
                                       ]
-                                    )
-                                  })
-                                ],
-                                2
-                              )
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _vm.formInputType() === "textType"
-                            ? _c(
-                                "div",
-                                { staticClass: "dynamic-btn__form-input" },
-                                [
-                                  _c(
+                                    ),
+                                    _vm._v(" "),
+                                    _vm._m(9),
+                                    _vm._v(" "),
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.inputLabel,
+                                          expression: "inputLabel"
+                                        }
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: { type: "text", id: "label" },
+                                      domProps: { value: _vm.inputLabel },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.inputLabel = $event.target.value
+                                        }
+                                      }
+                                    }),
+                                    _vm._v(" "),
+                                    _vm._m(10),
+                                    _vm._v(" "),
+                                    _c("textarea", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.inputDescription,
+                                          expression: "inputDescription"
+                                        }
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: { rows: "2", id: "description" },
+                                      domProps: { value: _vm.inputDescription },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.inputDescription =
+                                            $event.target.value
+                                        }
+                                      }
+                                    }),
+                                    _vm._v(" "),
+                                    _vm._m(11),
+                                    _vm._v(" "),
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.inputPlaceholder,
+                                          expression: "inputPlaceholder"
+                                        }
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: {
+                                        type: "text",
+                                        id: "placeholder"
+                                      },
+                                      domProps: { value: _vm.inputPlaceholder },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.inputPlaceholder =
+                                            $event.target.value
+                                        }
+                                      }
+                                    })
+                                  ])
+                                : _vm._e(),
+                              _vm._v(" "),
+                              _vm.formInputType() === "checkboxType"
+                                ? _c(
                                     "div",
-                                    {
-                                      staticClass:
-                                        "custom-control custom-switch"
-                                    },
                                     [
+                                      _vm._m(12),
+                                      _vm._v(" "),
                                       _c("input", {
-                                        staticClass: "custom-control-input",
+                                        directives: [
+                                          {
+                                            name: "model",
+                                            rawName: "v-model",
+                                            value: _vm.inputHeading,
+                                            expression: "inputHeading"
+                                          }
+                                        ],
+                                        staticClass: "form-control",
                                         attrs: {
-                                          type: "checkbox",
-                                          id: "dynamic"
+                                          id: "checkboxHeading",
+                                          type: "text"
                                         },
+                                        domProps: { value: _vm.inputHeading },
                                         on: {
-                                          click: function($event) {
-                                            _vm.inputDynamic = !_vm.inputDynamic
+                                          input: function($event) {
+                                            if ($event.target.composing) {
+                                              return
+                                            }
+                                            _vm.inputHeading =
+                                              $event.target.value
                                           }
                                         }
                                       }),
                                       _vm._v(" "),
                                       _c(
                                         "label",
-                                        {
-                                          staticClass: "custom-control-label",
-                                          attrs: { for: "dynamic" }
-                                        },
-                                        [_vm._v("Make Dynamic")]
-                                      )
-                                    ]
-                                  ),
-                                  _vm._v(" "),
-                                  _vm.inputDynamic
-                                    ? _c("div", { staticClass: "mt-3" }, [
-                                        _c("input", {
-                                          directives: [
+                                        { attrs: { for: "number" } },
+                                        [
+                                          _vm._v("Enter how many "),
+                                          _c(
+                                            "span",
                                             {
-                                              name: "model",
-                                              rawName: "v-model",
-                                              value:
-                                                _vm.inputDynamicDescription,
-                                              expression:
-                                                "inputDynamicDescription"
-                                            }
-                                          ],
-                                          staticClass: "form-control",
-                                          attrs: {
-                                            type: "text",
-                                            placeholder: "Enter Label"
-                                          },
-                                          domProps: {
-                                            value: _vm.inputDynamicDescription
-                                          },
-                                          on: {
-                                            input: function($event) {
-                                              if ($event.target.composing) {
-                                                return
-                                              }
-                                              _vm.inputDynamicDescription =
-                                                $event.target.value
-                                            }
+                                              staticClass:
+                                                "text-capitalize text-bold"
+                                            },
+                                            [_vm._v(_vm._s(_vm.inputType))]
+                                          ),
+                                          _vm._v("'s you need")
+                                        ]
+                                      ),
+                                      _vm._v(" "),
+                                      _vm._m(13),
+                                      _vm._v(" "),
+                                      _c("input", {
+                                        directives: [
+                                          {
+                                            name: "model",
+                                            rawName: "v-model",
+                                            value: _vm.checkboxCount,
+                                            expression: "checkboxCount"
                                           }
-                                        })
-                                      ])
-                                    : _vm._e()
-                                ]
-                              )
-                            : _vm._e()
+                                        ],
+                                        staticClass: "form-control col-6",
+                                        attrs: {
+                                          type: "number",
+                                          id: "number",
+                                          min: "1",
+                                          max: "20"
+                                        },
+                                        domProps: { value: _vm.checkboxCount },
+                                        on: {
+                                          change:
+                                            _vm.addCheckboxLabelDescriptionFields,
+                                          input: function($event) {
+                                            if ($event.target.composing) {
+                                              return
+                                            }
+                                            _vm.checkboxCount =
+                                              $event.target.value
+                                          }
+                                        }
+                                      }),
+                                      _vm._v(" "),
+                                      _vm._l(_vm.checkboxInputs, function(
+                                        input,
+                                        i
+                                      ) {
+                                        return _c(
+                                          "div",
+                                          {
+                                            key: i,
+                                            attrs: { id: "checkbox-" + i }
+                                          },
+                                          [
+                                            _c(
+                                              "label",
+                                              {
+                                                attrs: {
+                                                  for: "description-" + i
+                                                }
+                                              },
+                                              [
+                                                _vm._v("Enter Description  "),
+                                                _vm._m(14, true)
+                                              ]
+                                            ),
+                                            _vm._v(" "),
+                                            _c("textarea", {
+                                              directives: [
+                                                {
+                                                  name: "model",
+                                                  rawName: "v-model",
+                                                  value: input.description,
+                                                  expression:
+                                                    "input.description"
+                                                }
+                                              ],
+                                              staticClass: "form-control",
+                                              attrs: {
+                                                rows: "2",
+                                                id: "description-" + i
+                                              },
+                                              domProps: {
+                                                value: input.description
+                                              },
+                                              on: {
+                                                input: function($event) {
+                                                  if ($event.target.composing) {
+                                                    return
+                                                  }
+                                                  _vm.$set(
+                                                    input,
+                                                    "description",
+                                                    $event.target.value
+                                                  )
+                                                }
+                                              }
+                                            }),
+                                            _vm._v(" "),
+                                            _c(
+                                              "label",
+                                              { attrs: { for: "label-" + i } },
+                                              [
+                                                _vm._v("Enter Label  "),
+                                                _vm._m(15, true)
+                                              ]
+                                            ),
+                                            _vm._v(" "),
+                                            _c("input", {
+                                              directives: [
+                                                {
+                                                  name: "model",
+                                                  rawName: "v-model",
+                                                  value: input.label,
+                                                  expression: "input.label"
+                                                }
+                                              ],
+                                              staticClass: "form-control",
+                                              attrs: {
+                                                type: "text",
+                                                id: "label-" + i
+                                              },
+                                              domProps: { value: input.label },
+                                              on: {
+                                                input: function($event) {
+                                                  if ($event.target.composing) {
+                                                    return
+                                                  }
+                                                  _vm.$set(
+                                                    input,
+                                                    "label",
+                                                    $event.target.value
+                                                  )
+                                                }
+                                              }
+                                            }),
+                                            _vm._v(" "),
+                                            _vm.checkboxCount > 1
+                                              ? _c("div", {
+                                                  staticClass:
+                                                    "border-bottom mb-2"
+                                                })
+                                              : _vm._e()
+                                          ]
+                                        )
+                                      })
+                                    ],
+                                    2
+                                  )
+                                : _vm._e(),
+                              _vm._v(" "),
+                              _vm.formInputType() === "numberType"
+                                ? _c("div", [
+                                    _vm._m(16),
+                                    _vm._v(" "),
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.inputLabel,
+                                          expression: "inputLabel"
+                                        }
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: { type: "text", id: "label" },
+                                      domProps: { value: _vm.inputLabel },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.inputLabel = $event.target.value
+                                        }
+                                      }
+                                    }),
+                                    _vm._v(" "),
+                                    _vm._m(17),
+                                    _vm._v(" "),
+                                    _c("textarea", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.inputDescription,
+                                          expression: "inputDescription"
+                                        }
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: { rows: "2", id: "description" },
+                                      domProps: { value: _vm.inputDescription },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.inputDescription =
+                                            $event.target.value
+                                        }
+                                      }
+                                    }),
+                                    _vm._v(" "),
+                                    _c("label", { attrs: { for: "minimum" } }, [
+                                      _vm._v("Enter Minimum Value")
+                                    ]),
+                                    _vm._v(" "),
+                                    _vm._m(18),
+                                    _vm._v(" "),
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.min,
+                                          expression: "min"
+                                        }
+                                      ],
+                                      staticClass: "form-control col-6",
+                                      attrs: { type: "number", id: "minimum" },
+                                      domProps: { value: _vm.min },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.min = $event.target.value
+                                        }
+                                      }
+                                    }),
+                                    _vm._v(" "),
+                                    _c("label", { attrs: { for: "maximum" } }, [
+                                      _vm._v("Enter Maximum Value")
+                                    ]),
+                                    _vm._v(" "),
+                                    _vm._m(19),
+                                    _vm._v(" "),
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.max,
+                                          expression: "max"
+                                        }
+                                      ],
+                                      staticClass: "form-control col-6",
+                                      attrs: { type: "number", id: "maximum" },
+                                      domProps: { value: _vm.max },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.max = $event.target.value
+                                        }
+                                      }
+                                    })
+                                  ])
+                                : _vm._e(),
+                              _vm._v(" "),
+                              _vm.formInputType() === "addressType"
+                                ? _c("div", [
+                                    _c(
+                                      "div",
+                                      {
+                                        staticClass:
+                                          "dynamic-btn__form-input my-4"
+                                      },
+                                      [
+                                        _c(
+                                          "div",
+                                          {
+                                            staticClass:
+                                              "custom-control custom-switch"
+                                          },
+                                          [
+                                            _c("input", {
+                                              staticClass:
+                                                "custom-control-input",
+                                              attrs: {
+                                                type: "checkbox",
+                                                id: "required"
+                                              },
+                                              on: {
+                                                click: function($event) {
+                                                  _vm.inputRequired = !_vm.inputRequired
+                                                }
+                                              }
+                                            }),
+                                            _vm._v(" "),
+                                            _c(
+                                              "label",
+                                              {
+                                                staticClass:
+                                                  "custom-control-label",
+                                                attrs: { for: "required" }
+                                              },
+                                              [_vm._v("Input Required")]
+                                            )
+                                          ]
+                                        )
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    _vm._m(20),
+                                    _vm._v(" "),
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.inputHeading,
+                                          expression: "inputHeading"
+                                        }
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: { type: "text", id: "label" },
+                                      domProps: { value: _vm.inputHeading },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.inputHeading = $event.target.value
+                                        }
+                                      }
+                                    }),
+                                    _vm._v(" "),
+                                    _vm._m(21),
+                                    _vm._v(" "),
+                                    _c("textarea", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.inputDescription,
+                                          expression: "inputDescription"
+                                        }
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: { rows: "2", id: "description" },
+                                      domProps: { value: _vm.inputDescription },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.inputDescription =
+                                            $event.target.value
+                                        }
+                                      }
+                                    })
+                                  ])
+                                : _vm._e(),
+                              _vm._v(" "),
+                              _vm.formInputType() === "selectType"
+                                ? _c(
+                                    "div",
+                                    [
+                                      _vm._m(22),
+                                      _vm._v(" "),
+                                      _c("input", {
+                                        directives: [
+                                          {
+                                            name: "model",
+                                            rawName: "v-model",
+                                            value: _vm.inputHeading,
+                                            expression: "inputHeading"
+                                          }
+                                        ],
+                                        staticClass: "form-control",
+                                        attrs: {
+                                          id: "checkboxHeading",
+                                          type: "text"
+                                        },
+                                        domProps: { value: _vm.inputHeading },
+                                        on: {
+                                          input: function($event) {
+                                            if ($event.target.composing) {
+                                              return
+                                            }
+                                            _vm.inputHeading =
+                                              $event.target.value
+                                          }
+                                        }
+                                      }),
+                                      _vm._v(" "),
+                                      _vm._m(23),
+                                      _vm._v(" "),
+                                      _c("input", {
+                                        directives: [
+                                          {
+                                            name: "model",
+                                            rawName: "v-model",
+                                            value: _vm.inputPlaceholder,
+                                            expression: "inputPlaceholder"
+                                          }
+                                        ],
+                                        staticClass: "form-control",
+                                        attrs: {
+                                          type: "text",
+                                          id: "placeholder"
+                                        },
+                                        domProps: {
+                                          value: _vm.inputPlaceholder
+                                        },
+                                        on: {
+                                          input: function($event) {
+                                            if ($event.target.composing) {
+                                              return
+                                            }
+                                            _vm.inputPlaceholder =
+                                              $event.target.value
+                                          }
+                                        }
+                                      }),
+                                      _vm._v(" "),
+                                      _vm._m(24),
+                                      _vm._v(" "),
+                                      _vm._m(25),
+                                      _vm._v(" "),
+                                      _c("input", {
+                                        directives: [
+                                          {
+                                            name: "model",
+                                            rawName: "v-model",
+                                            value: _vm.selectCount,
+                                            expression: "selectCount"
+                                          }
+                                        ],
+                                        staticClass: "form-control col-6",
+                                        attrs: {
+                                          type: "number",
+                                          id: "number",
+                                          min: "1",
+                                          max: "20"
+                                        },
+                                        domProps: { value: _vm.selectCount },
+                                        on: {
+                                          change: _vm.addSelectOptions,
+                                          input: function($event) {
+                                            if ($event.target.composing) {
+                                              return
+                                            }
+                                            _vm.selectCount =
+                                              $event.target.value
+                                          }
+                                        }
+                                      }),
+                                      _vm._v(" "),
+                                      _vm._l(_vm.selectOptions, function(
+                                        input
+                                      ) {
+                                        return _c(
+                                          "div",
+                                          {
+                                            key: _vm.selectOptions.indexOf(
+                                              input
+                                            ),
+                                            attrs: {
+                                              id: _vm.selectOptions.indexOf(
+                                                input
+                                              )
+                                            }
+                                          },
+                                          [
+                                            _c(
+                                              "label",
+                                              { attrs: { for: "label" } },
+                                              [_vm._v("Enter Option")]
+                                            ),
+                                            _vm._v(" "),
+                                            _c("input", {
+                                              directives: [
+                                                {
+                                                  name: "model",
+                                                  rawName: "v-model",
+                                                  value: input.option,
+                                                  expression: "input.option"
+                                                }
+                                              ],
+                                              staticClass: "form-control",
+                                              attrs: {
+                                                type: "text",
+                                                id: "label"
+                                              },
+                                              domProps: { value: input.option },
+                                              on: {
+                                                input: function($event) {
+                                                  if ($event.target.composing) {
+                                                    return
+                                                  }
+                                                  _vm.$set(
+                                                    input,
+                                                    "option",
+                                                    $event.target.value
+                                                  )
+                                                }
+                                              }
+                                            }),
+                                            _vm._v(" "),
+                                            _vm.selectCount > 1
+                                              ? _c("div", {
+                                                  staticClass:
+                                                    "border-bottom mb-2"
+                                                })
+                                              : _vm._e()
+                                          ]
+                                        )
+                                      })
+                                    ],
+                                    2
+                                  )
+                                : _vm._e(),
+                              _vm._v(" "),
+                              _vm.dynamicControl
+                                ? _c(
+                                    "div",
+                                    { staticClass: "dynamic-btn__form-input" },
+                                    [
+                                      _vm.formInputType() === "textType"
+                                        ? _c("div", [
+                                            _c(
+                                              "div",
+                                              {
+                                                staticClass:
+                                                  "custom-control custom-switch"
+                                              },
+                                              [
+                                                _c("input", {
+                                                  staticClass:
+                                                    "custom-control-input",
+                                                  attrs: {
+                                                    type: "checkbox",
+                                                    id: "dynamic"
+                                                  },
+                                                  domProps: {
+                                                    checked: _vm.inputDynamic
+                                                  },
+                                                  on: {
+                                                    click: function($event) {
+                                                      _vm.inputDynamic = !_vm.inputDynamic
+                                                    }
+                                                  }
+                                                }),
+                                                _vm._v(" "),
+                                                _vm._m(26)
+                                              ]
+                                            ),
+                                            _vm._v(" "),
+                                            _vm.inputDynamic
+                                              ? _c(
+                                                  "div",
+                                                  { staticClass: "mt-3" },
+                                                  [
+                                                    _c("input", {
+                                                      directives: [
+                                                        {
+                                                          name: "model",
+                                                          rawName: "v-model",
+                                                          value:
+                                                            _vm.inputDynamicDescription,
+                                                          expression:
+                                                            "inputDynamicDescription"
+                                                        }
+                                                      ],
+                                                      staticClass:
+                                                        "form-control",
+                                                      attrs: {
+                                                        type: "text",
+                                                        placeholder:
+                                                          "Enter Button Label"
+                                                      },
+                                                      domProps: {
+                                                        value:
+                                                          _vm.inputDynamicDescription
+                                                      },
+                                                      on: {
+                                                        input: function(
+                                                          $event
+                                                        ) {
+                                                          if (
+                                                            $event.target
+                                                              .composing
+                                                          ) {
+                                                            return
+                                                          }
+                                                          _vm.inputDynamicDescription =
+                                                            $event.target.value
+                                                        }
+                                                      }
+                                                    })
+                                                  ]
+                                                )
+                                              : _vm._e()
+                                          ])
+                                        : _vm._e(),
+                                      _vm._v(" "),
+                                      _vm.formInputType() === "groupType"
+                                        ? _c("div", [
+                                            _c(
+                                              "div",
+                                              {
+                                                staticClass:
+                                                  "custom-control custom-switch"
+                                              },
+                                              [
+                                                _c("input", {
+                                                  staticClass:
+                                                    "custom-control-input",
+                                                  attrs: {
+                                                    type: "checkbox",
+                                                    id: "dynamic"
+                                                  },
+                                                  domProps: {
+                                                    checked:
+                                                      _vm.groupDetails
+                                                        .groupDynamic
+                                                  },
+                                                  on: {
+                                                    click: function($event) {
+                                                      _vm.groupDetails.groupDynamic = !_vm
+                                                        .groupDetails
+                                                        .groupDynamic
+                                                    }
+                                                  }
+                                                }),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "label",
+                                                  {
+                                                    staticClass:
+                                                      "custom-control-label",
+                                                    attrs: { for: "dynamic" }
+                                                  },
+                                                  [_vm._v("Make Dynamic")]
+                                                )
+                                              ]
+                                            ),
+                                            _vm._v(" "),
+                                            _vm.groupDetails.groupDynamic
+                                              ? _c(
+                                                  "div",
+                                                  { staticClass: "mt-3" },
+                                                  [
+                                                    _c("input", {
+                                                      directives: [
+                                                        {
+                                                          name: "model",
+                                                          rawName: "v-model",
+                                                          value:
+                                                            _vm.groupDetails
+                                                              .groupDynamicDescription,
+                                                          expression:
+                                                            "groupDetails.groupDynamicDescription"
+                                                        }
+                                                      ],
+                                                      staticClass:
+                                                        "form-control",
+                                                      attrs: {
+                                                        type: "text",
+                                                        placeholder:
+                                                          "Enter Label"
+                                                      },
+                                                      domProps: {
+                                                        value:
+                                                          _vm.groupDetails
+                                                            .groupDynamicDescription
+                                                      },
+                                                      on: {
+                                                        input: function(
+                                                          $event
+                                                        ) {
+                                                          if (
+                                                            $event.target
+                                                              .composing
+                                                          ) {
+                                                            return
+                                                          }
+                                                          _vm.$set(
+                                                            _vm.groupDetails,
+                                                            "groupDynamicDescription",
+                                                            $event.target.value
+                                                          )
+                                                        }
+                                                      }
+                                                    })
+                                                  ]
+                                                )
+                                              : _vm._e()
+                                          ])
+                                        : _vm._e()
+                                    ]
+                                  )
+                                : _vm._e()
+                            ]
+                          )
                         ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm.step === 3 && !_vm.inputInfoMode
+                      ? _c(
+                          "button",
+                          {
+                            key: "infoBtn",
+                            staticClass:
+                              "btn btn-info btn-sm float-right btns__icon",
+                            attrs: {
+                              id: "input-info",
+                              "data-type": _vm.inputType
+                            },
+                            on: {
+                              click: function($event) {
+                                $event.preventDefault()
+                                return _vm.inputInfo($event)
+                              }
+                            }
+                          },
+                          [
+                            _c("span", { attrs: { "data-feather": "info" } }),
+                            _vm._v(" Input Info")
+                          ]
+                        )
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm.inputInfoMode
+                      ? _c(
+                          "button",
+                          {
+                            key: "backInfoBtn",
+                            staticClass:
+                              "btn btn-secondary btn-sm float-right btns__icon",
+                            on: {
+                              click: function($event) {
+                                $event.preventDefault()
+                                _vm.inputInfoMode = false
+                              }
+                            }
+                          },
+                          [
+                            _c("span", {
+                              attrs: { "data-feather": "arrow-left-circle" }
+                            }),
+                            _vm._v(" Back")
+                          ]
+                        )
                       : _vm._e()
                   ]),
                   _vm._v(" "),
@@ -71702,7 +72948,8 @@ var render = function() {
                           ? _c("span", [_vm._v(" Form Preview ")])
                           : _c("span", [
                               _vm._v(
-                                "Create " +
+                                _vm._s(_vm.editMode ? "Edit" : "Create") +
+                                  " " +
                                   _vm._s(_vm.showInputType("", true)) +
                                   " Input"
                               )
@@ -71721,7 +72968,7 @@ var render = function() {
                                 _c(
                                   "button",
                                   {
-                                    staticClass: "btn btn-primary",
+                                    staticClass: "btn btn-primary btn-sm",
                                     attrs: {
                                       disabled: _vm.previewSelected !== 1
                                     },
@@ -71739,14 +72986,16 @@ var render = function() {
                                   _c(
                                     "label",
                                     {
-                                      staticClass: "mr-2 mb-0",
+                                      staticClass:
+                                        "mr-2 mb-0 form-create__pointer",
                                       attrs: { for: "select-all" }
                                     },
                                     [_vm._v("Select all")]
                                   ),
                                   _vm._v(" "),
                                   _c("input", {
-                                    staticClass: "form-checkbox mb-0",
+                                    staticClass:
+                                      "form-checkbox mb-0 form-create__pointer",
                                     attrs: {
                                       id: "select-all",
                                       type: "checkbox",
@@ -71764,19 +73013,24 @@ var render = function() {
                               "div",
                               { staticClass: "form-check float-right" },
                               [
-                                _c("label", { attrs: { for: "hide-form" } }, [
-                                  _vm._v("Hide form")
-                                ]),
+                                _c(
+                                  "label",
+                                  {
+                                    staticClass: "form-create__pointer",
+                                    attrs: { for: "hide-form" }
+                                  },
+                                  [_vm._v("Show Input In Form")]
+                                ),
                                 _vm._v(" "),
                                 _c("input", {
-                                  staticClass: "form-checkbox",
-                                  attrs: { id: "hide-form", type: "checkbox" },
-                                  domProps: { checked: _vm.hideForm },
-                                  on: {
-                                    click: function($event) {
-                                      _vm.hideForm = !_vm.hideForm
-                                    }
-                                  }
+                                  staticClass:
+                                    "form-checkbox form-create__pointer",
+                                  attrs: {
+                                    id: "hide-form",
+                                    type: "checkbox",
+                                    disabled: !_vm.formHtml
+                                  },
+                                  on: { click: _vm.showForm }
                                 })
                               ]
                             )
@@ -71787,47 +73041,212 @@ var render = function() {
                         "div",
                         {
                           staticClass:
-                            "border shadow-sm mb-4 p-2 form-create__preview"
+                            "border shadow-sm mb-4 form-create__preview"
                         },
                         [
                           !_vm.formHeading
                             ? _c("div", [
                                 _c("p", { staticClass: "text-secondary" }, [
-                                  _vm._v("Your form will build here!")
+                                  _vm._v("Your form will build here...")
                                 ])
                               ])
                             : _vm._e(),
                           _vm._v(" "),
                           _c("h4", [_vm._v(_vm._s(_vm.formHeading))]),
                           _vm._v(" "),
-                          !_vm.hideForm
+                          !_vm.formHidden
                             ? _c("div", {
                                 staticClass: "form-preview",
                                 domProps: { innerHTML: _vm._s(_vm.formHtml) }
                               })
                             : _vm._e(),
                           _vm._v(" "),
-                          _vm.inputType
+                          _vm.showHiddenForm
+                            ? _c("div", {
+                                staticClass: "form-preview",
+                                domProps: {
+                                  innerHTML: _vm._s(_vm.showFormHtml)
+                                }
+                              })
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _vm.inputType && !_vm.showHiddenForm
                             ? _c("div", { staticClass: "form-group" }, [
+                                _vm.formInputType() === "paymentType"
+                                  ? _c("div", [
+                                      _vm.inputLabel
+                                        ? _c("label", [
+                                            _vm._v(_vm._s(_vm.inputLabel))
+                                          ])
+                                        : _c(
+                                            "label",
+                                            { staticClass: "text-secondary" },
+                                            [_vm._v("Payment Heading")]
+                                          ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "p",
+                                        { staticClass: "text-secondary" },
+                                        [
+                                          _c("em", [
+                                            _vm._v(
+                                              _vm._s(
+                                                _vm.inputDescription ||
+                                                  "Payment Description"
+                                              )
+                                            )
+                                          ])
+                                        ]
+                                      ),
+                                      _vm._v(" "),
+                                      _vm._m(27),
+                                      _vm._v(" "),
+                                      _vm.inputRequired
+                                        ? _c(
+                                            "p",
+                                            { staticClass: "text-danger" },
+                                            [
+                                              _c("em", [
+                                                _vm._v(
+                                                  " All payment fields are (required)*"
+                                                )
+                                              ])
+                                            ]
+                                          )
+                                        : _vm._e(),
+                                      _vm._v(" "),
+                                      _vm._m(28),
+                                      _vm._v(" "),
+                                      _vm.addQuantity
+                                        ? _c("div", { staticClass: "mb-2" }, [
+                                            _c(
+                                              "label",
+                                              { attrs: { for: "addQuantity" } },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(_vm.quanityInputLabel)
+                                                )
+                                              ]
+                                            ),
+                                            _vm._v(" "),
+                                            _c("input", {
+                                              staticClass: "form-control col-6",
+                                              attrs: {
+                                                "data-price-type":
+                                                  "quantity-input",
+                                                name: "addQuantity",
+                                                type: "number",
+                                                min: "1",
+                                                max: "50",
+                                                value: "1",
+                                                id: "addQuantity"
+                                              },
+                                              on: { change: _vm.calPrice }
+                                            })
+                                          ])
+                                        : _vm._e(),
+                                      _vm._v(" "),
+                                      _c(
+                                        "div",
+                                        { staticClass: "clearfix mb-2" },
+                                        [
+                                          _c(
+                                            "div",
+                                            { staticClass: "float-right" },
+                                            [
+                                              _c("p", [
+                                                _c("strong", [
+                                                  _vm._v("Total: ")
+                                                ]),
+                                                _vm._v(
+                                                  "$" + _vm._s(_vm.showPrice)
+                                                )
+                                              ])
+                                            ]
+                                          )
+                                        ]
+                                      )
+                                    ])
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                _vm.formInputType(_vm.inputType) === "groupType"
+                                  ? _c("div", [
+                                      _vm.groupDetails.heading
+                                        ? _c("label", [
+                                            _vm._v(
+                                              _vm._s(_vm.groupDetails.heading)
+                                            )
+                                          ])
+                                        : _c(
+                                            "label",
+                                            { staticClass: "text-secondary" },
+                                            [_vm._v("Group Heading")]
+                                          ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "p",
+                                        { staticClass: "text-secondary" },
+                                        [
+                                          _c("em", [
+                                            _vm._v(
+                                              _vm._s(
+                                                _vm.groupDetails.description ||
+                                                  "Group Description"
+                                              )
+                                            )
+                                          ])
+                                        ]
+                                      ),
+                                      _vm._v(" "),
+                                      _c("div", {
+                                        domProps: {
+                                          innerHTML: _vm._s(_vm.groupInputsHtml)
+                                        }
+                                      })
+                                    ])
+                                  : _vm._e(),
+                                _vm._v(" "),
                                 _vm.formInputType(_vm.inputType) === "textType"
                                   ? _c("div", [
-                                      _c("label", [
-                                        _vm._v(
-                                          _vm._s(_vm.inputLabel || "Label") +
-                                            "  "
-                                        ),
-                                        _vm.inputRequired
-                                          ? _c(
-                                              "span",
-                                              { staticClass: "text-danger" },
-                                              [
-                                                _c("em", [
-                                                  _vm._v("(required)*")
-                                                ])
-                                              ]
-                                            )
-                                          : _vm._e()
-                                      ]),
+                                      _vm.inputLabel
+                                        ? _c("label", [
+                                            _vm._v(
+                                              _vm._s(_vm.inputLabel) + "  "
+                                            ),
+                                            _vm.inputRequired
+                                              ? _c(
+                                                  "span",
+                                                  {
+                                                    staticClass: "text-danger"
+                                                  },
+                                                  [
+                                                    _c("em", [
+                                                      _vm._v("(required)*")
+                                                    ])
+                                                  ]
+                                                )
+                                              : _vm._e()
+                                          ])
+                                        : _c(
+                                            "label",
+                                            { staticClass: "text-secondary" },
+                                            [
+                                              _vm._v("Label  "),
+                                              _vm.inputRequired
+                                                ? _c(
+                                                    "span",
+                                                    {
+                                                      staticClass: "text-danger"
+                                                    },
+                                                    [
+                                                      _c("em", [
+                                                        _vm._v("(required)*")
+                                                      ])
+                                                    ]
+                                                  )
+                                                : _vm._e()
+                                            ]
+                                          ),
                                       _vm._v(" "),
                                       _c(
                                         "p",
@@ -71902,11 +73321,11 @@ var render = function() {
                                       "div",
                                       [
                                         _vm.inputHeading
-                                          ? _c("h5", [
+                                          ? _c("label", [
                                               _vm._v(_vm._s(_vm.inputHeading))
                                             ])
                                           : _c(
-                                              "h5",
+                                              "label",
                                               { staticClass: "text-secondary" },
                                               [_vm._v("Heading")]
                                             ),
@@ -72064,26 +73483,15 @@ var render = function() {
                                 _vm._v(" "),
                                 _vm.formInputType() === "numberType"
                                   ? _c("div", [
-                                      _c(
-                                        "label",
-                                        { attrs: { for: "minimum" } },
-                                        [
-                                          _c(
-                                            "span",
-                                            {
-                                              staticClass:
-                                                "text-capitalize text-bold"
-                                            },
-                                            [
-                                              _vm._v(
-                                                _vm._s(
-                                                  _vm.inputLabel || "Label"
-                                                )
-                                              )
-                                            ]
-                                          )
-                                        ]
-                                      ),
+                                      _vm.inputLabel
+                                        ? _c("label", [
+                                            _vm._v(_vm._s(_vm.inputLabel))
+                                          ])
+                                        : _c(
+                                            "label",
+                                            { staticClass: "text-secondary" },
+                                            [_vm._v("Label")]
+                                          ),
                                       _vm._v(" "),
                                       _c(
                                         "p",
@@ -72151,7 +73559,7 @@ var render = function() {
                                                 staticClass:
                                                   "d-inline text-secondary"
                                               },
-                                              [_vm._v("Heading")]
+                                              [_vm._v("Label")]
                                             ),
                                             _vm._v("  "),
                                             _vm.inputRequired
@@ -72199,7 +73607,7 @@ var render = function() {
                                         }
                                       }),
                                       _vm._v(" "),
-                                      _vm._m(18)
+                                      _vm._m(29)
                                     ])
                                   : _vm._e(),
                                 _vm._v(" "),
@@ -72207,13 +73615,18 @@ var render = function() {
                                 "selectType"
                                   ? _c("div", [
                                       _vm.inputHeading
-                                        ? _c("h6", [
-                                            _vm._v(_vm._s(_vm.inputHeading))
-                                          ])
+                                        ? _c(
+                                            "label",
+                                            { staticClass: "d-block" },
+                                            [_vm._v(_vm._s(_vm.inputHeading))]
+                                          )
                                         : _c(
-                                            "h6",
-                                            { staticClass: "text-secondary" },
-                                            [_vm._v("Heading")]
+                                            "label",
+                                            {
+                                              staticClass:
+                                                "d-block text-secondary"
+                                            },
+                                            [_vm._v("Label")]
                                           ),
                                       _vm._v(" "),
                                       _c(
@@ -72224,6 +73637,7 @@ var render = function() {
                                             "option",
                                             {
                                               staticClass: "text-secondary",
+                                              staticStyle: { color: "" },
                                               attrs: {
                                                 selected: "",
                                                 hidden: "",
@@ -72237,7 +73651,7 @@ var render = function() {
                                               _vm._v(
                                                 _vm._s(
                                                   _vm.inputPlaceholder ||
-                                                    "Placeholder"
+                                                    "placeholder"
                                                 )
                                               )
                                             ]
@@ -72294,8 +73708,92 @@ var render = function() {
                                         ]
                                       )
                                     ])
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                _vm.groupDetails.groupDynamic
+                                  ? _c("div", { staticClass: "dynamic-btn" }, [
+                                      _c(
+                                        "button",
+                                        {
+                                          staticClass:
+                                            "btn btn-info dynamic-btn__btn"
+                                        },
+                                        [
+                                          _vm._v("+"),
+                                          _c(
+                                            "small",
+                                            {
+                                              class: {
+                                                "dynamic-btn__text":
+                                                  _vm.groupDetails
+                                                    .groupDynamicDescription
+                                              }
+                                            },
+                                            [
+                                              _vm._v(
+                                                _vm._s(
+                                                  _vm.groupDetails
+                                                    .groupDynamicDescription
+                                                )
+                                              )
+                                            ]
+                                          )
+                                        ]
+                                      )
+                                    ])
                                   : _vm._e()
                               ])
+                            : _vm._e(),
+                          _vm._v(" "),
+                          (_vm.formHtml && !_vm.inputType) ||
+                          (_vm.inputType && _vm.showHiddenForm) ||
+                          _vm.inputType === "payment"
+                            ? _c(
+                                "div",
+                                {
+                                  staticClass: "clearfix",
+                                  attrs: { id: "submit-reset-btns" }
+                                },
+                                [
+                                  _c("div", { staticClass: "float-right" }, [
+                                    _c(
+                                      "button",
+                                      {
+                                        staticClass: "btn btn-light",
+                                        attrs: { href: "#" },
+                                        on: {
+                                          click: function($event) {
+                                            $event.preventDefault()
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("Reset")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "button",
+                                      {
+                                        staticClass: "btn btn-primary",
+                                        attrs: { href: "#" },
+                                        on: {
+                                          click: function($event) {
+                                            $event.preventDefault()
+                                          }
+                                        }
+                                      },
+                                      [
+                                        _vm._v(
+                                          _vm._s(
+                                            _vm.paymentAdded
+                                              ? _vm.inputPbText
+                                              : "Submit"
+                                          )
+                                        )
+                                      ]
+                                    )
+                                  ])
+                                ]
+                              )
                             : _vm._e()
                         ]
                       ),
@@ -72308,7 +73806,7 @@ var render = function() {
                               _c(
                                 "button",
                                 {
-                                  staticClass: "btn btn-danger my-1",
+                                  staticClass: "btn btn-danger btn-sm my-1",
                                   attrs: { disabled: !_vm.previewSelected },
                                   on: {
                                     click: function($event) {
@@ -72323,8 +73821,30 @@ var render = function() {
                               _c(
                                 "button",
                                 {
-                                  staticClass: "btn btn-primary ml-2 my-1",
-                                  attrs: { disabled: _vm.previewSelected < 2 },
+                                  staticClass: "btn btn-info btn-sm my-1",
+                                  attrs: {
+                                    disabled: _vm.previewSelected !== 2
+                                  },
+                                  on: {
+                                    click: function($event) {
+                                      $event.preventDefault()
+                                      return _vm.switchSelected($event)
+                                    }
+                                  }
+                                },
+                                [_vm._v("Switch Selected")]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "button",
+                                {
+                                  staticClass:
+                                    "btn btn-primary btn-sm ml-2 my-1",
+                                  attrs: {
+                                    disabled:
+                                      _vm.previewSelected < 2 ||
+                                      _vm.paymentSelected
+                                  },
                                   on: {
                                     click: function($event) {
                                       $event.preventDefault()
@@ -72345,44 +73865,7 @@ var render = function() {
               _c("div", { staticClass: "modal-footer" }, [
                 _vm.step === 1
                   ? _c("div", { staticClass: "form-create__footer-btns" }, [
-                      _c(
-                        "button",
-                        {
-                          staticClass: "btn btn-danger btns__icon",
-                          attrs: { type: "button", "data-dismiss": "modal" }
-                        },
-                        [
-                          _c(
-                            "svg",
-                            {
-                              staticClass: "feather feather-x-circle",
-                              attrs: {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                width: "24",
-                                height: "24",
-                                viewBox: "0 0 24 24",
-                                fill: "none",
-                                stroke: "currentColor",
-                                "stroke-width": "2",
-                                "stroke-linecap": "round",
-                                "stroke-linejoin": "round"
-                              }
-                            },
-                            [
-                              _c("circle", {
-                                attrs: { cx: "12", cy: "12", r: "10" }
-                              }),
-                              _c("line", {
-                                attrs: { x1: "15", y1: "9", x2: "9", y2: "15" }
-                              }),
-                              _c("line", {
-                                attrs: { x1: "9", y1: "9", x2: "15", y2: "15" }
-                              })
-                            ]
-                          ),
-                          _vm._v(" Cancel")
-                        ]
-                      ),
+                      _vm._m(30),
                       _vm._v(" "),
                       _c(
                         "button",
@@ -72400,32 +73883,64 @@ var render = function() {
                           }
                         },
                         [
-                          _vm._v("Start "),
+                          _vm._v("Next "),
+                          _c("span", {
+                            attrs: { "data-feather": "arrow-right-circle" }
+                          })
+                        ]
+                      )
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.step === 2
+                  ? _c("div", { staticClass: "form-create__footer-btns" }, [
+                      _vm._m(31),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        {
+                          staticClass:
+                            "d-flex align-items-center justify-content-around"
+                        },
+                        [
                           _c(
-                            "svg",
+                            "button",
                             {
-                              staticClass: "feather feather-arrow-right-circle",
-                              attrs: {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                width: "24",
-                                height: "24",
-                                viewBox: "0 0 24 24",
-                                fill: "none",
-                                stroke: "currentColor",
-                                "stroke-width": "2",
-                                "stroke-linecap": "round",
-                                "stroke-linejoin": "round"
+                              staticClass: "btn btn-secondary mr-2 btns__icon",
+                              on: {
+                                click: function($event) {
+                                  $event.preventDefault()
+                                  _vm.step = 1
+                                }
                               }
                             },
                             [
-                              _c("circle", {
-                                attrs: { cx: "12", cy: "12", r: "10" }
+                              _c("span", {
+                                attrs: { "data-feather": "arrow-left-circle" }
                               }),
-                              _c("polyline", {
-                                attrs: { points: "12 16 16 12 12 8" }
-                              }),
-                              _c("line", {
-                                attrs: { x1: "8", y1: "12", x2: "16", y2: "12" }
+                              _vm._v(" Back")
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-primary",
+                              attrs: {
+                                disabled:
+                                  !_vm.formHtml && !_vm.formInputs.length
+                              },
+                              on: {
+                                click: function($event) {
+                                  $event.preventDefault()
+                                  return _vm.createEventForm($event)
+                                }
+                              }
+                            },
+                            [
+                              _vm._v("Create Form "),
+                              _c("span", {
+                                attrs: { "data-feather": "check-circle" }
                               })
                             ]
                           )
@@ -72434,316 +73949,60 @@ var render = function() {
                     ])
                   : _vm._e(),
                 _vm._v(" "),
-                _vm.step === 2
-                  ? _c("div", { staticClass: "form-create__footer-btns" }, [
-                      _c("div", [
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-danger btns__icon",
-                            attrs: { type: "button", "data-dismiss": "modal" }
-                          },
-                          [
-                            _c(
-                              "svg",
-                              {
-                                staticClass: "feather feather-x-circle",
-                                attrs: {
-                                  xmlns: "http://www.w3.org/2000/svg",
-                                  width: "24",
-                                  height: "24",
-                                  viewBox: "0 0 24 24",
-                                  fill: "none",
-                                  stroke: "currentColor",
-                                  "stroke-width": "2",
-                                  "stroke-linecap": "round",
-                                  "stroke-linejoin": "round"
-                                }
-                              },
-                              [
-                                _c("circle", {
-                                  attrs: { cx: "12", cy: "12", r: "10" }
-                                }),
-                                _c("line", {
-                                  attrs: {
-                                    x1: "15",
-                                    y1: "9",
-                                    x2: "9",
-                                    y2: "15"
-                                  }
-                                }),
-                                _c("line", {
-                                  attrs: {
-                                    x1: "9",
-                                    y1: "9",
-                                    x2: "15",
-                                    y2: "15"
-                                  }
-                                })
-                              ]
-                            ),
-                            _vm._v(" Cancel")
-                          ]
-                        )
-                      ]),
-                      _vm._v(" "),
-                      _c("div", [
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-secondary",
-                            on: {
-                              click: function($event) {
-                                $event.preventDefault()
-                                return _vm.back($event)
-                              }
-                            }
-                          },
-                          [
-                            _c(
-                              "svg",
-                              {
-                                staticClass:
-                                  "feather feather-arrow-left-circle",
-                                attrs: {
-                                  xmlns: "http://www.w3.org/2000/svg",
-                                  width: "24",
-                                  height: "24",
-                                  viewBox: "0 0 24 24",
-                                  fill: "none",
-                                  stroke: "currentColor",
-                                  "stroke-width": "2",
-                                  "stroke-linecap": "round",
-                                  "stroke-linejoin": "round"
-                                }
-                              },
-                              [
-                                _c("circle", {
-                                  attrs: { cx: "12", cy: "12", r: "10" }
-                                }),
-                                _c("polyline", {
-                                  attrs: { points: "12 8 8 12 12 16" }
-                                }),
-                                _c("line", {
-                                  attrs: {
-                                    x1: "16",
-                                    y1: "12",
-                                    x2: "8",
-                                    y2: "12"
-                                  }
-                                })
-                              ]
-                            ),
-                            _vm._v(" Back")
-                          ]
-                        ),
-                        _vm._v(" "),
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-primary",
-                            attrs: { disabled: !_vm.inputType },
-                            on: {
-                              click: function($event) {
-                                $event.preventDefault()
-                                return _vm.next($event)
-                              }
-                            }
-                          },
-                          [
-                            _vm._v("Create Form "),
-                            _c(
-                              "svg",
-                              {
-                                staticClass: "feather feather-check-circle",
-                                attrs: {
-                                  xmlns: "http://www.w3.org/2000/svg",
-                                  width: "24",
-                                  height: "24",
-                                  viewBox: "0 0 24 24",
-                                  fill: "none",
-                                  stroke: "currentColor",
-                                  "stroke-width": "2",
-                                  "stroke-linecap": "round",
-                                  "stroke-linejoin": "round"
-                                }
-                              },
-                              [
-                                _c("path", {
-                                  attrs: {
-                                    d: "M22 11.08V12a10 10 0 1 1-5.93-9.14"
-                                  }
-                                }),
-                                _c("polyline", {
-                                  attrs: { points: "22 4 12 14.01 9 11.01" }
-                                })
-                              ]
-                            )
-                          ]
-                        )
-                      ])
-                    ])
-                  : _vm._e(),
-                _vm._v(" "),
                 _vm.step === 3
                   ? _c("div", { staticClass: "form-create__footer-btns" }, [
-                      _c("div", [
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-danger",
-                            attrs: { type: "button", "data-dismiss": "modal" }
-                          },
-                          [
-                            _c(
-                              "svg",
-                              {
-                                staticClass: "feather feather-x-circle",
-                                attrs: {
-                                  xmlns: "http://www.w3.org/2000/svg",
-                                  width: "24",
-                                  height: "24",
-                                  viewBox: "0 0 24 24",
-                                  fill: "none",
-                                  stroke: "currentColor",
-                                  "stroke-width": "2",
-                                  "stroke-linecap": "round",
-                                  "stroke-linejoin": "round"
-                                }
-                              },
-                              [
-                                _c("circle", {
-                                  attrs: { cx: "12", cy: "12", r: "10" }
-                                }),
-                                _c("line", {
-                                  attrs: {
-                                    x1: "15",
-                                    y1: "9",
-                                    x2: "9",
-                                    y2: "15"
-                                  }
-                                }),
-                                _c("line", {
-                                  attrs: {
-                                    x1: "9",
-                                    y1: "9",
-                                    x2: "15",
-                                    y2: "15"
-                                  }
-                                })
-                              ]
-                            ),
-                            _vm._v(" Cancel")
-                          ]
-                        )
-                      ]),
+                      _vm._m(32),
                       _vm._v(" "),
-                      _c("div", [
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-secondary",
-                            on: {
-                              click: function($event) {
-                                $event.preventDefault()
-                                return _vm.back($event)
-                              }
-                            }
-                          },
-                          [
-                            _c(
-                              "svg",
-                              {
-                                staticClass:
-                                  "feather feather-arrow-left-circle",
-                                attrs: {
-                                  xmlns: "http://www.w3.org/2000/svg",
-                                  width: "24",
-                                  height: "24",
-                                  viewBox: "0 0 24 24",
-                                  fill: "none",
-                                  stroke: "currentColor",
-                                  "stroke-width": "2",
-                                  "stroke-linecap": "round",
-                                  "stroke-linejoin": "round"
+                      _c(
+                        "div",
+                        {
+                          staticClass:
+                            "d-flex align-items-center justify-content-around"
+                        },
+                        [
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-secondary mr-2 btns__icon",
+                              on: {
+                                click: function($event) {
+                                  $event.preventDefault()
+                                  return _vm.backStep($event)
                                 }
-                              },
-                              [
-                                _c("circle", {
-                                  attrs: { cx: "12", cy: "12", r: "10" }
-                                }),
-                                _c("polyline", {
-                                  attrs: { points: "12 8 8 12 12 16" }
-                                }),
-                                _c("line", {
-                                  attrs: {
-                                    x1: "16",
-                                    y1: "12",
-                                    x2: "8",
-                                    y2: "12"
-                                  }
-                                })
-                              ]
-                            ),
-                            _vm._v(" Back")
-                          ]
-                        ),
-                        _vm._v(" "),
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-primary",
-                            attrs: { disabled: !_vm.enableCreateInputBtn },
-                            on: {
-                              click: function($event) {
-                                $event.preventDefault()
-                                return _vm.createInput($event)
                               }
-                            }
-                          },
-                          [
-                            _vm._v("Create Input "),
-                            _c(
-                              "svg",
-                              {
-                                staticClass: "feather feather-plus-circle",
-                                attrs: {
-                                  xmlns: "http://www.w3.org/2000/svg",
-                                  width: "24",
-                                  height: "24",
-                                  viewBox: "0 0 24 24",
-                                  fill: "none",
-                                  stroke: "currentColor",
-                                  "stroke-width": "2",
-                                  "stroke-linecap": "round",
-                                  "stroke-linejoin": "round"
+                            },
+                            [
+                              _c("span", {
+                                attrs: { "data-feather": "arrow-left-circle" }
+                              }),
+                              _vm._v(" Back")
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-primary",
+                              attrs: { disabled: !_vm.enableCreateInputBtn },
+                              on: {
+                                click: function($event) {
+                                  $event.preventDefault()
+                                  return _vm.createInput(false, $event)
                                 }
-                              },
-                              [
-                                _c("circle", {
-                                  attrs: { cx: "12", cy: "12", r: "10" }
-                                }),
-                                _c("line", {
-                                  attrs: {
-                                    x1: "12",
-                                    y1: "8",
-                                    x2: "12",
-                                    y2: "16"
-                                  }
-                                }),
-                                _c("line", {
-                                  attrs: {
-                                    x1: "8",
-                                    y1: "12",
-                                    x2: "16",
-                                    y2: "12"
-                                  }
-                                })
-                              ]
-                            )
-                          ]
-                        )
-                      ])
+                              }
+                            },
+                            [
+                              _vm._v(
+                                _vm._s(_vm.editMode ? "Edit" : "Create") +
+                                  " Input "
+                              ),
+                              _c("span", {
+                                attrs: { "data-feather": "plus-circle" }
+                              })
+                            ]
+                          )
+                        ]
+                      )
                     ])
                   : _vm._e()
               ])
@@ -72760,17 +74019,40 @@ var render = function() {
           on: {
             click: function($event) {
               $event.preventDefault()
+              return _vm.initEditForm($event)
             }
           }
         },
         [
-          _vm._v("Create Form "),
+          _vm._v(
+            _vm._s(
+              Object.keys(_vm.createdFormJson).length
+                ? "Edit Form"
+                : "Create Form"
+            ) + " "
+          ),
           _c("span", {
             staticClass: "btns__icon--right",
             attrs: { "data-feather": "file-plus" }
           })
         ]
-      )
+      ),
+      _vm._v(" "),
+      _vm.createdFormHtml
+        ? _c(
+            "div",
+            {
+              staticClass:
+                "form-create__disable-inputs form-create__disable-inputs--transparent mt-4"
+            },
+            [
+              _c("div", {
+                staticClass: "border shadow-sm mb-4 form-create__preview",
+                domProps: { innerHTML: _vm._s(_vm.createdFormHtml) }
+              })
+            ]
+          )
+        : _vm._e()
     ]
   )
 }
@@ -72791,6 +74073,94 @@ var staticRenderFns = [
       },
       [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
     )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("p", [
+      _vm._v("Let's start creating your new form by entering the "),
+      _c("span", { staticClass: "font-weight-bold" }, [_vm._v("HEADING")]),
+      _vm._v(" for this form and the "),
+      _c("span", { staticClass: "font-weight-bold" }, [_vm._v("EMAIL")]),
+      _vm._v(" that you want this form to send to.")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("p", [
+      _vm._v("Select the "),
+      _c("span", { staticClass: "font-weight-bold" }, [_vm._v("INPUT")]),
+      _vm._v(" that you want to add to the form.")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("label", { attrs: { for: "heading" } }, [
+      _vm._v("Enter Heading  "),
+      _c("span", { staticClass: "text-secondary" }, [
+        _c("em", [_vm._v("(optional)")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("label", { attrs: { for: "description" } }, [
+      _vm._v("Enter Description  "),
+      _c("span", { staticClass: "text-secondary" }, [
+        _c("em", [_vm._v("(optional)")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("label", { attrs: { for: "label" } }, [
+      _vm._v("Enter Label  "),
+      _c("span", { staticClass: "text-secondary" }, [
+        _c("em", [_vm._v("(optional)")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("label", { attrs: { for: "description" } }, [
+      _vm._v("Enter Description  "),
+      _c("span", { staticClass: "text-secondary" }, [
+        _c("em", [_vm._v("(optional)")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("label", { attrs: { for: "total" } }, [
+      _vm._v("Enter Total  "),
+      _c("span", { staticClass: "text-danger" }, [
+        _c("em", [_vm._v("(required)*")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("label", { attrs: { for: "pb-text" } }, [
+      _vm._v("Button Text  "),
+      _c("span", { staticClass: "text-secondary" }, [
+        _c("em", [_vm._v("(optional)")])
+      ])
+    ])
   },
   function() {
     var _vm = this
@@ -72848,22 +74218,16 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("label", { attrs: { for: "description" } }, [
-      _vm._v("Enter Description  "),
-      _c("span", { staticClass: "text-secondary" }, [
-        _c("em", [_vm._v("(optional)")])
-      ])
+    return _c("span", { staticClass: "text-secondary" }, [
+      _c("em", [_vm._v("(optional)")])
     ])
   },
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("label", { attrs: { for: "label" } }, [
-      _vm._v("Enter Label  "),
-      _c("span", { staticClass: "text-danger" }, [
-        _c("em", [_vm._v("(required)*")])
-      ])
+    return _c("span", { staticClass: "text-danger" }, [
+      _c("em", [_vm._v("(required)*")])
     ])
   },
   function() {
@@ -72966,6 +74330,154 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("p", { staticClass: "text-secondary" }, [
       _c("em", [_vm._v("Max 20")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "label",
+      { staticClass: "custom-control-label", attrs: { for: "dynamic" } },
+      [
+        _vm._v("Make Dynamic  "),
+        _c("span", { staticClass: "text-secondary" }, [
+          _c("em", [_vm._v("(optional)")])
+        ])
+      ]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "my-3" }, [
+      _c("div", { staticClass: "form-check" }, [
+        _c("input", {
+          staticClass: "form-check-input",
+          attrs: {
+            id: "credit",
+            name: "paymentMethod",
+            value: "credit",
+            type: "radio",
+            checked: "",
+            required: ""
+          }
+        }),
+        _vm._v(" "),
+        _c(
+          "label",
+          { staticClass: "form-check-label", attrs: { for: "credit" } },
+          [_vm._v("Credit card")]
+        )
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "form-check" }, [
+        _c("input", {
+          staticClass: "form-check-input",
+          attrs: {
+            id: "debit",
+            name: "paymentMethod",
+            type: "radio",
+            value: "debit",
+            required: ""
+          }
+        }),
+        _vm._v(" "),
+        _c(
+          "label",
+          { staticClass: "form-check-label", attrs: { for: "debit" } },
+          [_vm._v("Debit card")]
+        )
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "row gy-3" }, [
+      _c("div", { staticClass: "col-md-6" }, [
+        _c("label", { staticClass: "form-label", attrs: { for: "cc-name" } }, [
+          _vm._v("Name on card")
+        ]),
+        _vm._v(" "),
+        _c("input", {
+          staticClass: "form-control",
+          attrs: { type: "text", id: "cc-name", placeholder: "", required: "" }
+        }),
+        _vm._v(" "),
+        _c("div", { staticClass: "invalid-feedback" }, [
+          _vm._v(
+            "\n                                                Name on card is required\n                                            "
+          )
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-md-6" }, [
+        _c(
+          "label",
+          { staticClass: "form-label", attrs: { for: "cc-number" } },
+          [_vm._v("Credit card number")]
+        ),
+        _vm._v(" "),
+        _c("input", {
+          staticClass: "form-control",
+          attrs: {
+            type: "text",
+            id: "cc-number",
+            placeholder: "",
+            required: ""
+          }
+        }),
+        _vm._v(" "),
+        _c("div", { staticClass: "invalid-feedback" }, [
+          _vm._v(
+            "\n                                                Credit card number is required\n                                            "
+          )
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-md-3" }, [
+        _c(
+          "label",
+          { staticClass: "form-label", attrs: { for: "cc-expiration" } },
+          [_vm._v("Expiration")]
+        ),
+        _vm._v(" "),
+        _c("input", {
+          staticClass: "form-control",
+          attrs: {
+            type: "text",
+            id: "cc-expiration",
+            placeholder: "",
+            required: ""
+          }
+        }),
+        _vm._v(" "),
+        _c("div", { staticClass: "invalid-feedback" }, [
+          _vm._v(
+            "\n                                                Expiration date required\n                                            "
+          )
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-md-3" }, [
+        _c("label", { staticClass: "form-label", attrs: { for: "cc-cvv" } }, [
+          _vm._v("CVV")
+        ]),
+        _vm._v(" "),
+        _c("input", {
+          staticClass: "form-control",
+          attrs: { type: "text", id: "cc-cvv", placeholder: "", required: "" }
+        }),
+        _vm._v(" "),
+        _c("div", { staticClass: "invalid-feedback" }, [
+          _vm._v(
+            "\n                                                Security code required\n                                            "
+          )
+        ])
+      ])
     ])
   },
   function() {
@@ -73104,6 +74616,55 @@ var staticRenderFns = [
           attrs: { type: "text", id: "zip" }
         })
       ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "button",
+      {
+        staticClass: "btn btn-danger btns__icon",
+        attrs: { type: "button", "data-dismiss": "modal" }
+      },
+      [_c("span", { attrs: { "data-feather": "x-circle" } }), _vm._v(" Cancel")]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", [
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-danger btns__icon",
+          attrs: { type: "button", "data-dismiss": "modal" }
+        },
+        [
+          _c("span", { attrs: { "data-feather": "x-circle" } }),
+          _vm._v(" Cancel")
+        ]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", [
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-danger btns__icon",
+          attrs: { type: "button", "data-dismiss": "modal" }
+        },
+        [
+          _c("span", { attrs: { "data-feather": "x-circle" } }),
+          _vm._v(" Cancel")
+        ]
+      )
     ])
   }
 ]

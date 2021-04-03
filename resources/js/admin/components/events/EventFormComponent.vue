@@ -127,11 +127,9 @@
 
 
                 <div class="form-group">
-                    <!-- <h5>Would You Like To Create A Sign Up Form Event?</h5>
-                    <button>Create Form</button> -->
-                    <form-create-component></form-create-component>
+                    <form-create-component @eventFormJson="storeEventFormJson"></form-create-component>
+                    <textarea v-model="eventFormJson" aria-hidden="true" name="eventFormJson" hidden></textarea>
                 </div>
-
 
 
             </div>
@@ -222,6 +220,7 @@ export default {
             email: "",
             errors: "",
             event: "",
+            eventFormJson: {},
             image: '',
             modifiedDate: "",
             name: "",
@@ -245,6 +244,7 @@ export default {
 
 
     methods: {
+
 
 
         // Events ===============
@@ -360,6 +360,10 @@ export default {
             this.zip = this.event.zip;
 
 
+        },
+
+        storeEventFormJson(formJson) {
+            this.eventFormJson = formJson;
         },
 
          todaysDate() {
